@@ -62,8 +62,8 @@ module Puppet::Util::RegistryBase
     [hkey, subkey]
   end
 
-  def value_split(path, default = nil)
-    if default == :true
+  def value_split(path, isdefault = nil)
+    if isdefault == :true
       hkey, subkey = key_split(path)
       value = ''
     else

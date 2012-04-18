@@ -19,7 +19,7 @@ Puppet::Type.newtype(:registry_value) do
     defaultto :false
   end
 
-  newparam(:default) do
+  newparam(:isdefault) do
     newvalues(:true, :false)
     defaultto :false
   end
@@ -50,7 +50,7 @@ Puppet::Type.newtype(:registry_value) do
   end
 
   validate do
-    @hkey, @subkey, @valuename = value_split(self[:path], self[:default])
+    @hkey, @subkey, @valuename = value_split(self[:path], self[:isdefault])
   end
 
   autorequire(:registry_key) do

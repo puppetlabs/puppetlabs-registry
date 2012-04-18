@@ -58,14 +58,14 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
-  describe "default parameter" do
+  describe "isdefault parameter" do
     it 'should not refer to the "default" value by default' do
-      value[:default].should == :false
+      value[:isdefault].should == :false
     end
 
     it 'should allow default' do
-      value[:default] = true
-      value[:default].should be_true
+      value[:isdefault] = true
+      value[:isdefault].should be_true
     end
   end
 
