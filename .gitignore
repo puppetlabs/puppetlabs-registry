@@ -1,0 +1,9 @@
+.rspec
+results
+.*.sw[op]
+*~
+\.\#*
+\#*\#
+*elc
+auto-save-list
+
