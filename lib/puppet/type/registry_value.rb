@@ -97,15 +97,13 @@ Puppet::Type.newtype(:registry_value) do
   end
 
   validate do
-    return true if self[:ensure] == :absent
-
     @hkey, @subkey, @valuename = value_split(self[:path], self[:default])
   end
 
   autorequire(:registry_key) do
     parents = []
     ascend(hkey, subkey) do |h, s|
-      parents << "#{h.keyname}\\#{s}"
+      parents << "#{h}\\#{s}"
     end
     parents
   end
