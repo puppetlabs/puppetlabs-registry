@@ -31,6 +31,21 @@ Puppet::Type.newtype(:registry_value) do
 
   newproperty(:data) do
     desc "The data of the registry value."
+
+    munge do |value|
+      case resource[:type]
+      when :dword, :qword
+        Integer(value)
+      when :array
+        # REMIND: this is not supported yet
+        value
+      when :binary
+        value
+      else #:string, :expand
+        value
+      end
+    end
+
     defaultto ''
   end
 
