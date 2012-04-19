@@ -62,12 +62,19 @@ module Puppet::Util::RegistryBase
           raise ArgumentError, "Unsupported prefined key: #{path}"
         end
 
+    # leading backslash is not part of the subkey name
+    subkey = subkey[1..-1] unless subkey.empty?
+
     [hkey, subkey]
   end
 
-  def value_split(path, isdefault = nil)
-    if isdefault == :true
-      hkey, subkey = key_split(path)
+  def value_split(path)
+    unless path
+      raise ArgumentError, "Invalid registry value"
+    end
+
+    if path[-1, 1] == '\\' # trailing backslash implies default value
+      hkey, subkey = key_split(path.gsub(/\\*$/, ''))
       value = ''
     else
       idx = path.rindex('\\')
