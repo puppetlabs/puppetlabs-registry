@@ -3,8 +3,7 @@ require 'spec_helper'
 require 'puppet/util/registry_base'
 
 describe Puppet::Type.type(:registry_key) do
-  let (:path) { 'HKLM\Software\PuppetSpecTest' }
-  let (:key) { Puppet::Type.type(:registry_key).new(:path => path) }
+  let (:key) { Puppet::Type.type(:registry_key).new(:path => 'HKLM\Software') }
 
   [:ensure].each do |property|
     it "should have a #{property} property" do
@@ -21,26 +20,23 @@ describe Puppet::Type.type(:registry_key) do
       Puppet::Type.type(:registry_key).attrtype(:path).should == :param
     end
 
-    it 'should accept a fully qualified path' do
-      key[:path].should == path
-    end
-
-    Puppet::Util::RegistryBase::HKEYS.each do |hkey|
-      it "should accept #{hkey}\\Subkey" do
-        described_class.new(:path => "#{hkey}\\Subkey")
+    %w[hklm hklm\software hklm\software\vendor].each do |path|
+      it "should accept #{path}" do
+        key[:path] = path
       end
     end
 
-    it 'should reject unknown keys' do
-      expect { key[:path] = 'UNKNOWN\Subkey' }.should raise_error(Puppet::Error)
+    %w[unknown unknown\subkey HKEY_PERFORMANCE_DATA].each do |path|
+      it "should reject #{path} as unsupported" do
+        expect { key[:path] = path }.should raise_error(Puppet::Error, /Unsupported/)
+      end
     end
 
-    it 'should accept a valid root key' do
-      key[:path] = 'HKLM'
-    end
-
-    it 'should reject an unknown root key' do
-      expect { key[:path] = 'UNKNOWN' }.should raise_error(Puppet::Error)
+    %[hklm\\ hklm\foo\\].each do |path|
+      it "should reject #{path} as invalid" do
+        path = "hklm\\" + 'a' * 256
+        expect { key[:path] = path }.should raise_error(Puppet::Error, /Invalid registry key/)
+      end
     end
 
     %w[HKLM HKEY_LOCAL_MACHINE hklm].each do |root|

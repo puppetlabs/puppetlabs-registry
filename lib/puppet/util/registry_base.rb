@@ -47,8 +47,11 @@ module Puppet::Util::RegistryBase
   end
 
   def key_split(path)
-    rootkey, subkey = path.split('\\', 2)
+    unless match = /^([^\\]*)((?:\\[^\\]{1,255})*)$/.match(path)
+      raise ArgumentError, "Invalid registry key: #{path}"
+    end
 
+    rootkey, subkey = match.captures
     hkey =
         case rootkey.downcase
         when /hkey_local_machine/, /hklm/
