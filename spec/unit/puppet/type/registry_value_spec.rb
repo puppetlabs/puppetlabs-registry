@@ -34,18 +34,26 @@ describe Puppet::Type.type(:registry_value) do
       described_class.new(:path => 'hklm\\software\\\\')
     end
 
-    %w[unknown\name unknown\subkey\name HKEY_PERFORMANCE_DATA\name].each do |path|
+    %w[HKEY_DYN_DATA\\ HKEY_PERFORMANCE_DATA\name].each do |path|
       it "should reject #{path} as unsupported" do
         expect { described_class.new(:path => path) }.to raise_error(Puppet::Error, /Unsupported/)
       end
     end
 
-    %[hklm hkcr].each do |path|
+    %[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
       it "should reject #{path} as invalid" do
         pending 'wrong message'
         expect { described_class.new(:path => path) }.should raise_error(Puppet::Error, /Invalid registry key/)
       end
     end
+
+    %w[HKLM\\name HKEY_LOCAL_MACHINE\\name hklm\\name].each do |root|
+      it "should canonicalize root key #{root}" do
+        value = described_class.new(:path => root)
+        value[:path].should == 'hklm\name'
+      end
+    end
+
 
     it 'should validate the length of the value name'
     it 'should validate the length of the value data'
@@ -91,9 +99,14 @@ describe Puppet::Type.type(:registry_value) do
       value[:data] = 'foobar'
     end
 
-    it "should support integer data" do
+    it "should support dword data" do
       value[:type] = :dword
       value[:data] = 0
+    end
+
+    it "should support qword data" do
+      value[:type] = :qword
+      value[:data] = 0xFFFF
     end
 
     it "should support binary data" do
