@@ -37,45 +37,6 @@ module Puppet::Util::RegistryBase
     HKEYS
   end
 
-  def ascend(hkey, subkey, &block)
-    yield hkey, subkey
-
-    while idx = subkey.rindex('\\')
-      subkey = subkey[0, idx]
-      yield hkey, subkey
-    end
-  end
-
-  def key_split(path)
-    rootkey, subkey = path.split('\\', 2)
-
-    hkey =
-        case rootkey.downcase
-        when /hkey_local_machine/, /hklm/
-          HKEYS[:hklm]
-        when /hkey_classes_root/, /hkcr/
-          HKEYS[:hkcr]
-        else
-          raise ArgumentError, "Unsupported prefined key: #{path}"
-        end
-
-    [hkey, subkey]
-  end
-
-  def value_split(path, isdefault = nil)
-    if isdefault == :true
-      hkey, subkey = key_split(path)
-      value = ''
-    else
-      idx = path.rindex('\\')
-      raise ArgumentError, "Registry value path must contain at least one backslash." unless idx
-
-      hkey, subkey = key_split(path[0, idx])
-      value = path[idx+1..-1] if idx > 0
-    end
-    [hkey, subkey, value]
-  end
-
   def access(mask = 0)
     # REMIND: skip this if 32-bit OS?
     #:redirect) == :true ? 0x200 : 0x100)

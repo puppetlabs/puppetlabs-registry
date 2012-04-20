@@ -1,4 +1,5 @@
 require 'puppet/util/registry_base'
+require 'puppet/util/key_path'
 
 Puppet::Type.newtype(:registry_key) do
   include Puppet::Util::RegistryBase
@@ -9,10 +10,7 @@ Puppet::Type.newtype(:registry_key) do
 
   ensurable
 
-  newparam(:path, :namevar => true) do
-    validate do |value|
-      resource.key_split(value.to_s)
-    end
+  newparam(:path, :parent => Puppet::Util::KeyPath, :namevar => true) do
   end
 
   newparam(:redirect) do
@@ -21,14 +19,11 @@ Puppet::Type.newtype(:registry_key) do
   end
 
   autorequire(:registry_key) do
-    hkey, subkey = key_split(self[:path])
-
     parents = []
-    ascend(hkey, subkey) do |h, s|
-      # skip ourselves
-      parents << "#{h.keyname}\\#{s}" unless s == subkey
+    path = parameter(:path)
+    path.ascend do |hkey, subkey|
+      parents << "#{hkey.keyname}\\#{subkey}" unless subkey == path.subkey # skip ourselves
     end
-
     parents
   end
 end
