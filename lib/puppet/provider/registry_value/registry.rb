@@ -14,8 +14,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   def create
     Puppet.info("creating: #{self}")
 
-    resource.hkey.open(resource.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
-      reg.write(resource.valuename, name2type(resource[:type]), resource[:data])
+    valuepath.hkey.open(valuepath.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
+      reg.write(valuepath.valuename, name2type(resource[:type]), resource[:data])
     end
   end
 
@@ -23,29 +23,29 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     Puppet.info("exists: #{self}")
 
     found = false
-    resource.hkey.open(resource.subkey, access(Win32::Registry::KEY_READ)) do |reg|
+    valuepath.hkey.open(valuepath.subkey, access(Win32::Registry::KEY_READ)) do |reg|
       type = [0].pack('L')
       size = [0].pack('L')
-      found = RegQueryValueExA.call(reg.hkey, resource.valuename, 0, type, 0, size) == 0
+      found = RegQueryValueExA.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
     end
     found
   end
 
   def flush
+    return if resource[:ensure] == :absent
+
     Puppet.info("flushing: #{self}")
 
-    # REMIND: not during destroy
-
-    resource.hkey.open(resource.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
-      reg.write(resource.valuename, name2type(regvalue[:type]), regvalue[:data])
+    valuepath.hkey.open(valuepath.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
+      reg.write(valuepath.valuename, name2type(regvalue[:type]), regvalue[:data])
     end
   end
 
   def destroy
     Puppet.info("destroying: #{self}")
 
-    resource.hkey.open(resource.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
-      reg.delete_value(resource.valuename)
+    valuepath.hkey.open(valuepath.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
+      reg.delete_value(valuepath.valuename)
     end
   end
 
@@ -68,12 +68,12 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   def regvalue
     unless @regvalue
       @regvalue = {}
-      resource.hkey.open(resource.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
+      valuepath.hkey.open(valuepath.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) do |reg|
         type = [0].pack('L')
         size = [0].pack('L')
 
-        if RegQueryValueExA.call(reg.hkey, resource.valuename, 0, type, 0, size) == 0
-          is_type, is_data = reg.read(resource.valuename)
+        if RegQueryValueExA.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
+          is_type, is_data = reg.read(valuepath.valuename)
           @regvalue[:type], @regvalue[:data] = type2name(is_type), is_data
         end
       end
@@ -81,7 +81,11 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     @regvalue
   end
 
+  def valuepath
+    @valuepath ||= resource.parameter(:path)
+  end
+
   def to_s
-    "#{resource.hkey.keyname}\\#{resource.subkey}\\#{resource.valuename}"
+    "#{valuepath.hkey.keyname}\\#{valuepath.subkey}\\#{valuepath.valuename}"
   end
 end

@@ -3,9 +3,6 @@ require 'spec_helper'
 require 'puppet/util/registry_base'
 
 describe Puppet::Type.type(:registry_value) do
-  let (:path) { 'HKLM\Software\PuppetSpecTest\ValueName' }
-  let (:value) { Puppet::Type.type(:registry_value).new(:path => path) }
-
   [:ensure, :type, :data].each do |property|
     it "should have a #{property} property" do
       described_class.attrclass(property).ancestors.should be_include(Puppet::Property)
@@ -21,26 +18,37 @@ describe Puppet::Type.type(:registry_value) do
       Puppet::Type.type(:registry_key).attrtype(:path).should == :param
     end
 
-    it 'should accept a fully qualified path' do
-      value[:path].should == path
-    end
-
-    Puppet::Util::RegistryBase::HKEYS.each do |hkey|
-      it "should accept #{hkey}\Subkey\value" do
-        Puppet::Type.type(:registry_key).new(:path => "#{hkey}\\Subkey\\value")
+    %w[hklm\propname hklm\software\propname].each do |path|
+      it "should accept #{path}" do
+        described_class.new(:path => path)
       end
     end
 
-    it 'should reject a root key' do
-      pending("Should it allow default value of root key")
-      expect { value[:path] = 'HKLM' }.should raise_error(Puppet::Error)
+    %w[hklm\\ hklm\software\\ hklm\software\vendor\\].each do |path|
+      it "should accept the unnamed (default) value: #{path}" do
+        described_class.new(:path => path)
+      end
     end
 
-    it 'should reject unknown root keys' do
-      pending("This is not working")
-      expect { value[:path] = 'UNKNOWN\Bar\Baz' }.should raise_error(Puppet::Error)
+    it "should strip trailling slashes from unnamed values" do
+      described_class.new(:path => 'hklm\\software\\\\')
     end
 
+    %w[unknown\name unknown\subkey\name HKEY_PERFORMANCE_DATA\name].each do |path|
+      it "should reject #{path} as unsupported" do
+        expect { described_class.new(:path => path) }.to raise_error(Puppet::Error, /Unsupported/)
+      end
+    end
+
+    %[hklm hkcr].each do |path|
+      it "should reject #{path} as invalid" do
+        pending 'wrong message'
+        expect { described_class.new(:path => path) }.should raise_error(Puppet::Error, /Invalid registry key/)
+      end
+    end
+
+    it 'should validate the length of the value name'
+    it 'should validate the length of the value data'
     it 'should canonicalize the root key'
     it 'should be case-preserving'
     it 'should be case-insensitive'
@@ -48,6 +56,8 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe "redirect parameter" do
+    let (:value) { described_class.new(:path => 'hklm\software\foo') }
+
     it 'should not redirect by default' do
       value[:redirect].should == :false
     end
@@ -58,18 +68,9 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
-  describe "isdefault parameter" do
-    it 'should not refer to the "default" value by default' do
-      value[:isdefault].should == :false
-    end
-
-    it 'should allow default' do
-      value[:isdefault] = true
-      value[:isdefault].should be_true
-    end
-  end
-
   describe "type property" do
+    let (:value) { described_class.new(:path => 'hklm\software\foo') }
+
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
       it "should support a #{type.to_s} type" do
         value[:type] = type
@@ -83,6 +84,8 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe "data property" do
+    let (:value) { described_class.new(:path => 'hklm\software\foo') }
+
     it "should support string data" do
       value[:type] = :string
       value[:data] = 'foobar'

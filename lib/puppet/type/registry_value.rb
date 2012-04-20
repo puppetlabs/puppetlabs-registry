@@ -1,4 +1,5 @@
 require 'puppet/util/registry_base'
+require 'puppet/util/value_path'
 
 Puppet::Type.newtype(:registry_value) do
   include Puppet::Util::RegistryBase
@@ -7,19 +8,12 @@ Puppet::Type.newtype(:registry_value) do
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
   end
 
-  attr_reader :hkey, :subkey, :valuename
-
   ensurable
 
-  newparam(:path, :namevar => true) do
+  newparam(:path, :parent => Puppet::Util::ValuePath, :namevar => true) do
   end
 
   newparam(:redirect) do
-    newvalues(:true, :false)
-    defaultto :false
-  end
-
-  newparam(:isdefault) do
     newvalues(:true, :false)
     defaultto :false
   end
@@ -49,14 +43,10 @@ Puppet::Type.newtype(:registry_value) do
     defaultto ''
   end
 
-  validate do
-    @hkey, @subkey, @valuename = value_split(self[:path], self[:isdefault])
-  end
-
   autorequire(:registry_key) do
     parents = []
-    ascend(hkey, subkey) do |h, s|
-      parents << "#{h}\\#{s}"
+    parameter(:path).ascend do |hkey, subkey|
+      parents << "#{hkey.keyname}\\#{subkey}"
     end
     parents
   end
