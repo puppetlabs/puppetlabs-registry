@@ -1,13 +1,11 @@
 require 'puppet/parameter'
-require 'puppet/util/registry_base'
+require 'puppet/util/key_path'
 
 class Puppet::Util::ValuePath < Puppet::Parameter::KeyPath
   attr_reader :valuename
 
-  def split(path)
-    unless path
-      raise ArgumentError, "Invalid registry value"
-    end
+  def munge(path)
+    raise ArgumentError, "Invalid registry value" unless path
 
     if path[-1, 1] == '\\' # trailing backslash implies default value
       super(path.gsub(/\\*$/, ''))
@@ -19,5 +17,8 @@ class Puppet::Util::ValuePath < Puppet::Parameter::KeyPath
       super(path[0, idx])
       @valuename = path[idx+1..-1] if idx > 0
     end
+
+    canonical = subkey.empty? ?  "#{root}\\#{valuename}" : "#{root}\\#{subkey}\\#{valuename}"
+    canonical.downcase
   end
 end

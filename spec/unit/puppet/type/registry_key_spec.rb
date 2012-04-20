@@ -26,13 +26,13 @@ describe Puppet::Type.type(:registry_key) do
       end
     end
 
-    %w[unknown unknown\subkey HKEY_PERFORMANCE_DATA].each do |path|
-      it "should reject #{path} as unsupported" do
+    %w[HKEY_DYN_DATA HKEY_PERFORMANCE_DATA].each do |path|
+      it "should reject #{path} as unsupported case insensitively" do
         expect { key[:path] = path }.should raise_error(Puppet::Error, /Unsupported/)
       end
     end
 
-    %[hklm\\ hklm\foo\\].each do |path|
+    %[hklm\\ hklm\foo\\ unknown unknown\subkey].each do |path|
       it "should reject #{path} as invalid" do
         path = "hklm\\" + 'a' * 256
         expect { key[:path] = path }.should raise_error(Puppet::Error, /Invalid registry key/)
@@ -41,7 +41,6 @@ describe Puppet::Type.type(:registry_key) do
 
     %w[HKLM HKEY_LOCAL_MACHINE hklm].each do |root|
       it "should canonicalize the root key #{root}" do
-        pending("Not implemented")
         key[:path] = root
         key[:path].should == 'hklm'
       end

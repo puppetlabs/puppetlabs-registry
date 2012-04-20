@@ -19,11 +19,6 @@ Puppet::Type.newtype(:registry_key) do
   end
 
   autorequire(:registry_key) do
-    parents = []
-    path = parameter(:path)
-    path.ascend do |hkey, subkey|
-      parents << "#{hkey.keyname}\\#{subkey}" unless subkey == path.subkey # skip ourselves
-    end
-    parents
+    parameter(:path).enum_for(:ascend).select { |p| self[:path] != p }
   end
 end
