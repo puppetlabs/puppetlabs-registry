@@ -44,11 +44,7 @@ Puppet::Type.newtype(:registry_value) do
   end
 
   autorequire(:registry_key) do
-    parents = []
-    parameter(:path).ascend do |hkey, subkey|
-      parents << "#{hkey.keyname}\\#{subkey}"
-    end
-    parents
+    parameter(:path).enum_for(:ascend)
   end
 end
 
