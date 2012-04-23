@@ -1,8 +1,8 @@
-require 'puppet/util/registry_base'
-require 'puppet/util/key_path'
+require 'puppet/modules/registry/registry_base'
+require 'puppet/modules/registry/key_path'
 
 Puppet::Type.newtype(:registry_key) do
-  include Puppet::Util::RegistryBase
+  include Puppet::Modules::Registry::RegistryBase
 
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
@@ -10,7 +10,7 @@ Puppet::Type.newtype(:registry_key) do
 
   ensurable
 
-  newparam(:path, :parent => Puppet::Util::KeyPath, :namevar => true) do
+  newparam(:path, :parent => Puppet::Modules::Registry::KeyPath, :namevar => true) do
   end
 
   newparam(:redirect) do
