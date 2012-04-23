@@ -24,6 +24,11 @@ module Puppet::Modules::Registry::RegistryBase
   # REG_RESOURCE_LIST REG_FULL_RESOURCE_DESCRIPTOR
   # REG_RESOURCE_REQUIREMENTS_LIST
 
+  # For 64-bit OS, use 64-bit view. Ignored on 32-bit OS
+  KEY_WOW64_64KEY = 0x100
+  # For 64-bit OS, use 32-bit view. Ignored on 32-bit OS
+  KEY_WOW64_32KEY = 0x200
+
   NAME2TYPE = {}
   TYPE2NAME.each_pair {|k,v| NAME2TYPE[v] = k}
 
@@ -37,11 +42,5 @@ module Puppet::Modules::Registry::RegistryBase
 
   def hkeys
     HKEYS
-  end
-
-  def access(mask = 0)
-    # REMIND: skip this if 32-bit OS?
-    #:redirect) == :true ? 0x200 : 0x100)
-    mask | (resource[:redirect] == 'true' ? 0x200 : 0x100)
   end
 end

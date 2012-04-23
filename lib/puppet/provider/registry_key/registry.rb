@@ -18,12 +18,12 @@ Puppet::Type.type(:registry_key).provide(:registry) do
 
   def create
     Puppet.debug("create key #{resource[:path]}")
-    keypath.hkey.create(keypath.subkey, access(Win32::Registry::KEY_ALL_ACCESS)) {|reg| true }
+    keypath.hkey.create(keypath.subkey, Win32::Registry::KEY_ALL_ACCESS | keypath.access) {|reg| true }
   end
 
   def exists?
     Puppet.debug("exists? key #{resource[:path]}")
-    !!keypath.hkey.open(keypath.subkey, access(Win32::Registry::KEY_READ)) {|reg| true } rescue false
+    !!keypath.hkey.open(keypath.subkey, Win32::Registry::KEY_READ | keypath.access) {|reg| true } rescue false
   end
 
   def destroy
@@ -31,7 +31,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
 
     raise "Cannot delete root key: #{resource[:path]}" unless keypath.subkey
 
-    if RegDeleteKeyEx.call(keypath.hkey.hkey, keypath.subkey, access, 0) != 0
+    if RegDeleteKeyEx.call(keypath.hkey.hkey, keypath.subkey, keypath.access, 0) != 0
       raise "Failed to delete registry key: #{resource[:path]}"
     end
   end
