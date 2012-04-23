@@ -49,8 +49,6 @@ class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
   def ascend(&block)
     p = self.value
 
-    yield p
-
     while idx = p.rindex('\\')
       p = p[0, idx]
       yield p

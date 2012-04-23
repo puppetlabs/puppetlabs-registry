@@ -38,8 +38,13 @@ Puppet::Type.newtype(:registry_value) do
     defaultto ''
   end
 
+  # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
-    parameter(:path).enum_for(:ascend)
+    req = []
+    if found = parameter(:path).enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
+      req << found.to_s
+    end
+    req
   end
 end
 

@@ -19,6 +19,6 @@ class Puppet::Modules::Registry::ValuePath < Puppet::Modules::Registry::KeyPath
     end
 
     canonical = subkey.empty? ?  "#{root}\\#{valuename}" : "#{root}\\#{subkey}\\#{valuename}"
-    canonical.downcase
+    canonical
   end
 end
