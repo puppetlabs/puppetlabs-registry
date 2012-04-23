@@ -1,0 +1,2 @@
+module Puppet::Modules
+end
