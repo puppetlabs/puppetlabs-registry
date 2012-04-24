@@ -10,7 +10,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
   RegDeleteKeyEx = Win32API.new('advapi32', 'RegDeleteKeyEx', 'LPLL', 'L')
 
   def self.instances
-    self::HKEYS.collect do |hkey|
+    self::HKEYS.keys.collect do |hkey|
       new(:provider => :registry,
           :name => "#{hkey.to_s}")
     end
