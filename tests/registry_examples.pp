@@ -27,10 +27,40 @@ class registry_example {
     ensure => present,
   }
 
-  registry_value { 'HKLM\Software\Vendor\Bar\valuename1':
+  registry_value { 'HKLM\Software\Vendor\Bar\valuedword2':
+    ensure => present,
+    type   => dword,
+    data   => 0xFFFFFFFF,
+  }
+
+  registry_value { 'HKLM\Software\Vendor\Bar\valueqword1':
     ensure => present,
     type   => qword,
     data   => 100,
+  }
+
+  registry_value { 'HKLM\Software\Vendor\Bar\valuedstring1':
+    ensure => present,
+    type   => string,
+    data   => 'this is a string',
+  }
+
+  registry_value { 'HKLM\Software\Vendor\Bar\valuedexpand1':
+    ensure => present,
+    type   => expand,
+    data   => '%windir%\system32',
+  }
+
+  registry_value { 'HKLM\Software\Vendor\Bar\valuedbinary1':
+    ensure => present,
+    type   => binary,
+    data   => 'DE AD BE EF',
+  }
+
+  registry_value { 'HKLM\Software\Vendor\Bar\valuedbinary2':
+    ensure => present,
+    type   => binary,
+    data   => 'CAFEBEEF',
   }
 
   # # REVISIT We need to make this work
