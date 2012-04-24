@@ -23,15 +23,34 @@ Puppet::Type.newtype(:registry_value) do
 
     munge do |value|
       case resource[:type]
-      when :dword, :qword
-        Integer(value)
+      when :dword
+        val = Integer(value) rescue nil
+        fail("The data must be a valid DWORD: #{value}") unless val and (val.abs >> 32) <= 0
+        val
+      when :qword
+        val = Integer(value) rescue nil
+        fail("The data must be a valid QWORD: #{value}") unless val and (val.abs >> 64) <= 0
+        val
       when :array
         # REMIND: this is not supported yet
         value
       when :binary
+        unless value.match(/^([a-f\d]{2} ?)*$/i)
+          fail("The data must be a hex encoded string of the form: '00 01 02 ...'")
+        end
         value
       else #:string, :expand
         value
+      end
+    end
+
+    def property_matches?(current, desired)
+      case resource[:type]
+      when :binary
+        return false unless current
+        current.casecmp(desired) == 0
+      else
+        super(current, desired)
       end
     end
 
