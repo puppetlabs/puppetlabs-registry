@@ -32,7 +32,7 @@ describe Puppet::Type.type(:registry_key) do
       end
     end
 
-    %[hklm\\ hklm\foo\\ unknown unknown\subkey].each do |path|
+    %[hklm\\ hklm\foo\\ unknown unknown\subkey \:hkey].each do |path|
       it "should reject #{path} as invalid" do
         path = "hklm\\" + 'a' * 256
         expect { key[:path] = path }.should raise_error(Puppet::Error, /Invalid registry key/)
@@ -49,16 +49,10 @@ describe Puppet::Type.type(:registry_key) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'should autorequire ancestor keys'
-  end
 
-  describe "redirect parameter" do
-    it 'should not redirect by default' do
-      key[:redirect].should == :false
-    end
-
-    it 'should allow redirection' do
-      key[:redirect] = true
-      key[:redirect].should be_true
+    it 'should support 32-bit keys' do
+      key[:path] = '32:hklm\software'
+      key.parameter(:path).access.should == 0x200
     end
   end
 end

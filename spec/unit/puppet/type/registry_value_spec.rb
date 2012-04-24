@@ -54,25 +54,15 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-
     it 'should validate the length of the value name'
     it 'should validate the length of the value data'
-    it 'should canonicalize the root key'
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'should autorequire ancestor keys'
-  end
 
-  describe "redirect parameter" do
-    let (:value) { described_class.new(:path => 'hklm\software\foo') }
-
-    it 'should not redirect by default' do
-      value[:redirect].should == :false
-    end
-
-    it 'should allow redirection' do
-      value[:redirect] = true
-      value[:redirect].should be_true
+    it 'should support 32-bit values' do
+      value = described_class.new(:path => '32:hklm\software\foo')
+      value.parameter(:path).access.should == 0x200
     end
   end
 

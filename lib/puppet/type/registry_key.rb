@@ -13,11 +13,6 @@ Puppet::Type.newtype(:registry_key) do
   newparam(:path, :parent => Puppet::Modules::Registry::KeyPath, :namevar => true) do
   end
 
-  newparam(:redirect) do
-    newvalues(:true, :false)
-    defaultto :false
-  end
-
   autorequire(:registry_key) do
     parameter(:path).enum_for(:ascend).select { |p| self[:path] != p }
   end
