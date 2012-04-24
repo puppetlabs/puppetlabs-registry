@@ -15,7 +15,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     Puppet.info("creating: #{self}")
 
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
-      reg.write(valuepath.valuename, name2type(resource[:type]), resource[:data])
+      ary = to_native(resource[:type], resource[:data])
+      reg.write(valuepath.valuename, ary[0], ary[1])
     end
   end
 
@@ -37,7 +38,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     Puppet.info("flushing: #{self}")
 
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
-      reg.write(valuepath.valuename, name2type(regvalue[:type]), regvalue[:data])
+      ary = to_native(regvalue[:type], regvalue[:data])
+      reg.write(valuepath.valuename, ary[0], ary[1])
     end
   end
 
@@ -73,8 +75,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
         size = [0].pack('L')
 
         if RegQueryValueExA.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
-          is_type, is_data = reg.read(valuepath.valuename)
-          @regvalue[:type], @regvalue[:data] = type2name(is_type), is_data
+          @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuepath.valuename))
         end
       end
     end
@@ -85,7 +86,35 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     @valuepath ||= resource.parameter(:path)
   end
 
-  def to_s
-    "#{valuepath.hkey.keyname}\\#{valuepath.subkey}\\#{valuepath.valuename}"
+  # convert puppet type and data to native
+  def to_native(ptype, pdata)
+    ndata =
+      case ptype
+      when :binary
+        pdata.scan(/[a-f\d]{2}/i).map{ |byte| [byte].pack('H2') }.join('')
+      else
+        pdata
+      end
+
+    return [name2type(ptype), ndata]
   end
+
+  # convert from native type and data to puppet
+  def from_native(ary)
+    ntype, ndata = ary
+
+    pdata =
+      case type2name(ntype)
+      when :binary
+        ndata.scan(/./).map{ |byte| byte.unpack('H2')[0]}.join(' ')
+      else
+        ndata
+      end
+
+    return [type2name(ntype), pdata]
+  end
+
+  # def to_s
+  #   "#{valuepath.hkey.keyname}\\#{valuepath.subkey}\\#{valuepath.valuename}"
+  # end
 end

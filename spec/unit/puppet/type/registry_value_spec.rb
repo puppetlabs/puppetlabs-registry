@@ -84,29 +84,74 @@ describe Puppet::Type.type(:registry_value) do
   describe "data property" do
     let (:value) { described_class.new(:path => 'hklm\software\foo') }
 
-    it "should support string data" do
-      value[:type] = :string
-      value[:data] = 'foobar'
+    context "string data" do
+      ['', 'foobar'].each do |data|
+        it "should accept '#{data}'" do
+          value[:type] = :string
+          value[:data] = data
+        end
+      end
+
+      pending "it should accept nil"
     end
 
-    it "should support dword data" do
-      value[:type] = :dword
-      value[:data] = 0
+    context "integer data" do
+      [:dword, :qword].each do |type|
+        context "for #{type}" do
+          [0, 0xFFFFFFFF, -1, 42].each do |data|
+            it "should accept #{data}" do
+              value[:type] = type
+              value[:data] = data
+            end
+          end
+
+          %w['foobar' :true].each do |data|
+            it "should reject #{data}" do
+              value[:type] = type
+              expect { value[:data] = data }.to raise_error(Puppet::Error)
+            end
+          end
+        end
+      end
+
+      context "for 64-bit integers" do
+        let :data do 0xFFFFFFFFFFFFFFFF end
+
+        it "should accept qwords" do
+          value[:type] = :qword
+          value[:data] = data
+        end
+
+        it "should reject dwords" do
+          value[:type] = :dword
+          expect { value[:data] = data }.to raise_error(Puppet::Error)
+        end
+      end
     end
 
-    it "should support qword data" do
-      value[:type] = :qword
-      value[:data] = 0xFFFF
+    context "binary data" do
+      ['', 'CA FE BE EF'].each do |data|
+        it "should accept '#{data}'" do
+          value[:type] = :binary
+          value[:data] = data
+        end
+      end
+
+      ["\040\040", 'foobar', :true].each do |data|
+        it "should reject '#{data}'" do
+          value[:type] = :binary
+          expect { value[:data] = data }.to raise_error(Puppet::Error)
+        end
+      end
     end
 
-    it "should support binary data" do
-      value[:type] = :binary
-      value[:data] = "CA FE BE EF"
-    end
+    context "array data" do
+      pending("array types not implemented")
 
-    it "should support array data" do
-      value[:type] = :array
-      value[:data] = ['foo', 'bar', 'baz']
+      it "should support array data" do
+        value[:type] = :array
+        value[:data] = ['foo', 'bar', 'baz']
+      end
     end
   end
 end
