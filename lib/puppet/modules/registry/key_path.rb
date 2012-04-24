@@ -1,8 +1,8 @@
 require 'puppet/parameter'
-require 'puppet/util/registry_base'
+require 'puppet/modules/registry/registry_base'
 
-class Puppet::Util::KeyPath < Puppet::Parameter
-  include Puppet::Util::RegistryBase
+class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
+  include Puppet::Modules::Registry::RegistryBase
 
   attr_reader :root, :hkey, :subkey
 

@@ -1,8 +1,8 @@
 # REMIND: need to support recursive delete of subkeys & values
 
 Puppet::Type.type(:registry_key).provide(:registry) do
-  require 'puppet/util/registry_base'
-  include Puppet::Util::RegistryBase
+  require 'puppet/modules/registry/registry_base'
+  include Puppet::Modules::Registry::RegistryBase
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows

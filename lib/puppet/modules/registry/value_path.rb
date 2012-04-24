@@ -1,7 +1,7 @@
 require 'puppet/parameter'
-require 'puppet/util/key_path'
+require 'puppet/modules/registry/key_path'
 
-class Puppet::Util::ValuePath < Puppet::Parameter::KeyPath
+class Puppet::Modules::Registry::ValuePath < Puppet::Modules::Registry::KeyPath
   attr_reader :valuename
 
   def munge(path)

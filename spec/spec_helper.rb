@@ -4,9 +4,8 @@ $LOAD_PATH.unshift File.join(dir, 'lib')
 require 'mocha'
 require 'puppet'
 require 'rspec'
-#require 'spec/autorun'
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
     config.mock_with :mocha
 end
 

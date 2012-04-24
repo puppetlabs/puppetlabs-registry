@@ -1,6 +1,6 @@
 #!/usr/bin/env rspec
 require 'spec_helper'
-require 'puppet/util/registry_base'
+require 'puppet/modules/registry/registry_base'
 
 describe Puppet::Type.type(:registry_key) do
   let (:key) { Puppet::Type.type(:registry_key).new(:path => 'HKLM\Software') }

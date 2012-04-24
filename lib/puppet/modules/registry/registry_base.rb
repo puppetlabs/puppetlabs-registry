@@ -1,4 +1,6 @@
-module Puppet::Util::RegistryBase
+require 'puppet/modules/registry'
+
+module Puppet::Modules::Registry::RegistryBase
   require 'win32/registry'
 
   HKEYS = {
