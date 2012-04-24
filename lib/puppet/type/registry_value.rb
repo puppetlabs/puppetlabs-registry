@@ -13,11 +13,6 @@ Puppet::Type.newtype(:registry_value) do
   newparam(:path, :parent => Puppet::Modules::Registry::ValuePath, :namevar => true) do
   end
 
-  newparam(:redirect) do
-    newvalues(:true, :false)
-    defaultto :false
-  end
-
   newproperty(:type) do
     newvalues(:string, :array, :dword, :qword, :binary, :expand)
     defaultto :string

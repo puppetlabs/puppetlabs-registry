@@ -4,15 +4,17 @@ require 'puppet/modules/registry/registry_base'
 class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
   include Puppet::Modules::Registry::RegistryBase
 
-  attr_reader :root, :hkey, :subkey
+  attr_reader :root, :hkey, :subkey, :access
 
   def munge(path)
-    unless captures = /^([^\\]*)((?:\\[^\\]{1,255})*)$/.match(path)
+    unless captures = /^(32:)?([h|H][^\\]*)((?:\\[^\\]{1,255})*)$/.match(path)
       raise ArgumentError, "Invalid registry key: #{path}"
     end
 
+    @access = (captures[1] and captures[1] == '32:') ? KEY_WOW64_32KEY : KEY_WOW64_64KEY
+
     # canonical root key symbol
-    @root = case captures[1].downcase
+    @root = case captures[2].downcase
             when /hkey_local_machine/, /hklm/
               :hklm
             when /hkey_classes_root/, /hkcr/
@@ -32,7 +34,7 @@ class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
     # the hkey object for the root key
     @hkey = HKEYS[root]
 
-    @subkey = captures[2]
+    @subkey = captures[3]
     if @subkey.empty?
       canonical = root.to_s
     else
