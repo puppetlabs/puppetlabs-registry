@@ -19,7 +19,7 @@ Puppet::Type.newtype(:registry_value) do
     defaultto :string
   end
 
-  newproperty(:data) do
+  newproperty(:data, :array_matching => :all) do
     desc "The data of the registry value."
 
     munge do |value|
@@ -32,15 +32,16 @@ Puppet::Type.newtype(:registry_value) do
         val = Integer(value) rescue nil
         fail("The data must be a valid QWORD: #{value}") unless val and (val.abs >> 64) <= 0
         val
-      when :array
-        # REMIND: this is not supported yet
-        value
       when :binary
         unless value.match(/^([a-f\d]{2} ?)*$/i)
           fail("The data must be a hex encoded string of the form: '00 01 02 ...'")
         end
-        value
-      else #:string, :expand
+        # First, strip out all spaces from the string in the manfest.  Next,
+        # put a space after each pair of hex digits.  Strip off the rightmost
+        # space if it's present.  Finally, downcase the whole thing.  The final
+        # result should be: "CaFE BEEF" => "ca fe be ef"
+        value.gsub(/\s+/, '').gsub(/([0-9a-f]{2})/i) { "#{$1} " }.rstrip.downcase
+      else #:string, :expand, :array
         value
       end
     end
@@ -53,6 +54,16 @@ Puppet::Type.newtype(:registry_value) do
       else
         super(current, desired)
       end
+    end
+
+    def change_to_s(currentvalue, newvalue)
+      if currentvalue.respond_to? :join
+        currentvalue = currentvalue.join(",")
+      end
+      if newvalue.respond_to? :join
+        newvalue = newvalue.join(",")
+      end
+      super(currentvalue, newvalue)
     end
 
     defaultto ''
