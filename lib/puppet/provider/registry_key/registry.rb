@@ -1,13 +1,12 @@
 # REMIND: need to support recursive delete of subkeys & values
 
 Puppet::Type.type(:registry_key).provide(:registry) do
-  require 'puppet/modules/registry/registry_base'
+  require 'pathname' # JJM WORK_AROUND #14073
+  require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry/registry_base'
   include Puppet::Modules::Registry::RegistryBase
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
-
-  RegDeleteKeyEx = Win32API.new('advapi32', 'RegDeleteKeyEx', 'LPLL', 'L')
 
   def self.instances
     self::HKEYS.keys.collect do |hkey|
@@ -30,8 +29,9 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     Puppet.debug("destroy key #{resource[:path]}")
 
     raise "Cannot delete root key: #{resource[:path]}" unless keypath.subkey
+    reg_delete_key_ex = Win32API.new('advapi32', 'RegDeleteKeyEx', 'LPLL', 'L')
 
-    if RegDeleteKeyEx.call(keypath.hkey.hkey, keypath.subkey, keypath.access, 0) != 0
+    if reg_delete_key_ex.call(keypath.hkey.hkey, keypath.subkey, keypath.access, 0) != 0
       raise "Failed to delete registry key: #{resource[:path]}"
     end
   end
