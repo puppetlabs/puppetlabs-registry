@@ -1,5 +1,10 @@
 require 'puppet/parameter'
-require 'puppet/modules/registry/registry_base'
+require 'pathname'
+# JJM WORK_AROUND
+# explicitly require files without relying on $LOAD_PATH until #14073 is fixed.
+# https://projects.puppetlabs.com/issues/14073 is fixed.
+require Pathname.new(__FILE__).dirname
+require Pathname.new(__FILE__).dirname + 'registry_base'
 
 class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
   include Puppet::Modules::Registry::RegistryBase
@@ -11,10 +16,14 @@ class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
       raise ArgumentError, "Invalid registry key: #{path}"
     end
 
-    @access = (captures[1] and captures[1] == '32:') ? KEY_WOW64_32KEY : KEY_WOW64_64KEY
+    @access = if captures[1] == '32:'
+                Puppet::Modules::Registry::KEY_WOW64_32KEY
+              else
+                Puppet::Modules::Registry::KEY_WOW64_64KEY
+              end
 
     # canonical root key symbol
-    @root = case captures[2].downcase
+    @root = case captures[2].to_s.downcase
             when /hkey_local_machine/, /hklm/
               :hklm
             when /hkey_classes_root/, /hkcr/
@@ -32,7 +41,7 @@ class Puppet::Modules::Registry::KeyPath < Puppet::Parameter
             end
 
     # the hkey object for the root key
-    @hkey = HKEYS[root]
+    @hkey = hkeys[root]
 
     @subkey = captures[3]
     if @subkey.empty?
