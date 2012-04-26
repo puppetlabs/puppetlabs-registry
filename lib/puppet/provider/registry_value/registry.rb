@@ -1,11 +1,11 @@
+require 'puppet/type'
 Puppet::Type.type(:registry_value).provide(:registry) do
-  require 'puppet/modules/registry/registry_base'
+  require 'pathname' # JJM WORK_AROUND #14073
+  require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry/registry_base'
   include Puppet::Modules::Registry::RegistryBase
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
-
-  RegQueryValueExA = Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
 
   def self.instances
     []
@@ -27,7 +27,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_READ | valuepath.access) do |reg|
       type = [0].pack('L')
       size = [0].pack('L')
-      found = RegQueryValueExA.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
+      found = reg_query_value_ex_a.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
     end
     found
   end
@@ -74,7 +74,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
         type = [0].pack('L')
         size = [0].pack('L')
 
-        if RegQueryValueExA.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
+        if reg_query_value_ex_a.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
           @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuepath.valuename))
         end
       end
@@ -112,6 +112,10 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       end
 
     return [type2name(ntype), pdata]
+  end
+
+  def reg_query_value_ex_a
+    @@reg_query_value_ex_a ||= Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
   end
 
   # def to_s
