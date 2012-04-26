@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec
+#!/usr/bin/env ruby -S rspec
 require 'spec_helper'
 require 'puppet/modules/registry/registry_base'
 
@@ -130,7 +130,7 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     context "binary data" do
-      ['', 'CA FE BE EF'].each do |data|
+      ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
         it "should accept '#{data}'" do
           value[:type] = :binary
           value[:data] = data
@@ -146,8 +146,6 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     context "array data" do
-      pending("array types not implemented")
-
       it "should support array data" do
         value[:type] = :array
         value[:data] = ['foo', 'bar', 'baz']

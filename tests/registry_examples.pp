@@ -63,26 +63,25 @@ class registry_example {
     data   => 'CAFEBEEF',
   }
 
-  # # REVISIT We need to make this work
-  # registry_value { 'HKLM\Software\Vendor\Bar\valuearray1':
-  #   ensure => present,
-  #   type   => array,
-  #   data   => [ 'one', 'two', 'three' ],
-  # }
+  registry_value { 'HKLM\Software\Vendor\Bar\valuearray1':
+    ensure => present,
+    type   => array,
+    data   => [ 'one', 'two', 'three' ],
+  }
 
-  # $some_string = "somestring"
-  # registry_value { 'HKLM\Software\Vendor\Bar\valuearray2':
-  #   ensure => present,
-  #   type   => array,
-  #   data   => [ 'one', 'two', $some_string ],
-  # }
+  $some_string = "somestring"
+  registry_value { 'HKLM\Software\Vendor\Bar\valuearray2':
+    ensure => present,
+    type   => array,
+    data   => [ 0, 'zero', '0', 123456, 'two', $some_string ],
+  }
 
-  # $some_array = [ "array1", "array2", "array3" ]
-  # registry_value { 'HKLM\Software\Vendor\Bar\valuearray3':
-  #   ensure => present,
-  #   type   => array,
-  #   data   => $some_array,
-  # }
+  $some_array = [ "array1", "array2", "array3" ]
+  registry_value { 'HKLM\Software\Vendor\Bar\valuearray3':
+    ensure => present,
+    type   => array,
+    data   => $some_array,
+  }
 }
 
 include registry_example

@@ -12,8 +12,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def create
-    Puppet.info("creating: #{self}")
-
+    Puppet.debug("Creating registry value: #{self}")
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
       ary = to_native(resource[:type], resource[:data])
       reg.write(valuepath.valuename, ary[0], ary[1])
@@ -21,8 +20,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def exists?
-    Puppet.info("exists: #{self}")
-
+    Puppet.debug("Checking the existence of registry value: #{self}")
     found = false
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_READ | valuepath.access) do |reg|
       type = [0].pack('L')
@@ -33,9 +31,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def flush
+    Puppet.debug("Flushing registry value: #{self}")
     return if resource[:ensure] == :absent
-
-    Puppet.info("flushing: #{self}")
 
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
       ary = to_native(regvalue[:type], regvalue[:data])
@@ -44,7 +41,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def destroy
-    Puppet.info("destroying: #{self}")
+    Puppet.debug("Destroying registry value: #{self}")
 
     valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
       reg.delete_value(valuepath.valuename)
@@ -88,12 +85,22 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   # convert puppet type and data to native
   def to_native(ptype, pdata)
+    # JJM Because the data property is set to :array_matching => :all we
+    # should always get an array from Puppet.  We need to convert this
+    # array to something usable by the Win API.
+    raise Puppet::Error, "Data should be an Array (ErrorID 37D9BBAB-52E8-4A7C-9F2E-D7BF16A59050)" unless pdata.kind_of?(Array)
     ndata =
       case ptype
       when :binary
-        pdata.scan(/[a-f\d]{2}/i).map{ |byte| [byte].pack('H2') }.join('')
-      else
+        pdata.first.scan(/[a-f\d]{2}/i).map{ |byte| [byte].pack('H2') }.join('')
+      when :array
+        # We already have an array, and the native API write method takes an
+        # array, so send it thru.
         pdata
+      else
+        # Since we have an array, take the first element and send it to the
+        # native API which is expecting a scalar.
+        pdata.first
       end
 
     return [name2type(ptype), ndata]
@@ -107,11 +114,18 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       case type2name(ntype)
       when :binary
         ndata.scan(/./).map{ |byte| byte.unpack('H2')[0]}.join(' ')
+      when :array
+        # We get the data from the registry in Array form.
+        ndata
       else
         ndata
       end
 
-    return [type2name(ntype), pdata]
+    # JJM Since the data property is set to :array_matching => all we should
+    # always give an array to Puppet.  This is why we have the ternary operator
+    # I'm not calling .to_a because Ruby issues a warning about the default
+    # implementation of to_a going away in the future.
+    return [type2name(ntype), pdata.kind_of?(Array) ? pdata : [pdata]]
   end
 
   def reg_query_value_ex_a
