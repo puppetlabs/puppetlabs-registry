@@ -1,5 +1,7 @@
 #!/usr/bin/env rspec
 require 'spec_helper'
+require 'puppet/resource'
+require 'puppet/resource/catalog'
 require 'puppet/modules/registry/registry_base'
 
 describe Puppet::Type.type(:registry_key) do
@@ -17,7 +19,7 @@ describe Puppet::Type.type(:registry_key) do
 
   describe "path parameter" do
     it "should have a path parameter" do
-      Puppet::Type.type(:registry_key).attrtype(:path).should == :param
+      Puppet::Type.type(:registry_key).attrtype(:path).must == :param
     end
 
     %w[hklm hklm\software hklm\software\vendor].each do |path|
@@ -42,7 +44,7 @@ describe Puppet::Type.type(:registry_key) do
     %w[HKLM HKEY_LOCAL_MACHINE hklm].each do |root|
       it "should canonicalize the root key #{root}" do
         key[:path] = root
-        key[:path].should == 'hklm'
+        key[:path].must == 'hklm'
       end
     end
 
@@ -52,7 +54,44 @@ describe Puppet::Type.type(:registry_key) do
 
     it 'should support 32-bit keys' do
       key[:path] = '32:hklm\software'
-      key.parameter(:path).access.should == 0x200
+      key.parameter(:path).access.must == 0x200
+    end
+  end
+
+  describe "#eval_generate" do
+    context "not purging" do
+      it "should return an empty array" do
+        key.eval_generate.must be_empty
+      end
+    end
+
+    context "purging" do
+      let (:catalog) do Puppet::Resource::Catalog.new end
+
+      before :each do
+        key[:purge] = true
+        catalog.add_resource(key)
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val1"))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val2"))
+      end
+
+      it "should return an empty array if the key doesn't have any values" do
+        key.provider.expects(:values).returns([])
+        key.eval_generate.must be_empty
+      end
+
+      it "should purge existing values that are not being managed" do
+        key.provider.expects(:values).returns(['val1', 'val3'])
+        res = key.eval_generate.first
+
+        res[:ensure].must == :absent
+        res[:path].must == "#{key[:path]}\\val3"
+      end
+
+      it "should return an empty array if all existing values are being managed" do
+        key.provider.expects(:values).returns(['val1', 'val2'])
+        key.eval_generate.must be_empty
+      end
     end
   end
 end
