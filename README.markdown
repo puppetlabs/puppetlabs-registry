@@ -4,6 +4,35 @@ Windows Registry Module
 This module provides the types and providers necessary to manage the Windows
 Registry with Puppet.
 
+Installation
+------------
+
+The best way to install this module is with the `puppet module` subcommand or
+the `puppet-module` Gem.
+
+    puppet module install puppetlabs-registry
+
+Make sure your `puppet agent` is configured to synchronize plugins using the
+setting:
+
+    [main]
+    pluginsync = true
+
+This is the default behavior of the Puppet Agent on Microsoft Windows
+platforms.  This setting will ensure the types and providers are synchronized
+and available on the agent before the configuration run takes place.
+
+
+Installation from source
+------------------------
+
+If you'd like to install this module from source, please simply clone a copy
+into your puppet master's `modulepath`.  Here is an example of how to do so for
+Puppet Enterprise:
+
+    $ cd /etc/puppetlabs/puppet/modules
+    $ git clone git://github.com/puppetlabs/puppetlabs-registry.git registry
+
 Examples
 --------
 
@@ -17,6 +46,9 @@ The `registry_key` and `registry_value` types are provided by this module.
       type   => string,
       data   => "The Puppet Agent service periodically manages your configuration",
     }
+
+Purge Values Example
+--------------------
 
 If you want to make sure only the values specified in Puppet are associated
 with a particular key, you can use the `purge_values => true` parameter of the
@@ -55,34 +87,29 @@ Notice how Value4, Value5 and Value6 are being removed.
     notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value1]/data: data changed '1' to '0'
     notice: Finished catalog run in 0.16 seconds
 
-Installation
-------------
+Compliance Example
+------------------
 
-The best way to install this module is with the `puppet module` subcommand or
-the `puppet-module` Gem.
+In order to use the Registry module with the Compliance feature of Puppet
+Enterprise, the `audit` metaparameter should be used with specific
+`registry_value` resources.  An example of this is provided in the
+`registry::compliance_example` class.
 
-    puppet module install puppetlabs-registry
+To get started:
 
-Make sure your `puppet agent` is configured to synchronize plugins using the
-setting:
+ 1. First, add the `registry::compliance_example` class to a node.
+ 2. Then, run `puppet agent --test` on the Windows node to setup a hierarchy of
+    keys in `HKLM\Software\Vendor\Puppet Labs\Examples\Compliance`
+ 3. Switch the `registry::compliance_example` class into audit mode by setting
+    a Facter fact: `$env:FACTER_REGISTRY_COMPLIANCE_EXAMPLE_MODE='audit'`.
+ 4. Get the new catalog containing the audit resources using: `puppet agent
+    --test`.
+ 5. Manually change a registry value inside of `HKLM\Software\Vendor\Puppet
+    Labs\Examples\Compliance`.
+ 6. Run `puppet inspect` and notice that Puppet has picked up the manual change
+    and set it to the Puppet Enterprise Console as an inspect report.
 
-    [main]
-    pluginsync = true
-
-This is the default behavior of the Puppet Agent on Microsoft Windows
-platforms.  This setting will ensure the types and providers are synchronized
-and available on the agent before the configuration run takes place.
-
-
-Installation from source
-------------------------
-
-If you'd like to install this module from source, please simply clone a copy
-into your puppet master's `modulepath`.  Here is an example of how to do so for
-Puppet Enterprise:
-
-    $ cd /etc/puppetlabs/puppet/modules
-    $ git clone git://github.com/puppetlabs/puppetlabs-registry.git registry
+![Registry Value Inspect Report](http://links.puppetlabs.com/screen_shot_registry_value_audit_01.png)
 
 License
 -------
