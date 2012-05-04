@@ -67,7 +67,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   def regvalue
     unless @regvalue
       @regvalue = {}
-      valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
+      valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_READ | valuepath.access) do |reg|
         type = [0].pack('L')
         size = [0].pack('L')
 

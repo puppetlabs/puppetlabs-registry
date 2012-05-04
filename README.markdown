@@ -18,6 +18,43 @@ The `registry_key` and `registry_value` types are provided by this module.
       data   => "The Puppet Agent service periodically manages your configuration",
     }
 
+If you want to make sure only the values specified in Puppet are associated
+with a particular key, you can use the `purge_values => true` parameter of the
+`registry_key` resource to delete any values not explicitly managed by Puppet.
+The `registry::example_purge` class shows how this is accomplished:
+
+Make sure the `registry::example_purge` class is included in the node catalog,
+then setup a registry key that contains six values:
+
+    PS C:\> $env:FACTER_PURGE_EXAMPLE_MODE = 'setup'
+    PS C:\> puppet agent --test
+    notice: /Stage[main]/Registry::Purge_example/Registry_key[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value3]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value2]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_key[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\SubKey]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value5]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value6]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\SubKey\Value1]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value1]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\SubKey\Value2]/ensure: created
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value4]/ensure: created
+    notice: Finished catalog run in 0.14 seconds
+
+Switching the mode to 'purge' will cause the class to only manage three of the
+six `registry_value` resources.  The other three will be purged since the
+`registry_key` resource has `purge_values => true` specified in the manifest.
+Notice how Value4, Value5 and Value6 are being removed.
+
+    PS C:\> $env:FACTER_PURGE_EXAMPLE_MODE = 'purge'
+    PS C:\> puppet agent --test
+    notice: /Registry_value[hklm\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value4]/ensure: removed
+    notice: /Registry_value[hklm\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value6]/ensure: removed
+    notice: /Registry_value[hklm\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value5]/ensure: removed
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value3]/data: data changed 'key3' to 'should not be purged'
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value2]/data: data changed '2' to '0'
+    notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value1]/data: data changed '1' to '0'
+    notice: Finished catalog run in 0.16 seconds
+
 Installation
 ------------
 
