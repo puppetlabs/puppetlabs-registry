@@ -38,4 +38,15 @@ Puppet::Type.type(:registry_key).provide(:registry) do
   def keypath
     @keypath ||= resource.parameter(:path)
   end
+
+  def values
+    names = []
+    # Only try and get the values for this key if the key itself exists.
+    if exists? then
+      keypath.hkey.open(keypath.subkey, Win32::Registry::KEY_READ | keypath.access) do |reg|
+        reg.each_value do |name, type, data| names << name end
+      end
+    end
+    names
+  end
 end
