@@ -1,0 +1,71 @@
+2012-05-04 - Jeff McCune <jeff@puppetlabs.com>
+ * Add registry::compliance_example class to test compliance (0aa8a68)
+
+2012-05-03 - Jeff McCune <jeff@puppetlabs.com>
+ * Allow values associated with a registry key to be purged (27eaee3)
+
+2012-05-01 - Jeff McCune <jeff@puppetlabs.com>
+ * Update README with info about the types provided (b9b2d11)
+
+2012-04-30 - Jeff McCune <jeff@puppetlabs.com>
+ * Add registry::service defined resource example (57c5b59)
+
+2012-04-25 - Jeff McCune <jeff@puppetlabs.com>
+ * Add REG_MULTI_SZ (type => array) implementation (1b17c6f)
+
+2012-04-26 - Jeff McCune <jeff@puppetlabs.com>
+ * Work around #3947, #4248, #14073; load our utility code (a8d9402)
+
+2012-04-24 - Josh Cooper <josh@puppetlabs.com>
+ * Handle binary registry values (4353642)
+
+2012-04-24 - Josh Cooper <josh@puppetlabs.com>
+ * Fix puppet resource registry_key (f736cff)
+
+2012-04-23 - Josh Cooper <josh@puppetlabs.com>
+ * Registry keys and values were autorequiring all ancestors (0de7a0a)
+
+2012-04-24 - Jeff McCune <jeff@puppetlabs.com>
+ * Add examples of current registry key and value types (bb7e4f4)
+
+2012-04-23 - Josh Cooper <josh@puppetlabs.com>
+ * Add the ability to manage 32 and 64-bit keys/values (9a16a9b)
+
+2012-04-23 - Josh Cooper <josh@puppetlabs.com>
+ * Remove rspec deprecation warning (94063d5)
+
+2012-04-23 - Josh Cooper <josh@puppetlabs.com>
+ * Rename registry-specific util code (cd2aaa1)
+
+2012-04-20 - Josh Cooper <josh@puppetlabs.com>
+ * Fix autorequiring when using different root key forms (b7a1c39)
+
+2012-04-19 - Josh Cooper <josh@puppetlabs.com>
+ * Refactor key and value paths (74ebc80)
+
+2012-04-19 - Josh Cooper <josh@puppetlabs.com>
+ * Encode default-ness in the registry path (64bba67)
+
+2012-04-19 - Josh Cooper <josh@puppetlabs.com>
+ * Better validation and testing of key paths (d05d1e6)
+
+2012-04-19 - Josh Cooper <josh@puppetlabs.com>
+ * Maint: Remove more crlf line endings (e9f00c1)
+
+2012-04-19 - Josh Cooper <josh@puppetlabs.com>
+ * Maint: remove windows cr line endings (0138a1d)
+
+2012-04-18 - Josh Cooper <josh@puppetlabs.com>
+ * Rename `default` parameter (f45af86)
+
+2012-04-18 - Josh Cooper <josh@puppetlabs.com>
+ * Fix modifying existing registry values (d06be98)
+
+2012-04-18 - Josh Cooper <josh@puppetlabs.com>
+ * Remove debugging (8601e92)
+
+2012-04-18 - Josh Cooper <josh@puppetlabs.com>
+ * Always split the path (de66832)
+
+2012-04-18 - Josh Cooper <josh@puppetlabs.com>
+ * Initial registry key and value types and providers (065d43d)
