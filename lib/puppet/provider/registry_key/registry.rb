@@ -37,7 +37,6 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     end
   end
 
-  # REVISIT - This is only dealing with the valuename and not the full path.
   def values
     names = []
     # Only try and get the values for this key if the key itself exists.

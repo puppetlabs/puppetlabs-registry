@@ -13,7 +13,12 @@ Puppet::Type.newtype(:registry_key) do
 
   newparam(:path, :namevar => true) do
     include Puppet::Modules::Registry::TypeKeyBase
-    desc "REVISIT: The path to the registry key."
+    desc <<-'EODESC'
+The path to the registry key to manage.  For example; 'HKLM\Software',
+'HKEY_LOCAL_MACHINE\Software\Vendor'.  If Puppet is running on a 64 bit system,
+the 32 bit registry key can be explicitly manage using a prefix.  For example:
+'32:HKLM\Software'
+    EODESC
     validate do |path|
       newpath(path).valid?
     end
@@ -25,7 +30,10 @@ Puppet::Type.newtype(:registry_key) do
   # REVISIT - Make a common parameter for boolean munging and validation.  This will be used
   # By both registry_key and registry_value types.
   newparam(:purge_values, :boolean => true) do
-    desc "Whether to delete any registry value associated with this key that is not being managed by puppet."
+    desc <<-'EODESC'
+Whether to delete any registry value associated with this key that is not being
+managed by puppet.
+    EODESC
     newvalues(:true, :false)
     defaultto false
 
