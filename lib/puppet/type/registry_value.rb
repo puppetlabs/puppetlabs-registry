@@ -1,9 +1,8 @@
 require 'puppet/type'
+require 'pathname' # JJM WORK_AROUND #14073
+require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/type_value_base'
 Puppet::Type.newtype(:registry_value) do
-  require 'pathname' # JJM WORK_AROUND #14073
-  require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/registry_base'
-  require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/value_path'
-  include Puppet::Modules::Registry::RegistryBase
+  include Puppet::Modules::Registry::TypeValueBase
 
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
@@ -11,16 +10,45 @@ Puppet::Type.newtype(:registry_value) do
 
   ensurable
 
-  newparam(:path, :parent => Puppet::Modules::Registry::ValuePath, :namevar => true) do
+  newparam(:path, :namevar => true) do
+    include Puppet::Modules::Registry::TypeValueBase
+    desc <<-'EODESC'
+The path to the registry value to manage.  For example; 'HKLM\Software\Value1',
+'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'.  If Puppet is running on a 64 bit
+system, the 32 bit registry key can be explicitly manage using a prefix.  For
+example: '32:HKLM\Software\Value3'
+    EODESC
+    validate do |path|
+      newpath(path).valid?
+    end
+    munge do |path|
+      newpath(path).canonical
+    end
   end
 
   newproperty(:type) do
+    desc <<-'EODESC'
+The Windows data type of the registry value.  Puppet provides helpful names for
+these types as follows:
+
+ * string => REG_SZ
+ * array  => REG_MULTI_SZ
+ * expand => REG_EXPAND_SZ
+ * dword  => REG_DWORD
+ * qword  => REG_QWORD
+ * binary => REG_BINARY
+    EODESC
     newvalues(:string, :array, :dword, :qword, :binary, :expand)
     defaultto :string
   end
 
   newproperty(:data, :array_matching => :all) do
-    desc "The data of the registry value."
+    desc <<-'EODESC'
+The data stored in the registry value.  Data should be specified as a string
+value but may be specified as a Puppet array when the type is set to 'array'.
+    EODESC
+
+    defaultto ''
 
     munge do |value|
       case resource[:type]
@@ -65,17 +93,15 @@ Puppet::Type.newtype(:registry_value) do
       end
       super(currentvalue, newvalue)
     end
-
-    defaultto ''
   end
 
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
-    if found = parameter(:path).enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
+    path = newpath(value(:path))
+    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
       req << found.to_s
     end
     req
   end
 end
-

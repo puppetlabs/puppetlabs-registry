@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -S rspec
 require 'spec_helper'
-require 'puppet/modules/registry/registry_base'
+require 'puppet/type/registry_value'
 
 describe Puppet::Type.type(:registry_value) do
   [:ensure, :type, :data].each do |property|
@@ -59,10 +59,8 @@ describe Puppet::Type.type(:registry_value) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'should autorequire ancestor keys'
-
     it 'should support 32-bit values' do
       value = described_class.new(:path => '32:hklm\software\foo')
-      value.parameter(:path).access.should == 0x200
     end
   end
 

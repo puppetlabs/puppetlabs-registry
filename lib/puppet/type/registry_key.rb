@@ -1,9 +1,9 @@
 require 'puppet/type'
+require 'pathname' # JJM WORK_AROUND #14073
+require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/type_key_base'
+
 Puppet::Type.newtype(:registry_key) do
-  require 'pathname' # JJM WORK_AROUND #14073
-  require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/registry_base'
-  require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/key_path'
-  extend Puppet::Modules::Registry::RegistryBase
+  include Puppet::Modules::Registry::TypeKeyBase
 
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
@@ -11,11 +11,29 @@ Puppet::Type.newtype(:registry_key) do
 
   ensurable
 
-  newparam(:path, :parent => Puppet::Modules::Registry::KeyPath, :namevar => true) do
+  newparam(:path, :namevar => true) do
+    include Puppet::Modules::Registry::TypeKeyBase
+    desc <<-'EODESC'
+The path to the registry key to manage.  For example; 'HKLM\Software',
+'HKEY_LOCAL_MACHINE\Software\Vendor'.  If Puppet is running on a 64 bit system,
+the 32 bit registry key can be explicitly manage using a prefix.  For example:
+'32:HKLM\Software'
+    EODESC
+    validate do |path|
+      newpath(path).valid?
+    end
+    munge do |path|
+      newpath(path).canonical
+    end
   end
 
+  # REVISIT - Make a common parameter for boolean munging and validation.  This will be used
+  # By both registry_key and registry_value types.
   newparam(:purge_values, :boolean => true) do
-    desc "Whether to delete any registry value associated with this key that is not being managed by puppet."
+    desc <<-'EODESC'
+Whether to delete any registry value associated with this key that is not being
+managed by puppet.
+    EODESC
     newvalues(:true, :false)
     defaultto false
 
@@ -43,7 +61,8 @@ Puppet::Type.newtype(:registry_key) do
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
-    if found = parameter(:path).enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
+    path = newpath(value(:path))
+    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
       req << found.to_s
     end
     req
@@ -55,7 +74,7 @@ Puppet::Type.newtype(:registry_key) do
 
     # get the "should" names of registry values associated with this key
     should_values = catalog.relationship_graph.direct_dependents_of(self).select {|dep| dep.type == :registry_value }.map do |reg|
-      reg.parameter(:path).valuename
+      Puppet::Modules::Registry::RegistryValuePath.new(reg.parameter(:path).value).valuename
     end
 
     # get the "is" names of registry values associated with this key

@@ -1,11 +1,11 @@
-#!/usr/bin/env rspec
+#!/usr/bin/env ruby -S rspec
 require 'spec_helper'
 require 'puppet/resource'
 require 'puppet/resource/catalog'
-require 'puppet/modules/registry/registry_base'
+require 'puppet/type/registry_key'
 
 describe Puppet::Type.type(:registry_key) do
-  let (:key) { Puppet::Type.type(:registry_key).new(:path => 'HKLM\Software') }
+  let (:key) { Puppet::Type.type(:registry_key).new(:name => 'HKLM\Software') }
 
   [:ensure].each do |property|
     it "should have a #{property} property" do
@@ -51,10 +51,8 @@ describe Puppet::Type.type(:registry_key) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'should autorequire ancestor keys'
-
     it 'should support 32-bit keys' do
       key[:path] = '32:hklm\software'
-      key.parameter(:path).access.must == 0x200
     end
   end
 

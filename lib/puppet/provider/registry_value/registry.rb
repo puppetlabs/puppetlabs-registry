@@ -1,8 +1,10 @@
 require 'puppet/type'
+require 'pathname' # JJM WORK_AROUND #14073
+require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry'
+require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry/provider_base'
+
 Puppet::Type.type(:registry_value).provide(:registry) do
-  require 'pathname' # JJM WORK_AROUND #14073
-  require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry/registry_base'
-  include Puppet::Modules::Registry::RegistryBase
+  include Puppet::Modules::Registry::ProviderBase
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
@@ -11,40 +13,32 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     []
   end
 
-  def create
-    Puppet.debug("Creating registry value: #{self}")
-    valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
-      ary = to_native(resource[:type], resource[:data])
-      reg.write(valuepath.valuename, ary[0], ary[1])
-    end
-  end
-
   def exists?
     Puppet.debug("Checking the existence of registry value: #{self}")
     found = false
-    valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_READ | valuepath.access) do |reg|
+    hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
       type = [0].pack('L')
       size = [0].pack('L')
-      found = reg_query_value_ex_a.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
+      found = reg_query_value_ex_a.call(reg.hkey, valuename, 0, type, 0, size) == 0
     end
     found
+  end
+
+  def create
+    Puppet.debug("Creating registry value: #{self}")
+    write_value
   end
 
   def flush
     Puppet.debug("Flushing registry value: #{self}")
     return if resource[:ensure] == :absent
-
-    valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
-      ary = to_native(regvalue[:type], regvalue[:data])
-      reg.write(valuepath.valuename, ary[0], ary[1])
-    end
+    write_value
   end
 
   def destroy
     Puppet.debug("Destroying registry value: #{self}")
-
-    valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_ALL_ACCESS | valuepath.access) do |reg|
-      reg.delete_value(valuepath.valuename)
+    hive.open(subkey, Win32::Registry::KEY_ALL_ACCESS | access) do |reg|
+      reg.delete_value(valuename)
     end
   end
 
@@ -67,20 +61,16 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   def regvalue
     unless @regvalue
       @regvalue = {}
-      valuepath.hkey.open(valuepath.subkey, Win32::Registry::KEY_READ | valuepath.access) do |reg|
+      hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
         type = [0].pack('L')
         size = [0].pack('L')
 
-        if reg_query_value_ex_a.call(reg.hkey, valuepath.valuename, 0, type, 0, size) == 0
-          @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuepath.valuename))
+        if reg_query_value_ex_a.call(reg.hkey, valuename, 0, type, 0, size) == 0
+          @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuename))
         end
       end
     end
     @regvalue
-  end
-
-  def valuepath
-    @valuepath ||= resource.parameter(:path)
   end
 
   # convert puppet type and data to native
@@ -135,4 +125,17 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   # def to_s
   #   "#{valuepath.hkey.keyname}\\#{valuepath.subkey}\\#{valuepath.valuename}"
   # end
+
+  private
+
+  def write_value
+    hive.open(subkey, Win32::Registry::KEY_ALL_ACCESS | access) do |reg|
+      ary = to_native(resource[:type], resource[:data])
+      reg.write(valuename, ary[0], ary[1])
+    end
+  end
+
+  def path
+    @path ||= Puppet::Modules::Registry::RegistryValuePath.new(resource.parameter(:path).value)
+  end
 end
