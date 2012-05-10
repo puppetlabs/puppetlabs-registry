@@ -1,10 +1,8 @@
 require 'puppet/type'
 require 'pathname' # JJM WORK_AROUND #14073
-require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry/type_key_base'
+require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry'
 
 Puppet::Type.newtype(:registry_key) do
-  include Puppet::Modules::Registry::TypeKeyBase
-
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
   end
@@ -12,7 +10,6 @@ Puppet::Type.newtype(:registry_key) do
   ensurable
 
   newparam(:path, :namevar => true) do
-    include Puppet::Modules::Registry::TypeKeyBase
     desc <<-'EODESC'
 The path to the registry key to manage.  For example; 'HKLM\Software',
 'HKEY_LOCAL_MACHINE\Software\Vendor'.  If Puppet is running on a 64 bit system,
@@ -20,10 +17,10 @@ the 32 bit registry key can be explicitly manage using a prefix.  For example:
 '32:HKLM\Software'
     EODESC
     validate do |path|
-      newpath(path).valid?
+      Puppet::Modules::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      newpath(path).canonical
+      Puppet::Modules::Registry::RegistryKeyPath.new(path).canonical
     end
   end
 
@@ -61,7 +58,7 @@ managed by puppet.
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
-    path = newpath(value(:path))
+    path = Puppet::Modules::Registry::RegistryKeyPath.new(value(:path))
     if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
       req << found.to_s
     end
