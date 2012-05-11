@@ -18,6 +18,8 @@ Registry_key { ensure => present}
 registry_key { 'HKLM\\Software\\Vendor': }
 registry_key { '#{keypath}': }
 registry_key { '#{keypath}\\SubKey1': }
+registry_key { '32:#{keypath}': }
+registry_key { '32:#{keypath}\\SubKey1': }
 HERE
 
 # Setup the master to use the modules specified in the --modules option
@@ -28,6 +30,8 @@ step "Start the master" do
     keys_created = [
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created/,
+      /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
+      /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created/,
     ]
 
     windows_agents.each do |agent|

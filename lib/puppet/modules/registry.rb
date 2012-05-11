@@ -85,11 +85,14 @@ module Puppet::Modules::Registry
         raise ArgumentError, "Invalid registry key: #{path}"
       end
 
-      result[:access] = if captures[1] == '32:'
-                          Puppet::Modules::Registry::KEY_WOW64_32KEY
-                        else
-                          Puppet::Modules::Registry::KEY_WOW64_64KEY
-                        end
+      case captures[1]
+      when '32:'
+        result[:access] = Puppet::Modules::Registry::KEY_WOW64_32KEY
+        result[:prefix] = '32:'
+      else
+        result[:access] = Puppet::Modules::Registry::KEY_WOW64_64KEY
+        result[:prefix] = ''
+      end
 
       # canonical root key symbol
       result[:root] = case captures[2].to_s.downcase
@@ -112,11 +115,11 @@ module Puppet::Modules::Registry
       result[:subkey] = captures[3]
 
       if result[:subkey].empty?
-        result[:canonical] = result[:root].to_s
+        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}"
       else
         # Leading backslash is not part of the subkey name
         result[:subkey].sub!(/^\\(.*)$/, '\1')
-        result[:canonical] = "#{result[:root].to_s}\\#{result[:subkey]}"
+        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}\\#{result[:subkey]}"
       end
 
       result
