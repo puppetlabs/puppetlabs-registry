@@ -130,3 +130,25 @@ Support
 
 Please log tickets and issues at our [Module Issue
 Tracker](http://projects.puppetlabs.com/projects/modules)
+
+Known Issues
+------------
+
+The `registry_key` auto-require functionality doesn't appear to work with `->`
+style relationships.  This results in a circular dependency:
+
+
+    Registry_key { ensure => absent }
+    registry_key { '#{keypath}\\SubKey1': }
+    -> registry_key { '#{keypath}\\SubKeyToPurge': }
+    -> registry_key { '#{keypath}': }
+
+But this does not:
+
+    registry_key { '#{keypath}\\SubKey1': }
+    registry_key { '#{keypath}\\SubKeyToPurge': }
+    registry_key { '#{keypath}':
+      require => Registry_key['#{keypath}\\SubKeyToPurge', '#{keypath}\\SubKey1'],
+    }
+
+EOF
