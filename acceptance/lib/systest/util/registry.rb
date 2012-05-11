@@ -89,6 +89,45 @@ module Systest::Util::Registry
     @agent_exit_codes ||= [0, 2]
   end
 
+  def randomstring(length)
+    chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
+    str = ""
+    1.upto(length) { |i| str << chars[rand(chars.size-1)] }
+    return str
+  end
+
+  # Create a file on the host.
+  # Parameters:
+  # [host] the host to create the file on
+  # [file_path] the path to the file to be created
+  # [file_content] a string containing the contents to be written to the file
+  # [options] a hash containing additional behavior options.  Currently supported:
+  # * :mkdirs (default false) if true, attempt to create the parent directories on the remote host before writing
+  #       the file
+  # * :owner (default 'root') the username of the user that the file should be owned by
+  # * :group (default 'puppet') the name of the group that the file should be owned by
+  # * :mode (default '644') the mode (file permissions) that the file should be created with
+  def create_test_file(host, file_rel_path, file_content, options)
+
+    # set default options
+    options[:mkdirs] ||= false
+    options[:owner] ||= (host['user'] || "root")
+    options[:group] ||= (host['group'] || "puppet")
+    options[:mode] ||= "755"
+
+    file_path = get_test_file_path(host, file_rel_path)
+
+    mkdirs(host, File.dirname(file_path)) if (options[:mkdirs] == true)
+    create_remote_file(host, file_path, file_content)
+    #
+    # NOTE: we need these chown/chmod calls because the acceptance framework connects to the nodes as "root", but
+    #  puppet 'master' runs as user 'puppet'.  Therefore, in order for puppet master to be able to read any files
+    #  that we've created, we have to carefully set their permissions
+    #
+    chown(host, options[:owner], options[:group], file_path)
+    chmod(host, options[:mode], file_path)
+  end
+
   def setup_master(master_manifest_content="# Intentionally Blank\n")
     step "Setup Puppet Master Manifest" do
       masters.each do |host|
