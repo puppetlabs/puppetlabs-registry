@@ -16,6 +16,7 @@ module Puppet::Modules::Registry
   class RegistryPathBase < String
     attr_reader :path
     def initialize(path)
+      @filter_path_memo = nil
       @path ||= path
       super(path)
     end
@@ -60,6 +61,9 @@ module Puppet::Modules::Registry
     private
 
     def filter_path
+      if @filter_path_memo
+        return @filter_path_memo
+      end
       result = {}
 
       path = @path
@@ -122,7 +126,7 @@ module Puppet::Modules::Registry
         result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}\\#{result[:subkey]}"
       end
 
-      result
+      @filter_path_memo = result
     end
 
   end
