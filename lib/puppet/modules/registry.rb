@@ -26,10 +26,6 @@ module Puppet::Modules::Registry
       (filter_path and true) rescue false
     end
 
-    def valuename
-      filter_path[:valuename]
-    end
-
     def canonical
       filter_path[:canonical]
     end
@@ -40,14 +36,6 @@ module Puppet::Modules::Registry
 
     def root
       filter_path[:root]
-    end
-
-    def subkey
-      filter_path[:subkey]
-    end
-
-    def default?
-      !!filter_path[:is_default]
     end
 
     def ascend(&block)
@@ -132,9 +120,14 @@ module Puppet::Modules::Registry
   end
 
   class RegistryKeyPath < RegistryPathBase
+    def subkey
+      filter_path[:subkey]
+    end
+
     def valuename
       ''
     end
+
     def default?
       false
     end
@@ -143,6 +136,14 @@ module Puppet::Modules::Registry
   class RegistryValuePath < RegistryPathBase
     def subkey
       filter_path[:subkey].gsub(/\\#{filter_path[:valuename]}/, '')
+    end
+
+    def valuename
+      filter_path[:valuename]
+    end
+
+    def default?
+      !!filter_path[:is_default]
     end
   end
 end
