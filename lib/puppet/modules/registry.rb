@@ -16,6 +16,7 @@ module Puppet::Modules::Registry
   class RegistryPathBase < String
     attr_reader :path
     def initialize(path)
+      @filter_path_memo = nil
       @path ||= path
       super(path)
     end
@@ -23,10 +24,6 @@ module Puppet::Modules::Registry
     # The path is valid if we're able to parse it without exceptions.
     def valid?
       (filter_path and true) rescue false
-    end
-
-    def valuename
-      filter_path[:valuename]
     end
 
     def canonical
@@ -41,14 +38,6 @@ module Puppet::Modules::Registry
       filter_path[:root]
     end
 
-    def subkey
-      filter_path[:subkey]
-    end
-
-    def default?
-      !!filter_path[:is_default]
-    end
-
     def ascend(&block)
       p = canonical
       while idx = p.rindex('\\')
@@ -60,6 +49,9 @@ module Puppet::Modules::Registry
     private
 
     def filter_path
+      if @filter_path_memo
+        return @filter_path_memo
+      end
       result = {}
 
       path = @path
@@ -85,11 +77,14 @@ module Puppet::Modules::Registry
         raise ArgumentError, "Invalid registry key: #{path}"
       end
 
-      result[:access] = if captures[1] == '32:'
-                          Puppet::Modules::Registry::KEY_WOW64_32KEY
-                        else
-                          Puppet::Modules::Registry::KEY_WOW64_64KEY
-                        end
+      case captures[1]
+      when '32:'
+        result[:access] = Puppet::Modules::Registry::KEY_WOW64_32KEY
+        result[:prefix] = '32:'
+      else
+        result[:access] = Puppet::Modules::Registry::KEY_WOW64_64KEY
+        result[:prefix] = ''
+      end
 
       # canonical root key symbol
       result[:root] = case captures[2].to_s.downcase
@@ -112,22 +107,27 @@ module Puppet::Modules::Registry
       result[:subkey] = captures[3]
 
       if result[:subkey].empty?
-        result[:canonical] = result[:root].to_s
+        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}"
       else
         # Leading backslash is not part of the subkey name
         result[:subkey].sub!(/^\\(.*)$/, '\1')
-        result[:canonical] = "#{result[:root].to_s}\\#{result[:subkey]}"
+        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}\\#{result[:subkey]}"
       end
 
-      result
+      @filter_path_memo = result
     end
 
   end
 
   class RegistryKeyPath < RegistryPathBase
+    def subkey
+      filter_path[:subkey]
+    end
+
     def valuename
       ''
     end
+
     def default?
       false
     end
@@ -136,6 +136,14 @@ module Puppet::Modules::Registry
   class RegistryValuePath < RegistryPathBase
     def subkey
       filter_path[:subkey].gsub(/\\#{filter_path[:valuename]}/, '')
+    end
+
+    def valuename
+      filter_path[:valuename]
+    end
+
+    def default?
+      !!filter_path[:is_default]
     end
   end
 end
