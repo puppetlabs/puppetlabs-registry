@@ -123,14 +123,6 @@ module Puppet::Modules::Registry
     def subkey
       filter_path[:subkey]
     end
-
-    def valuename
-      ''
-    end
-
-    def default?
-      false
-    end
   end
 
   class RegistryValuePath < RegistryPathBase
