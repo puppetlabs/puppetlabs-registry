@@ -132,7 +132,10 @@ Please log tickets and issues at our [Module Issue
 Tracker](http://projects.puppetlabs.com/projects/modules)
 
 Known Issues
-------------
+============
+
+Autorequire relationships
+-------------------------
 
 The `registry_key` auto-require functionality doesn't appear to work with `->`
 style relationships.  This results in a circular dependency:
@@ -150,5 +153,23 @@ But this does not:
     registry_key { '#{keypath}':
       require => Registry_key['#{keypath}\\SubKeyToPurge', '#{keypath}\\SubKey1'],
     }
+
+Autorequire case sensitivity
+----------------------------
+
+The autorequire functionality currently does a case sensitive match against
+parent keys.  This means the following `registry_value` will not Autorequire
+the parent `registry_key`:
+
+    registry_key { 'HKLM\Software\Vendor\PUPPETLABS':
+      ensure => present,
+    }
+    registry_value { 'HKLM\Software\Vendor\puppetlabs\RegValue':
+      data => "Does not auto-require parent key",
+    }
+
+The work around is to make sure all of your parent keys match case with values
+you're managing inside these keys.  This is a bug and we plan to fix it as soon
+as possible.
 
 EOF
