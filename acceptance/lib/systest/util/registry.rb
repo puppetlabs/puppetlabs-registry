@@ -138,7 +138,7 @@ module Systest::Util::Registry
       masters.each do |host|
         moddir = get_test_file_path(host, master_module_dir)
         mkdirs(host, moddir)
-        on host, "ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
+        on host, "ln -s /opt/puppet-git-repos/stdlib \"#{moddir}/stdlib\"; ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
       end
     end
   end
