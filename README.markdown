@@ -50,6 +50,23 @@ The `registry_key` and `registry_value` types are provided by this module.
       data   => "The Puppet Agent service periodically manages your configuration",
     }
 
+The `registry::value` defined resource type provides a convenient way to manage
+values and the parent key:
+
+    registry::value { 'MyApp Setting1':
+      key   => 'HKLM\Software\Vendor\PuppetLabs',
+      value => setting1,
+      data  => 'Hello World!'
+    }
+
+With this single resource declaration both the `registry_key` of
+`HKLM\Software\Vendor\PuppetLabs` and the `registry_value` of
+`HKLM\Software\Vendor\PuppetLabs\setting` will be managed.
+
+The `registry::value` defined type only managed keys and values in the system
+native architecture.  That is to say, the 32 bit keys won't be managed by this
+defined type on a 64 bit OS.
+
 Purge Values Example
 --------------------
 
