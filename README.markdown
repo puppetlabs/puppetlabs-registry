@@ -8,9 +8,12 @@ Installation
 ------------
 
 The best way to install this module is with the `puppet module` subcommand or
-the `puppet-module` Gem.  On your puppet master, execute the following command:
+the `puppet-module` Gem.  On your puppet master, execute the following command,
+optionally specifying your puppet master's `modulepath` in which to install the module:
 
-    $ puppet module install puppetlabs-registry
+    $ puppet module install [--modulepath <path>] puppetlabs-registry
+
+See the section [Installing Modules](http://docs.puppetlabs.com/puppet/2.7/reference/modules_installing.html#installing-modules-1) for more information.
 
 Make sure your `puppet agent` is configured to synchronize plugins using the
 setting:
