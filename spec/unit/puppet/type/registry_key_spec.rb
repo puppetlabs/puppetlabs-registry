@@ -66,11 +66,17 @@ describe Puppet::Type.type(:registry_key) do
     context "purging" do
       let (:catalog) do Puppet::Resource::Catalog.new end
 
+      # This is overridden here so we get a consistent association with the key
+      # and a catalog using memoized let methods.
+      let (:key) do
+        Puppet::Type.type(:registry_key).new(:name => 'HKLM\Software', :catalog => catalog)
+      end
+
       before :each do
         key[:purge_values] = true
         catalog.add_resource(key)
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val1"))
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val2"))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val1", :catalog => catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val2", :catalog => catalog))
       end
 
       it "should return an empty array if the key doesn't have any values" do
@@ -90,6 +96,38 @@ describe Puppet::Type.type(:registry_key) do
         key.provider.expects(:values).returns(['val1', 'val2'])
         key.eval_generate.must be_empty
       end
+    end
+  end
+
+  describe "#autorequire" do
+    let :the_catalog do
+      Puppet::Resource::Catalog.new
+    end
+
+    let(:the_resource_name) { 'HKLM\Software\Vendor\PuppetLabs' }
+
+    let :the_resource do
+      # JJM Holy cow this is an intertangled mess.  ;)
+      resource = Puppet::Type.type(:registry_key).new(:name => the_resource_name, :catalog => the_catalog)
+      the_catalog.add_resource resource
+      resource
+    end
+
+    it 'Should initialize the catalog instance variable' do
+      the_resource.catalog.must be the_catalog
+    end
+
+    it 'Should allow case insensitive lookup using the downcase path' do
+      the_resource.must be the_catalog.resource(:registry_key, the_resource_name.downcase)
+    end
+
+    it 'Should preserve the case of the user specified path' do
+      the_resource.must be the_catalog.resource(:registry_key, the_resource_name)
+    end
+
+    it 'Should return the same resource regardless of the alias used' do
+      the_resource.must be the_catalog.resource(:registry_key, the_resource_name)
+      the_resource.must be the_catalog.resource(:registry_key, the_resource_name.downcase)
     end
   end
 end
