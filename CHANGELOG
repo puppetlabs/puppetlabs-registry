@@ -1,3 +1,54 @@
+2012-05-16 - Jeff McCune <jeff@puppetlabs.com>
+ * (#14529) Add registry::value defined type (bf44208)
+
+2012-05-16 - Josh Cooper <josh+github@puppetlabs.com>
+ * Update README.markdown (2e9e45e)
+
+2012-05-16 - Josh Cooper <josh+github@puppetlabs.com>
+ * Update README.markdown (3904838)
+
+2012-05-15 - Josh Cooper <josh@puppetlabs.com>
+ * (Maint) Add type documentation (82205ad)
+
+2012-05-15 - Josh Cooper <josh+github@puppetlabs.com>
+ * Remove note about case-sensitivity, as that is no longer an issue (5440a0e)
+
+2012-05-15 - Jeff McCune <jeff@puppetlabs.com>
+ * (#14501) Fix autorequire case sensitivity (d5c12f0)
+
+2012-05-15 - Jeff McCune <jeff@puppetlabs.com>
+ * (maint) Remove RegistryKeyPath#{valuename,default?} methods (29db478)
+
+2012-05-14 - Jeff McCune <jeff@puppetlabs.com>
+ * Add acceptance tests for registry_value provider (6285f4a)
+
+2012-05-14 - Jeff McCune <jeff@puppetlabs.com>
+ * Eliminate RegistryPathBas#(default?,valuename) from base class (2234f96)
+
+2012-05-14 - Jeff McCune <jeff@puppetlabs.com>
+ * Memoize the filter_path method for performance (6139b7d)
+
+2012-05-11 - Jeff McCune <jeff@puppetlabs.com>
+ * Add Registry_key ensure => absent and purge_values coverage (cfd3789)
+
+2012-05-11 - Jeff McCune <jeff@puppetlabs.com>
+ * Fix cannot alias error when managing 32 and 64 bit versions of a key (3a2f260)
+
+2012-05-11 - Jeff McCune <jeff@puppetlabs.com>
+ * Add registry_key creation acceptance test (0e68654)
+
+2012-05-09 - Jeff McCune <jeff@puppetlabs.com>
+ * Add acceptance tests for the registry type (0a01b11)
+
+2012-05-08 - Jeff McCune <jeff@puppetlabs.com>
+ * Update type description strings (c69bf2d)
+
+2012-05-05 - Jeff McCune <jeff@puppetlabs.com>
+ * Separate the implementation of the type and provider (4e06ae5)
+
+2012-05-04 - Jeff McCune <jeff@puppetlabs.com>
+ * Add watchr script to automatically run tests (d5bce2d)
+
 2012-05-04 - Jeff McCune <jeff@puppetlabs.com>
  * Add registry::compliance_example class to test compliance (0aa8a68)
 
