@@ -1,9 +1,4 @@
-.rspec
-results
-.*.sw[op]
-*~
-\.\#*
-\#*\#
-*elc
-auto-save-list
-
+pkg/
+.DS_Store
+metadata.json
+coverage/
