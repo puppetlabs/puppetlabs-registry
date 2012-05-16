@@ -20,7 +20,12 @@ the 32 bit registry key can be explicitly manage using a prefix.  For example:
       Puppet::Modules::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      Puppet::Modules::Registry::RegistryKeyPath.new(path).canonical
+      canonical = Puppet::Modules::Registry::RegistryKeyPath.new(path).canonical
+      # Windows is case insensitive and case preserving.  We deal with this by
+      # aliasing resources to their downcase values.  This is inspired by the
+      # munge block in the alias metaparameter.
+      @resource.catalog.alias(@resource, canonical.downcase) if @resource.catalog.respond_to? :alias
+      canonical
     end
   end
 
@@ -59,8 +64,11 @@ managed by puppet.
   autorequire(:registry_key) do
     req = []
     path = Puppet::Modules::Registry::RegistryKeyPath.new(value(:path))
-    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
-      req << found.to_s
+    # It is important to match against the downcase value of the path because
+    # other resources are expected to alias themselves to the downcase value so
+    # that we respect the case insensitive and preserving nature of Windows.
+    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
+      req << found.to_s.downcase
     end
     req
   end

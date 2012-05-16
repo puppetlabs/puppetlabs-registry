@@ -20,7 +20,12 @@ example: '32:HKLM\Software\Value3'
       Puppet::Modules::Registry::RegistryValuePath.new(path).valid?
     end
     munge do |path|
-      Puppet::Modules::Registry::RegistryValuePath.new(path).canonical
+      canonical = Puppet::Modules::Registry::RegistryValuePath.new(path).canonical
+      # Windows is case insensitive and case preserving.  We deal with this by
+      # aliasing resources to their downcase values.  This is inspired by the
+      # munge block in the alias metaparameter.
+      @resource.catalog.alias(@resource, canonical.downcase) if @resource.catalog.respond_to? :alias
+      canonical
     end
   end
 
@@ -97,8 +102,11 @@ value but may be specified as a Puppet array when the type is set to 'array'.
   autorequire(:registry_key) do
     req = []
     path = Puppet::Modules::Registry::RegistryKeyPath.new(value(:path))
-    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s) }
-      req << found.to_s
+    # It is important to match against the downcase value of the path because
+    # other resources are expected to alias themselves to the downcase value so
+    # that we respect the case insensitive and preserving nature of Windows.
+    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
+      req << found.to_s.downcase
     end
     req
   end
