@@ -8,9 +8,9 @@ Installation
 ------------
 
 The best way to install this module is with the `puppet module` subcommand or
-the `puppet-module` Gem.
+the `puppet-module` Gem.  On your puppet master, execute the following command:
 
-    puppet module install puppetlabs-registry
+    $ puppet module install puppetlabs-registry
 
 Make sure your `puppet agent` is configured to synchronize plugins using the
 setting:
@@ -87,30 +87,6 @@ Notice how Value4, Value5 and Value6 are being removed.
     notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value1]/data: data changed '1' to '0'
     notice: Finished catalog run in 0.16 seconds
 
-Compliance Example
-------------------
-
-In order to use the Registry module with the Compliance feature of Puppet
-Enterprise, the `audit` metaparameter should be used with specific
-`registry_value` resources.  An example of this is provided in the
-`registry::compliance_example` class.
-
-To get started:
-
- 1. First, add the `registry::compliance_example` class to a node.
- 2. Then, run `puppet agent --test` on the Windows node to setup a hierarchy of
-    keys in `HKLM\Software\Vendor\Puppet Labs\Examples\Compliance`
- 3. Switch the `registry::compliance_example` class into audit mode by setting
-    a Facter fact: `$env:FACTER_REGISTRY_COMPLIANCE_EXAMPLE_MODE='audit'`.
- 4. Get the new catalog containing the audit resources using: `puppet agent
-    --test`.
- 5. Manually change a registry value inside of `HKLM\Software\Vendor\Puppet
-    Labs\Examples\Compliance`.
- 6. Run `puppet inspect` and notice that Puppet has picked up the manual change
-    and set it to the Puppet Enterprise Console as an inspect report.
-
-![Registry Value Inspect Report](http://links.puppetlabs.com/screen_shot_registry_value_audit_01.png)
-
 License
 -------
 
@@ -129,29 +105,11 @@ Support
 -------
 
 Please log tickets and issues at our [Module Issue
-Tracker](http://projects.puppetlabs.com/projects/modules)
+Tracker](http://projects.puppetlabs.com/projects/modules).
 
 Known Issues
 ============
 
-Autorequire relationships
--------------------------
-
-The `registry_key` auto-require functionality doesn't appear to work with `->`
-style relationships.  This results in a circular dependency:
-
-
-    Registry_key { ensure => absent }
-    registry_key { '#{keypath}\\SubKey1': }
-    -> registry_key { '#{keypath}\\SubKeyToPurge': }
-    -> registry_key { '#{keypath}': }
-
-But this does not:
-
-    registry_key { '#{keypath}\\SubKey1': }
-    registry_key { '#{keypath}\\SubKeyToPurge': }
-    registry_key { '#{keypath}':
-      require => Registry_key['#{keypath}\\SubKeyToPurge', '#{keypath}\\SubKey1'],
-    }
+Please refer to the [current list](http://projects.puppetlabs.com/projects/modules/issues?v%5Bcategory_id%5D%5B%5D=309) of known registry issues.
 
 EOF
