@@ -154,22 +154,4 @@ But this does not:
       require => Registry_key['#{keypath}\\SubKeyToPurge', '#{keypath}\\SubKey1'],
     }
 
-Autorequire case sensitivity
-----------------------------
-
-The autorequire functionality currently does a case sensitive match against
-parent keys.  This means the following `registry_value` will not Autorequire
-the parent `registry_key`:
-
-    registry_key { 'HKLM\Software\Vendor\PUPPETLABS':
-      ensure => present,
-    }
-    registry_value { 'HKLM\Software\Vendor\puppetlabs\RegValue':
-      data => "Does not auto-require parent key",
-    }
-
-The work around is to make sure all of your parent keys match case with values
-you're managing inside these keys.  This is a bug and we plan to fix it as soon
-as possible.
-
 EOF
