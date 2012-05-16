@@ -3,6 +3,22 @@ require 'pathname' # JJM WORK_AROUND #14073
 require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry'
 
 Puppet::Type.newtype(:registry_key) do
+  @doc = <<-EOT
+    Manages registry keys on Windows systems.
+
+    Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are
+    supported.  Other predefined root keys, e.g. HKEY_USERS, are not
+    currently supported.
+
+    If Puppet creates a registry key, Windows will automatically create any
+    necessary parent registry keys that do not exist.
+
+    Puppet will not recursively delete registry keys.
+
+    **Autorequires:** Any parent registry key managed by Puppet will be
+    autorequired.
+EOT
+
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
   end
@@ -10,12 +26,11 @@ Puppet::Type.newtype(:registry_key) do
   ensurable
 
   newparam(:path, :namevar => true) do
-    desc <<-'EODESC'
-The path to the registry key to manage.  For example; 'HKLM\Software',
-'HKEY_LOCAL_MACHINE\Software\Vendor'.  If Puppet is running on a 64 bit system,
-the 32 bit registry key can be explicitly manage using a prefix.  For example:
-'32:HKLM\Software'
-    EODESC
+    desc "The path to the registry key to manage.  For example; 'HKLM\Software',
+      'HKEY_LOCAL_MACHINE\Software\Vendor'.  If Puppet is running on a 64-bit
+      system, the 32-bit registry key can be explicitly managed using a
+      prefix.  For example: '32:HKLM\Software'"
+
     validate do |path|
       Puppet::Modules::Registry::RegistryKeyPath.new(path).valid?
     end
@@ -32,10 +47,9 @@ the 32 bit registry key can be explicitly manage using a prefix.  For example:
   # REVISIT - Make a common parameter for boolean munging and validation.  This will be used
   # By both registry_key and registry_value types.
   newparam(:purge_values, :boolean => true) do
-    desc <<-'EODESC'
-Whether to delete any registry value associated with this key that is not being
-managed by puppet.
-    EODESC
+    desc "Whether to delete any registry value associated with this key that is
+    not being managed by puppet."
+
     newvalues(:true, :false)
     defaultto false
 

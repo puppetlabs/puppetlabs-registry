@@ -3,6 +3,17 @@ require 'pathname' # JJM WORK_AROUND #14073
 require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry'
 
 Puppet::Type.newtype(:registry_value) do
+  @doc = <<-EOT
+    Manages registry values on Windows systems.
+
+    The `registry_value` type can manage registry values.  See the
+    `type` and `data` attributes for information about supported
+    registry types, e.g. REG_SZ, and how the data should be specified.
+
+    **Autorequires:** Any parent registry key managed by Puppet will be
+    autorequired.
+EOT
+
   def self.title_patterns
     [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
   end
@@ -10,12 +21,12 @@ Puppet::Type.newtype(:registry_value) do
   ensurable
 
   newparam(:path, :namevar => true) do
-    desc <<-'EODESC'
-The path to the registry value to manage.  For example; 'HKLM\Software\Value1',
-'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'.  If Puppet is running on a 64 bit
-system, the 32 bit registry key can be explicitly manage using a prefix.  For
-example: '32:HKLM\Software\Value3'
-    EODESC
+    desc "The path to the registry value to manage.  For example:
+      'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'.
+      If Puppet is running on a 64-bit system, the 32-bit registry key can
+      be explicitly manage using a prefix.  For example:
+      '32:HKLM\Software\Value3'"
+
     validate do |path|
       Puppet::Modules::Registry::RegistryValuePath.new(path).valid?
     end
@@ -30,26 +41,25 @@ example: '32:HKLM\Software\Value3'
   end
 
   newproperty(:type) do
-    desc <<-'EODESC'
-The Windows data type of the registry value.  Puppet provides helpful names for
-these types as follows:
+    desc "The Windows data type of the registry value.  Puppet provides
+      helpful names for these types as follows:
 
- * string => REG_SZ
- * array  => REG_MULTI_SZ
- * expand => REG_EXPAND_SZ
- * dword  => REG_DWORD
- * qword  => REG_QWORD
- * binary => REG_BINARY
-    EODESC
+      * string => REG_SZ
+      * array  => REG_MULTI_SZ
+      * expand => REG_EXPAND_SZ
+      * dword  => REG_DWORD
+      * qword  => REG_QWORD
+      * binary => REG_BINARY
+
+    "
     newvalues(:string, :array, :dword, :qword, :binary, :expand)
     defaultto :string
   end
 
   newproperty(:data, :array_matching => :all) do
-    desc <<-'EODESC'
-The data stored in the registry value.  Data should be specified as a string
-value but may be specified as a Puppet array when the type is set to 'array'.
-    EODESC
+    desc "The data stored in the registry value.  Data should be specified
+     as a string value but may be specified as a Puppet array when the
+     type is set to `array`."
 
     defaultto ''
 
