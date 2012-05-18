@@ -31,12 +31,18 @@ EOT
       Puppet::Modules::Registry::RegistryValuePath.new(path).valid?
     end
     munge do |path|
-      canonical = Puppet::Modules::Registry::RegistryValuePath.new(path).canonical
+      reg_path = Puppet::Modules::Registry::RegistryValuePath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
-      @resource.catalog.alias(@resource, canonical.downcase) if @resource.catalog.respond_to? :alias
-      canonical
+      if @resource.catalog
+        reg_path.aliases.each do |alt_name|
+          @resource.catalog.alias(@resource, alt_name)
+        end
+      else
+        Puppet.debug "Resource has no associated catalog.  Aliases are not being set for #{@resource.to_s}"
+      end
+      reg_path.canonical
     end
   end
 
@@ -111,7 +117,9 @@ EOT
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
-    path = Puppet::Modules::Registry::RegistryKeyPath.new(value(:path))
+    # This is a value path and not a key path because it's based on the path of
+    # the value resource.
+    path = Puppet::Modules::Registry::RegistryValuePath.new(value(:path))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.

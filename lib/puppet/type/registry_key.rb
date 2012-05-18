@@ -35,12 +35,18 @@ EOT
       Puppet::Modules::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      canonical = Puppet::Modules::Registry::RegistryKeyPath.new(path).canonical
+      reg_path = Puppet::Modules::Registry::RegistryKeyPath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
-      @resource.catalog.alias(@resource, canonical.downcase) if @resource.catalog.respond_to? :alias
-      canonical
+      if @resource.catalog
+        reg_path.aliases.each do |alt_name|
+          @resource.catalog.alias(@resource, alt_name)
+        end
+      else
+        Puppet.debug "Resource has no associated catalog.  Aliases are not being set for #{@resource.to_s}"
+      end
+      reg_path.canonical
     end
   end
 
@@ -102,7 +108,7 @@ EOT
     # create absent registry_value resources for the complement
     resources = []
     (is_values - should_values).each do |name|
-      resources << Puppet::Type.type(:registry_value).new(:path => "#{self[:path]}\\#{name}", :ensure => :absent)
+      resources << Puppet::Type.type(:registry_value).new(:path => "#{self[:path]}\\#{name}", :ensure => :absent, :catalog => catalog)
     end
     resources
   end

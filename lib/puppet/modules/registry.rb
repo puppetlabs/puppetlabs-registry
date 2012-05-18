@@ -30,6 +30,13 @@ module Puppet::Modules::Registry
       filter_path[:canonical]
     end
 
+    # This method is meant to help setup aliases so autorequire can sort itself
+    # out in a case insensitive but preserving manner.  It returns an array of
+    # resource identifiers.
+    def aliases
+      [canonical.downcase]
+    end
+
     def access
       filter_path[:access]
     end
@@ -104,30 +111,45 @@ module Puppet::Modules::Registry
                 raise ArgumentError, "Invalid registry key: #{path}"
               end
 
-      result[:subkey] = captures[3]
+      result[:trailing_path] = captures[3]
 
-      if result[:subkey].empty?
+      result[:trailing_path].gsub!(/^\\/, '')
+
+      if result[:trailing_path].empty?
         result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}"
       else
         # Leading backslash is not part of the subkey name
-        result[:subkey].sub!(/^\\(.*)$/, '\1')
-        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}\\#{result[:subkey]}"
+        result[:canonical] = "#{result[:prefix]}#{result[:root].to_s}\\#{result[:trailing_path]}"
       end
 
       @filter_path_memo = result
     end
-
   end
 
   class RegistryKeyPath < RegistryPathBase
     def subkey
-      filter_path[:subkey]
+      filter_path[:trailing_path]
     end
   end
 
   class RegistryValuePath < RegistryPathBase
+    def canonical
+      # This method gets called in the type and the provider.  We need to
+      # preserve the trailing backslash for the provider, otherwise it won't
+      # think this is a default value.
+      if default?
+        filter_path[:canonical] << "\\"
+      else
+        filter_path[:canonical]
+      end
+    end
+
     def subkey
-      filter_path[:subkey].gsub(/\\#{filter_path[:valuename]}/, '')
+      if default?
+        filter_path[:trailing_path]
+      else
+        filter_path[:trailing_path].gsub(/^(.*)\\.*$/, '\1')
+      end
     end
 
     def valuename
