@@ -43,6 +43,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def flush
+    # REVISIT - This concept of flush seems different than package provider's
+    # concept of flush.
     Puppet.debug("Flushing registry value: #{self}")
     return if resource[:ensure] == :absent
     write_value
@@ -134,10 +136,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   def reg_query_value_ex_a
     @@reg_query_value_ex_a ||= Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
   end
-
-  # def to_s
-  #   "#{valuepath.hkey.keyname}\\#{valuepath.subkey}\\#{valuepath.valuename}"
-  # end
 
   private
 
