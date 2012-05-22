@@ -1,4 +1,8 @@
-2012-05-16 - Jeff McCune <jeff@puppetlabs.com>
+0.1.1 - 2012-05-21 - Jeff McCune <jeff@puppetlabs.com>
+ * (#14517) Improve error handling when writing values (27223db)
+ * (#14572) Fix management of the default value (f29bdc5)
+
+0.1.0 - 2012-05-16 - Jeff McCune <jeff@puppetlabs.com>
  * (#14529) Add registry::value defined type (bf44208)
 
 2012-05-16 - Josh Cooper <josh+github@puppetlabs.com>
