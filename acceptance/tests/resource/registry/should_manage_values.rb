@@ -292,6 +292,15 @@ step "Start the master" do
         end
         assert_no_match(/err:/, result.stdout, "Expected no error messages.")
       end
+
+      step "Registry Values - Phase 3 - Check the default value (#14572)"
+      # (#14572) This test uses the 64 bit version of reg.exe to read the
+      # default value of a registry key.  It should contain the string shown in
+      # val_re.
+      on agent, "/cygdrive/c/windows/sysnative/reg.exe query '#{keypath}\\Subkey1'" do
+        val_re = /\(Default\)    REG_SZ    Default Data phase=2/i
+        assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
+      end
     end
   end
 end

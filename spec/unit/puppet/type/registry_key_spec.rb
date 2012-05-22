@@ -5,7 +5,13 @@ require 'puppet/resource/catalog'
 require 'puppet/type/registry_key'
 
 describe Puppet::Type.type(:registry_key) do
-  let (:key) { Puppet::Type.type(:registry_key).new(:name => 'HKLM\Software') }
+  let (:catalog) do Puppet::Resource::Catalog.new end
+
+  # This is overridden here so we get a consistent association with the key
+  # and a catalog using memoized let methods.
+  let (:key) do
+    Puppet::Type.type(:registry_key).new(:name => 'HKLM\Software', :catalog => catalog)
+  end
 
   [:ensure].each do |property|
     it "should have a #{property} property" do
