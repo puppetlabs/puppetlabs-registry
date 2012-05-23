@@ -40,7 +40,7 @@ describe Puppet::Type.type(:registry_key) do
       end
     end
 
-    %[hklm\\ hklm\foo\\ unknown unknown\subkey \:hkey].each do |path|
+    %w[hklm\\ hklm\foo\\ unknown unknown\subkey \:hkey].each do |path|
       it "should reject #{path} as invalid" do
         path = "hklm\\" + 'a' * 256
         expect { key[:path] = path }.should raise_error(Puppet::Error, /Invalid registry key/)

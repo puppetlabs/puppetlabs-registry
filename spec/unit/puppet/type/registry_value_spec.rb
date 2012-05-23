@@ -42,7 +42,7 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    %[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
+    %w[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
       it "should reject #{path} as invalid" do
         pending 'wrong message'
         expect { described_class.new(:path => path, :catalog => catalog) }.should raise_error(Puppet::Error, /Invalid registry key/)
