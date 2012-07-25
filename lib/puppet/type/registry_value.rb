@@ -1,6 +1,10 @@
 require 'puppet/type'
-require 'pathname' # JJM WORK_AROUND #14073
-require Pathname.new(__FILE__).dirname.dirname.expand_path + 'modules/registry'
+begin
+  require "puppet_x/puppetlabs/registry"
+rescue
+  require 'pathname' # JJM WORK_AROUND #14073 and #7788
+  require Pathname.new(__FILE__).dirname + "../../" + "puppet_x/puppetlabs/registry"
+end
 
 Puppet::Type.newtype(:registry_value) do
   @doc = <<-EOT
@@ -28,10 +32,10 @@ EOT
       '32:HKLM\Software\Value3'"
 
     validate do |path|
-      Puppet::Modules::Registry::RegistryValuePath.new(path).valid?
+      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path).valid?
     end
     munge do |path|
-      reg_path = Puppet::Modules::Registry::RegistryValuePath.new(path)
+      reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
@@ -119,7 +123,7 @@ EOT
     req = []
     # This is a value path and not a key path because it's based on the path of
     # the value resource.
-    path = Puppet::Modules::Registry::RegistryValuePath.new(value(:path))
+    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
