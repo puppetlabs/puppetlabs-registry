@@ -1,8 +1,8 @@
-require 'pathname' # JJM WORK_AROUND #14073
-require Pathname.new(__FILE__).dirname.expand_path
-
 # This module is meant to be mixed into the registry_key AND registry_value providers.
-module Puppet::Modules::Registry::ProviderBase
+module PuppetX
+module Puppetlabs
+module Registry
+module ProviderBase
   # This is a class method in order to be easily mocked in the spec tests.
   def self.initialize_system_api
     if Puppet.features.microsoft_windows?
@@ -85,4 +85,7 @@ module Puppet::Modules::Registry::ProviderBase
     type2name_map.each_pair {|k,v| name2type[v] = k}
     name2type[name]
   end
+end
+end
+end
 end
