@@ -1,10 +1,16 @@
 require 'puppet/type'
-require 'pathname' # JJM WORK_AROUND #14073
-require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry'
-require Pathname.new(__FILE__).dirname.dirname.dirname.expand_path + 'modules/registry/provider_base'
+begin
+  require "puppet_x/puppetlabs/registry"
+  require "puppet_x/puppetlabs/registry/provider_base"
+rescue LoadError => detail
+  require "pathname" # JJM WORK_AROUND #14073 and #7788
+  module_base = Pathname.new(__FILE__).dirname + "../../../"
+  require module_base + "puppet_x/puppetlabs/registry"
+  require module_base + "puppet_x/puppetlabs/registry/provider_base"
+end
 
 Puppet::Type.type(:registry_value).provide(:registry) do
-  include Puppet::Modules::Registry::ProviderBase
+  include PuppetX::Puppetlabs::Registry::ProviderBase
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
@@ -160,6 +166,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def path
-    @path ||= Puppet::Modules::Registry::RegistryValuePath.new(resource.parameter(:path).value)
+    @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value)
   end
 end
