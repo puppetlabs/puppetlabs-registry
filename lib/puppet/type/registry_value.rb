@@ -1,6 +1,5 @@
 require 'puppet/type'
 begin
-  debugger
   require "puppet_x/puppetlabs/registry"
 rescue LoadError => detail
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
