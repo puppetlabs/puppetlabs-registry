@@ -22,12 +22,12 @@
 
 ##Overview
 
-The Registry module enables you to manage your Windows registry from your *nix puppet master.
+The Registry module enables you to manage your Windows Registry from your *nix puppet master.
 
 ##Module Description
 
 This module provides the types and providers necessary to create and manage Windows
-Registry keys, values and services with Puppet. 
+Registry keys and values with Puppet. 
 
 ##Setup
 
@@ -48,7 +48,7 @@ To begin using Registry, you must download the module to your puppet master. Thi
 
 The bulk of Registry's capabilities comes from two resource types: `registry_key` and `registry_value`. Combined, these types allow you to specify the registry container and file(s) meant to be in it. 
 
-The defined resource type `registry::value` allows you to manage registry values and the parent key in one fell swoop. For example,
+The defined resource type `registry::value` allows you to manage registry values and the parent key in one fell swoop.
 
     registry::value { 'MyApp Setting1':
       key   => 'HKLM\Software\Vendor\PuppetLabs',
@@ -77,13 +77,13 @@ The type or types you declare will be applied at the next catalog run, and each 
 There are a few functions worth taking note of: 
 
 * If Puppet creates a registry key, Windows will automatically create any necessary parent registry keys that do not already exist.
-* Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported.  Other predefined root keys, e.g. HKEY_USERS, are not currently supported.
+* Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported.  Other predefined root keys (e.g. HKEY_USERS) are not currently supported.
 * Puppet will not recursively delete registry keys.
 * Any parent registry key managed by Puppet will be autorequired.
 
 ###Puppet Enterprise console
 
-Follow the [instructions above](#beginning-with-registy), except add the defined resource type or custom types to a class that is or can be applied to your nodes. 
+Follow the [instructions above](#beginning-with-registry), except add the defined resource type or custom types to a class that is or can be applied to your nodes. 
 
 Once you have added the type(s) to a class, use the [Puppet Enterprise console](http://docs.puppetlabs.com/pe/2.5/console_classes_groups.html#classes) to assign the class to a Windows node or node group.
 
@@ -102,7 +102,7 @@ The `registry::value` defined resource type allows you to use Puppet to manage t
 
 In the above example, a value named 'puppetmaster' would be created inside the key `HKLM\Software\Vendor\PuppetLabs`.
 
-The `registry::value` defined type only manages keys and values in the system native architecture. In other words, 32 bit keys applied in a 64 bit OS won't be managed by this defined type; instead, you must use the custom resource types individually.
+The `registry::value` defined type only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS won't be managed by this defined type; instead, you must use the custom resource types individually.
 
 ####Parameters in `registry::value`:
 
@@ -150,9 +150,9 @@ Determines whether or not the key must exist. If not included, the module will d
 
 #####`path`
 
-Specifies the path of registry key to manage. For example: `HKLMSoftware`or `HKEY_LOCAL_MACHINESoftwareVendor`. 
+Specifies the path of registry key to manage. For example: `HKLM\Software`or `HKEY_LOCAL_MACHINE\Software\Vendor`. 
 
-If Puppet is running on a 64-bit system, the 32-bit registry key can be explicitly managed using a prefix. For example: `32:HKLMSoftware`.
+If Puppet is running on a 64-bit system, the 32-bit registry key can be explicitly managed using a prefix. For example: `32:HKLM\Software`.
 
 #####`purge_values`
 
@@ -176,9 +176,9 @@ This type may be used outside of the `registry::value` defined type for specific
 
 #####`path`
 
-Specifies the path of the registry value to manage. For example: `HKLMSoftwareValue1` or `HKEY_LOCAL_MACHINESoftwareVendorValue2`. 
+Specifies the path of the registry value to manage. For example: `HKLM\Software\Value1` or `HKEY_LOCAL_MACHINE\Software\Vendor\Value2`. 
 
-If Puppet is running on a 64-bit system, the 32-bit registry value can be explicitly managed using a prefix. For example: `32:HKLMSoftwareValue3`
+If Puppet is running on a 64-bit system, the 32-bit registry value can be explicitly managed using a prefix. For example: `32:HKLM\Software\Value3`
 
 #####`ensure`
 
