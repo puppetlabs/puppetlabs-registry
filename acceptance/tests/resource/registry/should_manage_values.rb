@@ -320,12 +320,17 @@ step "Start the master" do
       end
 
       step "Registry Values - Phase 3 - Check the default value (#14572)"
-      # (#14572) This test uses the 64 bit version of reg.exe to read the
+      # (#14572) This test uses the 'native' version of reg.exe to read the
       # default value of a registry key.  It should contain the string shown in
       # val_re.
-      on agent, "/cygdrive/c/windows/sysnative/reg.exe query '#{keypath}\\Subkey1'" do
-        val_re = /\(Default\)    REG_SZ    Default Data phase=2/i
-        assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
+      dir = native_sysdir(agent)
+      if not dir
+        Log.warn("Cannot query 64-bit view of registry from 32-bit process, skipping")
+      else
+        on agent, "#{dir}/reg.exe query '#{keypath}\\Subkey1'" do
+          val_re = /\(Default\)    REG_SZ    Default Data phase=2/i
+          assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
+        end
       end
     end
   end
