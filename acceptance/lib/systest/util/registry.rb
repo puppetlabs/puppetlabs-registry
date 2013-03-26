@@ -89,6 +89,22 @@ module Systest::Util::Registry
     @agent_exit_codes ||= [0, 2]
   end
 
+  def x64?(agent)
+    on(agent, facter('architecture')).stdout.chomp == 'x64'
+  end
+
+  def native_sysdir(agent)
+    if x64?(agent)
+      if on(agent, 'ls /cygdrive/c/windows/sysnative', :acceptable_exit_codes => (0..255)).exit_code == 0
+        '`cygpath -W`/sysnative'
+      else
+        nil
+      end
+    else
+      '`cygpath -S`'
+    end
+  end
+
   def randomstring(length)
     chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
     str = ""
