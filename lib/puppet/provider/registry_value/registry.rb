@@ -140,7 +140,11 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def reg_query_value_ex_a
-    @@reg_query_value_ex_a ||= Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
+    self.class.reg_query_value_ex_a
+  end
+
+  def self.reg_query_value_ex_a
+    @reg_query_value_ex_a ||= Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
   end
 
   private
