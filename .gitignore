@@ -2,4 +2,3 @@ pkg/
 .DS_Store
 metadata.json
 coverage/
-Gemfile.lock
