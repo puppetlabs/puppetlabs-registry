@@ -36,14 +36,14 @@ describe Puppet::Type.type(:registry_key) do
 
     %w[HKEY_DYN_DATA HKEY_PERFORMANCE_DATA].each do |path|
       it "should reject #{path} as unsupported case insensitively" do
-        expect { key[:path] = path }.should raise_error(Puppet::Error, /Unsupported/)
+        expect { key[:path] = path }.to raise_error(Puppet::Error, /Unsupported/)
       end
     end
 
     %w[hklm\\ hklm\foo\\ unknown unknown\subkey \:hkey].each do |path|
       it "should reject #{path} as invalid" do
         path = "hklm\\" + 'a' * 256
-        expect { key[:path] = path }.should raise_error(Puppet::Error, /Invalid registry key/)
+        expect { key[:path] = path }.to raise_error(Puppet::Error, /Invalid registry key/)
       end
     end
 
