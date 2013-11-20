@@ -1,4 +1,29 @@
-pkg/
+-metadata.json
+-coverage/
+
+## MAC OS
 .DS_Store
-metadata.json
-coverage/
+
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+tags
+
+## Gemfile
+Gemfile.lock
+
+## Bundler
+.bundle/
+.vendor/
+vendor/bundle/
+
+## Puppet Module Tool
+pkg/
