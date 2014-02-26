@@ -2,38 +2,32 @@
 
 ####Table of Contents
 
-1. [Overview - What is the Registry module?](#overview)
-2. [Module Description - What does the module do?](#module-description)
-3. [Setup - The basics of getting started with Registry](#setup)
-    * [What Registry affects](#what-registry-affects)
+1. [Overview - What is the registry module?](#overview)
+2. [Setup - The basics of getting started with registry](#setup)
+    * [What registry affects](#what-registry-affects)
     * [Setup requirements](#setup-requirements)
-    * [Beginning with Registry](#beginning-with-registry)
-    * [Puppet Enterprise Console](#puppet-enterprise-console)
-4. [Usage - Configuration options and additional functionality](#usage)
+    * [Beginning with registry](#beginning-with-registry)
+        * [Puppet Enterprise console](#puppet-enterprise-console)
+        * [Noteworthy functionality](#noteworthy_functionality)
+3. [Usage - Configuration options and additional functionality](#usage)
     * [Defined Type: registry::value](#defined-type-registryvalue)
     * [Custom Type: registry_key](#custom-type-registrykey)
     * [Custom Type: registry_value](#custom-type-registryvalue)
     * [Defined Type: registry::service](#defined-type-registryservice)
     * [Purge Values](#purge-values)
-    * [Puppet Enterprise: Compliance](#puppet-enterprise-compliance)
-5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
+4. [Limitations - OS compatibility, etc.](#limitations)
+5. [Development - Guide for contributing to the module](#development)
 
 
 ##Overview
 
-The Registry module enables you to manage your Windows Registry from your *nix puppet master.
-
-##Module Description
-
-This module provides the types and providers necessary to create and manage Windows
-Registry keys and values with Puppet. 
+The registry module enables you to manage your Windows Registry from your *nix puppet master by supplying the types and providers necessary to create and manage Windows Registry keys and values with Puppet. 
 
 ##Setup
 
-###What Registry affects
+###What registry affects
 
-* files, folders and services in Windows Registry    
+* files, folders, and services in Windows Registry    
 * node manifests
 
 ###Setup requirements
@@ -44,11 +38,11 @@ This setting will ensure the types and providers are synchronized and available 
 
 ###Beginning with Registry
 
-To begin using Registry, you must download the module to your puppet master. This module is intended for installation on a *nix master for use with a Windows agent.
+The registry module is intended to enable a *nix master server to interact with a Windows agent. The module must be downloaded and installed on your puppet master.
 
-The bulk of Registry's capabilities comes from two resource types: `registry_key` and `registry_value`. Combined, these types allow you to specify the registry container and file(s) meant to be in it. 
+The bulk of registry's capabilities comes from two resource types: `registry_key` and `registry_value`. Combined, these types allow you to specify the Registry container and the file(s) meant to be in it. 
 
-The defined resource type `registry::value` allows you to manage registry values and the parent key in one fell swoop.
+The defined resource type `registry::value` allows you to manage Registry values and the parent key in one fell swoop.
 
     registry::value { 'MyApp Setting1':
       key   => 'HKLM\Software\Vendor\PuppetLabs',
@@ -56,7 +50,7 @@ The defined resource type `registry::value` allows you to manage registry values
       data  => 'Hello World!'
     }
     
-Within this defined type, you can specify multiple registry values for one registry key and manage both at once. 
+Within this defined type, you can specify multiple Registry values for one registry key and manage both at once. 
 
 If, on the other hand, you just want to manage a standalone key or value, you can declare each resource type individually in your site.pp manifest.
 
@@ -72,20 +66,20 @@ and/or
       data   => "The Puppet Agent service periodically manages your configuration",
     }
 
-The type or types you declare will be applied at the next catalog run, and each one will be managed individually.   
+The type or types you declare will be applied at the next catalog run, and each one will be managed individually.
 
-There are a few functions worth taking note of: 
+####Puppet Enterprise console
 
-* If Puppet creates a registry key, Windows will automatically create any necessary parent registry keys that do not already exist.
+The Puppet Enterprise console makes using the registry module even easier. To manage Registry values or keys add the `registry::value` defined type, `registry_key` resource, or registry custom types to a class that is or can be applied to your agent nodes.
+
+Once you have applied the type(s) or resources to a class, use the [Puppet Enterprise console](http://docs.puppetlabs.com/pe/latest/console_classes_groups.html#classes) to assign the class to a Windows node or node group.
+
+####Noteworthy functionality 
+
+* If Puppet creates a Registry key, Windows will automatically create any necessary parent Registry keys that do not already exist.
 * Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported.  Other predefined root keys (e.g. HKEY_USERS) are not currently supported.
-* Puppet will not recursively delete registry keys.
-* Any parent registry key managed by Puppet will be autorequired.
-
-###Puppet Enterprise console
-
-Follow the [instructions above](#beginning-with-registry), except add the defined resource type or custom types to a class that is or can be applied to your nodes. 
-
-Once you have added the type(s) to a class, use the [Puppet Enterprise console](http://docs.puppetlabs.com/pe/2.5/console_classes_groups.html#classes) to assign the class to a Windows node or node group.
+* Puppet will not recursively delete Registry keys.
+* Any parent Registry key managed by Puppet will be autorequired.
 
 ##Usage
 
@@ -100,15 +94,15 @@ The `registry::value` defined resource type allows you to use Puppet to manage t
       }
     }
 
-In the above example, a value named 'puppetmaster' would be created inside the key `HKLM\Software\Vendor\PuppetLabs`.
+In the above example, a value named 'puppetmaster' would be created inside the key HKLM\Software\Vendor\PuppetLabs`.
 
-The `registry::value` defined type only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS won't be managed by this defined type; instead, you must use the custom resource types individually.
+The `registry::value` defined type only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS won't be managed by this defined type; instead, you must use the custom resource types, [`registry_key`](#custom-type-registry_key) and [`registry_value`](#custom-type-registry_value) individually.
 
 ####Parameters in `registry::value`:
 
 #####`data`
 
-Lists the data inside the registry value. Data should be specified as a string value, unless you have set the `type` parameter to 'array'.
+Lists the data inside the Registry value. Data should be specified as a string, unless you have set the `type` parameter to 'array'.
 
 #####`key`
 
@@ -122,7 +116,7 @@ Determines the type of the registry value(s).  Defaults to 'string'. Valid value
 
 Lists the name of the registry value(s) to manage.  This will be copied from the resource title if not specified.  
 
-You can also use this parameter to set a specific registry value as the default value for the key. To do so you must name the value `'(default)'`.
+You can also use this parameter to set a specific registry value as the default value for the key. To do so you must name the value '(default)'.
 
     registry::value { 'Setting0':
       key   => 'HKLM\System\CurrentControlSet\Services\Puppet',
@@ -134,7 +128,7 @@ It is worth noting that you can still add additional values in a string (or arra
 
 ###Custom Type: registry_key
 
-The `registry_key` custom type allows management of individual registry keys on Windows systems. 
+This custom type allows management of individual Registry keys on Windows systems. 
 
     registry_key { 'HKLM\System\CurrentControlSet\Services\Puppet':
       ensure => present,
@@ -150,19 +144,19 @@ Determines whether or not the key must exist. If not included, the module will d
 
 #####`path`
 
-Specifies the path of registry key to manage. For example: `HKLM\Software`or `HKEY_LOCAL_MACHINE\Software\Vendor`. 
+Specifies the path of the Registry key to manage. For example: 'HKLM\Software' or 'HKEY_LOCAL_MACHINE\Software\Vendor'. 
 
-If Puppet is running on a 64-bit system, the 32-bit registry key can be explicitly managed using a prefix. For example: `32:HKLM\Software`.
+If Puppet is running on a 64-bit system, the 32-bit registry key can be explicitly managed using a prefix. For example: '32:HKLM\Software'.
 
 #####`purge_values`
 
-Whether to delete any registry value associated with this key that is not being managed by puppet. Valid values are 'true' and 'false'. 
+Whether to delete any Registry value associated with this key that is not being managed by Puppet. Valid values are 'true' and 'false'. 
 
-[See below](#purge-values) for more information on how this parameter works.
+See the [Purge Values section](#purge-values) for more information on how this parameter works.
 
 ###Custom Type: registry_value
 
-The `registry_value` custom type allows management of individual registry values on Windows systems. 
+This custom type allows management of individual Registry values on Windows systems. 
 
     registry_value { 'HKLM\System\CurrentControlSet\Services\Puppet\Description':
       ensure => present,
@@ -176,9 +170,9 @@ This type may be used outside of the `registry::value` defined type for specific
 
 #####`path`
 
-Specifies the path of the registry value to manage. For example: `HKLM\Software\Value1` or `HKEY_LOCAL_MACHINE\Software\Vendor\Value2`. 
+Specifies the path of the registry value to manage. For example: 'HKLM\Software\Value1' or 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'. 
 
-If Puppet is running on a 64-bit system, the 32-bit registry value can be explicitly managed using a prefix. For example: `32:HKLM\Software\Value3`
+If Puppet is running on a 64-bit system, the 32-bit Registry value can be explicitly managed using a prefix. For example: '32:HKLM\Software\Value3'.
 
 #####`ensure`
 
@@ -186,15 +180,15 @@ Determines whether or not the value must exist. If not included, the module will
 
 #####`type`
 
-Determines the type of the registry value data. Valid values are 'string', 'array', 'dword', 'qword', 'binary', or 'expand'.
+Determines the type of the Registry value data. Valid values are 'string', 'array', 'dword', 'qword', 'binary', or 'expand'.
 
 #####`data`
 
-Lists the data inside the registry value. Data should be specified as a string value, unless you have set the `type` parameter to 'array'.
+Lists the data inside the Registry value. Data should be specified as a string value, unless you have set the `type` parameter to 'array'.
 
 ###Defined Type: registry::service
 
-The `registry::service` defined resource type utilizes specific registry keys and values to manage service entries in the Microsoft service control framework. Specifically, `registry::service` manages the values in the key `HKLM\System\CurrentControlSet\Services\$name\`.
+The `registry::service` defined resource type utilizes specific Registry keys and values to manage service entries in the Microsoft service control framework. Specifically, `registry::service` manages the values in the key HKLM\System\CurrentControlSet\Services\$name\.
 
     registry::service { puppet:
       ensure       => present,
@@ -227,7 +221,7 @@ Specifies the command to execute.
 
 Specifies the starting mode of the service. Valid values are 'automatic', 'manual', and 'disabled'. 
 
-The native service resource can also be used to manage this setting. You can read more about that [here](http://docs.puppetlabs.com/references/latest/type.html#service).
+The [native service resource](http://docs.puppetlabs.com/references/latest/type.html#service) can also be used to manage this setting.
 
 ####Extended `registry::service` example
 
@@ -253,11 +247,11 @@ The Registry module provides a means of ensuring that only Puppet-specified valu
 
 In order to make sure only the values specified via Puppet are associated
 with a particular key, use the `purge_values => true` parameter of the
-`registry_key` resource. Enabling this feature will delete any values not managed by Puppet. 
+`registry_key` resource. **Enabling this feature will delete any values not managed by Puppet.** 
 
 The `registry::purge_example` class provides a quick and easy way to see a demonstration of how this works. This example class has two modes of operation determined by the Facter fact `PURGE_EXAMPLE_MODE`: 'setup' or 'purge'.
 
-To run the demonstration, make sure the `registry::purge_example` class is included in the node catalog, then set an environment variable in Power Shell. This will set up a registry key that contains six values. 
+To run the demonstration, make sure the `registry::purge_example` class is included in the node catalog, then set an environment variable in Power Shell. This will set up a Registry key that contains six values. 
 
     PS C:\> $env:FACTER_PURGE_EXAMPLE_MODE = 'setup'
     PS C:\> puppet agent --test
@@ -289,21 +283,11 @@ Notice how Value4, Value5 and Value6 are being removed.
     notice: /Stage[main]/Registry::Purge_example/Registry_value[HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge\Value1]/data: data changed '1' to '0'
     notice: Finished catalog run in 0.16 seconds
 
-###Puppet Enterprise: Compliance
-
-The Registry module comes with a class that provides an example of how to use the audit metaparameter to inspect `registry_key` and `registry_value` resources with the Compliance feature of Puppet Enterprise.
-
-To use this class, either 
-
-    include registry::compliance_example
-
-or, use the Puppet Enterprise console to assign the class to a Windows node or node group.
-
 ##Limitations
 
-This module was developed for use on *nix puppet master with Windows puppet agents.
+This module was developed for use on *nix puppet master, and has been tested on Windows Server 2003, 2008 R2, 2012, and 2012 R2 on the puppet agents.
 
-Please log tickets and issues at our [Module Issue Tracker](http://projects.puppetlabs.com/projects/modules).
+Please log tickets and issues at our [Module Issue Tracker](https://tickets.puppetlabs.com/browse/MODULES).
 
 ##Development
 
