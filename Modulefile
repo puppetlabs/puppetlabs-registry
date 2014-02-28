@@ -1,5 +1,5 @@
 name    'puppetlabs-registry'
-version '0.1.2'
+version '1.0.0'
 source 'git://github.com/puppetlabs/puppetlabs-registry.git'
 author 'puppetlabs'
 license 'Apache License, Version 2.0'
