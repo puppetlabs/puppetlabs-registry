@@ -1,6 +1,7 @@
 require 'rake'
 require 'rspec/core/rake_task'
 require 'puppetlabs_spec_helper/rake_tasks'
+require 'puppet-lint/tasks/puppet-lint'
 
 task :default => [:test]
 
@@ -15,3 +16,6 @@ RSpec::Core::RakeTask.new(:coverage) do |t|
   t.rcov = true
   t.rcov_opts = ['--exclude', 'spec']
 end
+
+
+PuppetLint.configuration.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp","tests/**/*.pp"]
