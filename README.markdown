@@ -1,4 +1,5 @@
 #registry
+[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-registry.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-registry)
 
 ####Table of Contents
 
