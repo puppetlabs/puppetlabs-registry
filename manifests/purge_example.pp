@@ -6,7 +6,8 @@
 #   This class has two modes of operation determined by the Facter fact
 #   PURGE_EXAMPLE_MODE  The value of this fact can be either 'setup' or 'purge'
 #
-#   The easiest way to set this mode is to set an environment variable in Power Shell:
+#   The easiest way to set this mode is to set an
+#    environment variable in Power Shell:
 #
 #   The setup mode creates a registry key and 6 values.
 #
@@ -107,11 +108,11 @@ class registry::purge_example {
       }
     }
     default: {
-      notify { "purge_example_notice":
-        message => "The purge_example_mode fact is not set.  To try this
-        example class first set \$env:FACTER_PURGE_EXAMPLE_MODE = 'setup' then
-        run puppet agent, then set \$env:FACTER_PURGE_EXAMPLE_MODE = 'purge'
-        and run puppet agent again to see the values purged.",
+      notify { 'purge_example_notice':
+        message => 'The purge_example_mode fact is not set.  To try this
+        example class first set \$env:FACTER_PURGE_EXAMPLE_MODE = \'setup\' then
+        run puppet agent, then set \$env:FACTER_PURGE_EXAMPLE_MODE = \'purge\'
+        and run puppet agent again to see the values purged.',
       }
     }
   }

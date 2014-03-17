@@ -34,17 +34,18 @@
 #
 #   registry::service { puppet:
 #     ensure       => present,
-#     display_name => "Puppet Agent",
-#     description  => "Periodically fetches and applies configurations from a Puppet master server.",
+#     display_name => 'Puppet Agent',
+#     description  => 'Periodically fetches and applies
+#                   configurations from a Puppet master server.',
 #     command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 #   }
 #
 define registry::service(
-  $ensure       = "UNSET",
-  $display_name = "UNSET",
-  $description  = "UNSET",
-  $command      = "UNSET",
-  $start        = "UNSET"
+  $ensure       = 'UNSET',
+  $display_name = 'UNSET',
+  $description  = 'UNSET',
+  $command      = 'UNSET',
+  $start        = 'UNSET'
 ) {
 
   $ensure_real = $ensure ? {
@@ -64,7 +65,8 @@ define registry::service(
     default => $description,
   }
 
-  # FIXME Better validation of the command parameter.  (Fully qualified path?  Though, it will be a REG_EXPAND_SZ.)
+  # FIXME Better validation of the command parameter.
+  # (Fully qualified path?  Though, it will be a REG_EXPAND_SZ.)
   $command_real = $command ? {
     default => $command,
   }
