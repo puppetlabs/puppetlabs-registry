@@ -3,3 +3,6 @@ pkg/
 coverage/
 .idea/
 *.iml
+acceptance/log/*
+.vagrant
+Gemfile.lock

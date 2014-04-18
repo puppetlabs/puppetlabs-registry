@@ -1,5 +1,5 @@
 require 'pathname'
-require Pathname.new(__FILE__).dirname.dirname.dirname.dirname + 'lib/systest/util/registry'
+require 'systest/util/registry'
 # Include our utility methods in the singleton class of the test case instance.
 class << self
   include Systest::Util::Registry
@@ -49,7 +49,8 @@ HERE
 setup_master master_manifest_content
 
 step "Start the master" do
-  with_master_running_on(master, master_options) do
+  with_puppet_running_on master, :__commandline_args__ => master_options do
+
     # A set of keys we expect Puppet to create
     phase1_resources_created = [
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
