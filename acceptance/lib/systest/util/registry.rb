@@ -1,4 +1,5 @@
 require 'pathname'
+
 require Pathname.new(__FILE__).dirname
 # This module is meant to be mixed into the individual test cases for the
 # registry module.
@@ -82,6 +83,14 @@ module Systest::Util::Registry
     "--modulepath=\"#{get_test_file_path(master, master_module_dir)}\" " +
     "--autosign true --pluginsync"
   end
+  def master_options_hash
+    @master_options_hash ||= {
+        :manifest   => "#{get_test_file_path(master, master_manifest_file)}",
+        :modulepath => "#{get_test_file_path(master, master_module_dir)} ",
+        :autosign   => true,
+        :pluginsync => true
+    }
+  end
 
   def agent_exit_codes
     # legal exit codes whenever we run the agent
@@ -143,18 +152,37 @@ module Systest::Util::Registry
     chown(host, options[:owner], options[:group], file_path)
     chmod(host, options[:mode], file_path)
   end
-
+  def puppet_module_install(host = nil, source = nil, module_name = nil, module_path = '/etc/puppet/modules')
+    module_dir = File.join(module_path,module_name)
+    on host, "mkdir -p #{module_path}"
+    ['manifests','lib'].each do |folder|
+      on host, "mkdir -p #{File.join(module_dir,folder)}"
+      host.do_scp_to(File.join(source,folder),module_dir,{:mkdir => true})
+    end
+  end
   def setup_master(master_manifest_content="# Intentionally Blank\n")
     step "Setup Puppet Master Manifest" do
+      proj_root = File.expand_path(File.join(File.dirname(__FILE__),'../../../../'))
       masters.each do |host|
+        puppet_module_install(host,proj_root,'registry',File.join(host['puppetpath'],"modules"))
         create_test_file(host, master_manifest_file, master_manifest_content, :mkdirs => true)
+        puppet_conf_update_ini = <<-MANIFEST
+        ini_setting{'Update Puppet.Conf':
+            ensure             => present,
+            section            => 'main',
+            key_val_separator  => '=',
+            path               => '#{host['puppetpath']}/puppet.conf',
+            setting            => 'manifestdir',
+            value              => '#{host_test_tmp_dirs[host.name]}/master_manifest/' }
+        MANIFEST
+        on host, puppet('apply','--debug'), :stdin => puppet_conf_update_ini
       end
     end
     step "Symlink the module(s) into the master modulepath" do
       masters.each do |host|
         moddir = get_test_file_path(host, master_module_dir)
         mkdirs(host, moddir)
-        on host, "ln -s /opt/puppet-git-repos/stdlib \"#{moddir}/stdlib\"; ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
+        #on host, "ln -s /opt/puppet-git-repos/stdlib \"#{moddir}/stdlib\"; ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
       end
     end
   end
@@ -162,6 +190,15 @@ module Systest::Util::Registry
   def clean_up
     step "Clean Up" do
       masters.each do |host|
+        puppet_conf_update_ini = <<-MANIFEST
+        ini_setting{'Revert Puppet.Conf':
+            ensure             => absent,
+            section            => 'main',
+            key_val_separator  => '=',
+            path               => '#{host['puppetpath']}/puppet.conf',
+            setting            => 'manifestdir' }
+        MANIFEST
+        on host, puppet('apply','--debug'), :stdin => puppet_conf_update_ini
         on host, "rm -rf \"%s\"" % get_test_file_path(host, '')
       end
       agents.each do |host|
