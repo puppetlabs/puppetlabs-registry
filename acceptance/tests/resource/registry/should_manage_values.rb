@@ -184,7 +184,7 @@ class phase1 {
   # Binary Values
   registry_value { '#{keypath}\\SubKey1\\ValueBinary1':
     type => binary,
-    data => "0${::fact_phase}",
+    data => "${::fact_phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueBinary2':
     type => binary,
