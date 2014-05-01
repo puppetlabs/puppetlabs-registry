@@ -1,5 +1,5 @@
 require 'pathname'
-require Pathname.new(__FILE__).dirname.dirname.dirname.dirname + 'lib/systest/util/registry'
+require 'systest/util/registry'
 # Include our utility methods in the singleton class of the test case instance.
 class << self
   include Systest::Util::Registry
@@ -14,7 +14,7 @@ HERE
 setup_master master_manifest_content
 
 step "Start the master and test pluginsync" do
-  with_master_running_on(master, master_options) do
+  with_puppet_running_on master, :__commandline_args__ => master_options do
     windows_agents.each do |agent|
       this_agent_args = agent_args % get_test_file_path(agent, agent_lib_dir)
       run_agent_on(agent, this_agent_args, :acceptable_exit_codes => agent_exit_codes) do
