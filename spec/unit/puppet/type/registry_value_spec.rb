@@ -136,6 +136,12 @@ describe Puppet::Type.type(:registry_value) do
           value[:data] = data
         end
       end
+      [9,'1','A'].each do |data|
+        it "should accept '#{data}' and have a leading zero" do
+          value[:type] = :binary
+          value[:data] = data
+        end
+      end
 
       ["\040\040", 'foobar', :true].each do |data|
         it "should reject '#{data}'" do
