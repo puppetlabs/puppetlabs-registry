@@ -1,3 +1,7 @@
+##2014-05-20 - Supported Release 1.0.1
+#####Bugfixes
+- Add zero padding to binary single character inputs
+
 ##2014-03-04 - Supported Release 1.0.0
 ###Summary
 This is a supported release.
