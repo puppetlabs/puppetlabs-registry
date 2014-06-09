@@ -1,6 +1,6 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
-
+require 'beaker/tasks/test'
 task :default => [:test]
 
 desc 'Run RSpec'
@@ -16,7 +16,7 @@ RSpec::Core::RakeTask.new(:coverage) do |t|
 end
 
 desc "Run rake tasks"
-task "beaker:test:pe" do |t, args|
+task "beaker:test:penow" do |t, args|
 
   cmd_str = "beaker --options-file .beaker-pe.cfg "
   args.extras.each do |v|
