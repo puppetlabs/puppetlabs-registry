@@ -153,12 +153,8 @@ module Systest::Util::Registry
     chmod(host, options[:mode], file_path)
   end
   def puppet_module_install(host = nil, source = nil, module_name = nil, module_path = '/etc/puppet/modules')
-    module_dir = File.join(module_path,module_name)
-    on host, "mkdir -p #{module_path}"
-    ['manifests','lib'].each do |folder|
-      on host, "mkdir -p #{File.join(module_dir,folder)}"
-      host.do_scp_to(File.join(source,folder),module_dir,{:mkdir => true})
-    end
+    opts = {:source => source, :module_name => module_name,:target_module_path => module_path}
+    copy_root_module_to(host,opts)
   end
   def setup_master(master_manifest_content="# Intentionally Blank\n")
     step "Setup Puppet Master Manifest" do

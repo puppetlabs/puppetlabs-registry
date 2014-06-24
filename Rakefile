@@ -23,18 +23,6 @@ RSpec::Core::RakeTask.new(:coverage) do |t|
   t.rcov_opts = ['--exclude', 'spec']
 end
 
-desc "Run rake tasks"
-task "beaker:test:pe" do |t, args|
-
-  cmd_str = "beaker --options-file ./acceptance/.beaker-pe.cfg "
-  args.extras.each do |v|
-    cmd_str += "#{v} "
-  end
-
-  #Dir.chdir("./")
-  system(cmd_str)
-  #Dir.chdir("../")
-end
 
 
 
