@@ -22,7 +22,3 @@ RSpec::Core::RakeTask.new(:coverage) do |t|
   t.rcov = true
   t.rcov_opts = ['--exclude', 'spec']
 end
-
-
-
-
