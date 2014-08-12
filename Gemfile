@@ -19,7 +19,7 @@ group :development, :test do
   gem 'pry',                     :require => false
   gem 'simplecov',               :require => false
   gem 'rspec', '~>2.14.0',       :require => false
-  gem 'beaker',                  :require => false
+  gem 'beaker',                  :require => false, :platforms => :ruby
 end
 
 ENV['GEM_PUPPET_VERSION'] ||= ENV['PUPPET_GEM_VERSION']
