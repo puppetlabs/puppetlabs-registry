@@ -102,7 +102,7 @@ module Registry
                 /hkey_performance_text/,
                 /hkey_performance_nlstext/,
                 /hkey_dyn_data/
-                raise ArgumentError, "Unsupported prefined key: #{path}"
+                raise ArgumentError, "Unsupported predefined key: #{path}"
               else
                 raise ArgumentError, "Invalid registry key: #{path}"
               end
