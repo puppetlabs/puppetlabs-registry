@@ -29,7 +29,7 @@
     },
     {
       "name": "puppet",
-      "version_requirement": "3.x"
+      "version_requirement": ">= 3.3.0"
     }
   ],
   "description": "This module provides a native type and provider to manage keys and values in the Windows Registry",
