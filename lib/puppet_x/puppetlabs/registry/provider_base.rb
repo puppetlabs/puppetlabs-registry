@@ -3,6 +3,46 @@ module PuppetX
 module Puppetlabs
 module Registry
 module ProviderBase
+  def self.define_ffi
+    extend FFI::Library
+
+    ffi_convention :stdcall
+
+    # uintptr_t is defined in an FFI conf as platform specific, either
+    # ulong_long on x64 or just ulong on x86
+    typedef :uintptr_t, :handle
+    # any time LONG / ULONG is in a win32 API definition DO NOT USE platform specific width
+    # which is what FFI uses by default
+    # instead create new aliases for these very special cases
+    typedef :int32, :win32_long
+    typedef :uint32, :win32_ulong
+    typedef :uint32, :dword
+
+    # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724911(v=vs.85).aspx
+    # LONG WINAPI RegQueryValueEx(
+    #   _In_         HKEY hKey,
+    #   _In_opt_     LPCTSTR lpValueName,
+    #   _Reserved_   LPDWORD lpReserved,
+    #   _Out_opt_    LPDWORD lpType,
+    #   _Out_opt_    LPBYTE lpData,
+    #   _Inout_opt_  LPDWORD lpcbData
+    # );
+    ffi_lib :advapi32
+    attach_function :RegQueryValueExA,
+      [:handle, :pointer, :pointer, :pointer, :pointer, :pointer], :win32_long
+
+    # http://msdn.microsoft.com/en-us/library/windows/desktop/ms724847(v=vs.85).aspx
+    # LONG WINAPI RegDeleteKeyEx(
+    #   _In_        HKEY hKey,
+    #   _In_        LPCTSTR lpSubKey,
+    #   _In_        REGSAM samDesired,
+    #   _Reserved_  DWORD Reserved
+    # );
+    ffi_lib :advapi32
+    attach_function :RegDeleteKeyExA,
+      [:handle, :pointer, :win32_ulong, :dword], :win32_long
+  end
+
   # This is a class method in order to be easily mocked in the spec tests.
   def self.initialize_system_api
     if Puppet.features.microsoft_windows?
@@ -10,6 +50,17 @@ module ProviderBase
         require 'win32/registry'
       rescue LoadError => exc
         msg = "Could not load the required win32/registry library (ErrorID 1EAD86E3-D533-4286-BFCB-CCE8B818DDEA) [#{exc.message}]"
+        Puppet.err msg
+        error = Puppet::Error.new(msg)
+        error.set_backtrace exc.backtrace
+        raise error
+      end
+
+      begin
+        require 'ffi'
+        define_ffi
+      rescue LoadError => exc
+        msg = "Could not load the required ffi library [#{exc.message}]"
         Puppet.err msg
         error = Puppet::Error.new(msg)
         error.set_backtrace exc.backtrace
