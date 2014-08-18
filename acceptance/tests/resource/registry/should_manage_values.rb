@@ -1,5 +1,5 @@
 require 'pathname'
-require Pathname.new(__FILE__).dirname.dirname.dirname.dirname + 'lib/systest/util/registry'
+require 'systest/util/registry'
 # Include our utility methods in the singleton class of the test case instance.
 class << self
   include Systest::Util::Registry
@@ -184,7 +184,7 @@ class phase1 {
   # Binary Values
   registry_value { '#{keypath}\\SubKey1\\ValueBinary1':
     type => binary,
-    data => "0${::fact_phase}",
+    data => "${::fact_phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueBinary2':
     type => binary,
@@ -215,7 +215,7 @@ HERE
 setup_master master_manifest_content
 
 step "Start the master" do
-  with_master_running_on(master, master_options) do
+  with_puppet_running_on master, :__commandline_args__ => master_options do
     windows_agents.each do |agent|
       this_agent_args = agent_args % get_test_file_path(agent, agent_lib_dir)
       x64 = x64?(agent)

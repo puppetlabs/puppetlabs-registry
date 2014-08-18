@@ -16,10 +16,10 @@ Puppet::Type.newtype(:registry_value) do
 
     **Autorequires:** Any parent registry key managed by Puppet will be
     autorequired.
-EOT
+  EOT
 
   def self.title_patterns
-    [ [ /^(.*?)\Z/m, [ [ :path, lambda{|x| x} ] ] ] ]
+    [[/^(.*?)\Z/m, [[:path, lambda { |x| x }]]]]
   end
 
   ensurable
@@ -84,6 +84,9 @@ EOT
         fail("The data must be a valid QWORD: #{value}") unless val and (val.abs >> 64) <= 0
         val
       when :binary
+        if (value.respond_to?(:length) && value.length == 1) || (value.kind_of?(Integer) && value <= 9)
+          value = "0#{value}"
+        end
         unless value.match(/^([a-f\d]{2} ?)*$/i)
           fail("The data must be a hex encoded string of the form: '00 01 02 ...'")
         end
