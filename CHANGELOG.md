@@ -1,3 +1,13 @@
+##2014-07-15 - Supported Release 1.0.2
+###Summary
+
+This release merely updates metadata.json so the module can be uninstalled and
+upgraded via the puppet module command.
+
+##2014-05-20 - Supported Release 1.0.1
+#####Bugfixes
+- Add zero padding to binary single character inputs
+
 ##2014-03-04 - Supported Release 1.0.0
 ###Summary
 This is a supported release.

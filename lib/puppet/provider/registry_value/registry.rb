@@ -24,9 +24,12 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     found = false
     begin
       hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
-        type = [0].pack('L')
-        size = [0].pack('L')
-        found = reg_query_value_ex_a.call(reg.hkey, valuename, 0, type, 0, size) == 0
+        status = RegQueryValueExA(reg.hkey, valuename,
+          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
+          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL)
+
+        found = status == 0
+        raise Win32::Registry::Error.new(status) if !found
       end
     rescue Win32::Registry::Error => detail
       case detail.code
@@ -83,10 +86,9 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     unless @regvalue
       @regvalue = {}
       hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
-        type = [0].pack('L')
-        size = [0].pack('L')
-
-        if reg_query_value_ex_a.call(reg.hkey, valuename, 0, type, 0, size) == 0
+        if RegQueryValueExA(reg.hkey, valuename,
+          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
+          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL) == 0
           @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuename))
         end
       end
@@ -137,14 +139,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # I'm not calling .to_a because Ruby issues a warning about the default
     # implementation of to_a going away in the future.
     return [type2name(ntype), pdata.kind_of?(Array) ? pdata : [pdata]]
-  end
-
-  def reg_query_value_ex_a
-    self.class.reg_query_value_ex_a
-  end
-
-  def self.reg_query_value_ex_a
-    @reg_query_value_ex_a ||= Win32API.new('advapi32', 'RegQueryValueEx', 'LPLPPP', 'L')
   end
 
   private
