@@ -10,16 +10,20 @@ def location_for(place, fake_version = nil)
   end
 end
 
+beaker_version = ENV['BEAKER_VERSION']
 group :development, :test do
   gem 'rake',                    :require => false
   gem 'mocha', '~>0.10.5',       :require => false
   gem 'puppetlabs_spec_helper',  :require => false
   gem 'serverspec',              :require => false
   gem 'puppet-lint',             :require => false
-  gem 'pry',                     :require => false
   gem 'simplecov',               :require => false
   gem 'rspec', '~>2.14.0',       :require => false
-  gem 'beaker',                  :require => false, :platforms => :ruby
+  if beaker_version
+    gem 'beaker', *location_for(beaker_version), :platforms => :ruby
+  else
+    gem 'beaker',                :require => false, :platforms => :ruby
+  end
 end
 
 is_x64 = Gem::Platform.local.cpu == 'x64'
