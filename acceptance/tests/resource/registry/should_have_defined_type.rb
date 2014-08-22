@@ -53,7 +53,7 @@ step "Start testing should_have_defined_type" do
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting2\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting3\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
   ]
-  agents.each do |agent|
+  windows_agents.each do |agent|
     step "Phase 1.a - Create some values"
     apply_manifest_on agent, manifest, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
       phase1_resources_created.each do |val_re|

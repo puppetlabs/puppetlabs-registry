@@ -138,15 +138,15 @@ step "Start the master" do
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString3\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString4\].ensure: created/,
   ]
+  windows_agents.each do |agent|
 
-  if x64?(agent)
-    phase1_resources_created += [
-        /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\].ensure: created/,
-        /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SUBKEY1\].ensure: created/,
-    ]
-  end
+    if x64?(agent)
+      phase1_resources_created += [
+          /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\].ensure: created/,
+          /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SUBKEY1\].ensure: created/,
+      ]
+    end
 
-  agents.each do |agent|
     step "Registry Tolerate Mixed Case Values - Phase 1.a - Create some values"
     apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
       phase1_resources_created.each do |val_re|
