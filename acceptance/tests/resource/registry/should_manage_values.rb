@@ -13,8 +13,9 @@ keyname = "PuppetLabsTest_Value_#{randomstring(8)}"
 vendor_path = "HKLM\\Software\\Vendor"
 keypath = "#{vendor_path}\\#{keyname}"
 
-phase1 = <<P1
-  notify { fact_phase: message => "fact_phase: $fact_phase" }
+def getManifest(keypath, vendor_path, phase)
+  manifest = <<P1
+  notify { fact_phase: message => "fact_phase: #{phase}" }
   registry_key { '#{vendor_path}': ensure => present }
   if $architecture == 'x64' {
     registry_key { '32:#{vendor_path}': ensure => present }
@@ -31,28 +32,28 @@ phase1 = <<P1
 
   # The Default Value
   registry_value { '#{keypath}\\SubKey1\\\\':
-    data => "Default Data phase=${::fact_phase}",
+    data => "Default Data phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey2\\\\':
     type => array,
-    data => [ "Default Data L1 phase=${::fact_phase}", "Default Data L2 phase=${::fact_phase}" ],
+    data => [ "Default Data L1 phase=#{phase}", "Default Data L2 phase=#{phase}" ],
   }
 
   # String Values
   registry_value { '#{keypath}\\SubKey1\\ValueString1':
-    data => "Should be a string phase=${::fact_phase}",
+    data => "Should be a string phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueString2':
     type => string,
-    data => "Should be a string phase=${::fact_phase}",
+    data => "Should be a string phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueString3':
     ensure => present,
     type   => string,
-    data   => "Should be a string phase=${::fact_phase}",
+    data   => "Should be a string phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueString4':
-    data   => "Should be a string phase=${::fact_phase}",
+    data   => "Should be a string phase=#{phase}",
     type   => string,
     ensure => present,
   }
@@ -60,19 +61,19 @@ phase1 = <<P1
   if $architecture == 'x64' {
     # String Values
     registry_value { '32:#{keypath}\\SubKey1\\ValueString1':
-      data => "Should be a string phase=${::fact_phase}",
+      data => "Should be a string phase=#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueString2':
       type => string,
-      data => "Should be a string phase=${::fact_phase}",
+      data => "Should be a string phase=#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueString3':
       ensure => present,
       type   => string,
-      data   => "Should be a string phase=${::fact_phase}",
+      data   => "Should be a string phase=#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueString4':
-      data   => "Should be a string phase=${::fact_phase}",
+      data   => "Should be a string phase=#{phase}",
       type   => string,
       ensure => present,
     }
@@ -81,52 +82,52 @@ phase1 = <<P1
   # Array Values
   registry_value { '#{keypath}\\SubKey1\\ValueArray1':
     type => array,
-    data => "Should be an array L1 phase=${::fact_phase}",
+    data => "Should be an array L1 phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueArray2':
     type => array,
-    data => [ "Should be an array L1 phase=${::fact_phase}" ],
+    data => [ "Should be an array L1 phase=#{phase}" ],
   }
   registry_value { '#{keypath}\\SubKey1\\ValueArray3':
     type => array,
-    data => [ "Should be an array L1 phase=${::fact_phase}",
-              "Should be an array L2 phase=${::fact_phase}" ],
+    data => [ "Should be an array L1 phase=#{phase}",
+              "Should be an array L2 phase=#{phase}" ],
   }
   registry_value { '#{keypath}\\SubKey1\\ValueArray4':
     ensure => present,
     type   => array,
-    data   => [ "Should be an array L1 phase=${::fact_phase}",
-                "Should be an array L2 phase=${::fact_phase}" ],
+    data   => [ "Should be an array L1 phase=#{phase}",
+                "Should be an array L2 phase=#{phase}" ],
   }
   registry_value { '#{keypath}\\SubKey1\\ValueArray5':
-    data   => [ "Should be an array L1 phase=${::fact_phase}",
-                "Should be an array L2 phase=${::fact_phase}" ],
+    data   => [ "Should be an array L1 phase=#{phase}",
+                "Should be an array L2 phase=#{phase}" ],
     type   => array,
     ensure => present,
   }
   if $architecture == 'x64' {
     registry_value { '32:#{keypath}\\SubKey1\\ValueArray1':
       type => array,
-      data => "Should be an array L1 phase=${::fact_phase}",
+      data => "Should be an array L1 phase=#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueArray2':
       type => array,
-      data => [ "Should be an array L1 phase=${::fact_phase}" ],
+      data => [ "Should be an array L1 phase=#{phase}" ],
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueArray3':
       type => array,
-      data => [ "Should be an array L1 phase=${::fact_phase}",
-                "Should be an array L2 phase=${::fact_phase}" ],
+      data => [ "Should be an array L1 phase=#{phase}",
+                "Should be an array L2 phase=#{phase}" ],
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueArray4':
       ensure => present,
       type   => array,
-      data   => [ "Should be an array L1 phase=${::fact_phase}",
-                  "Should be an array L2 phase=${::fact_phase}" ],
+      data   => [ "Should be an array L1 phase=#{phase}",
+                  "Should be an array L2 phase=#{phase}" ],
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueArray5':
-      data   => [ "Should be an array L1 phase=${::fact_phase}",
-                  "Should be an array L2 phase=${::fact_phase}" ],
+      data   => [ "Should be an array L1 phase=#{phase}",
+                  "Should be an array L2 phase=#{phase}" ],
       type   => array,
       ensure => present,
     }
@@ -135,21 +136,21 @@ phase1 = <<P1
   # Expand Values
   registry_value { '#{keypath}\\SubKey1\\ValueExpand1':
     type => expand,
-    data => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=${::fact_phase}",
+    data => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueExpand2':
     type   => expand,
-    data   => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=${::fact_phase}",
+    data   => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=#{phase}",
     ensure => present,
   }
   if $architecture == 'x64' {
     registry_value { '32:#{keypath}\\SubKey1\\ValueExpand1':
       type => expand,
-      data => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=${::fact_phase}",
+      data => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueExpand2':
       type   => expand,
-      data   => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=${::fact_phase}",
+      data   => "%SystemRoot% - Should be a REG_EXPAND_SZ phase=#{phase}",
       ensure => present,
     }
   }
@@ -157,48 +158,48 @@ phase1 = <<P1
   # DWORD Values
   registry_value { '#{keypath}\\SubKey1\\ValueDword1':
     type => dword,
-    data => $::fact_phase,
+    data => #{phase},
   }
   if $architecture == 'x64' {
     registry_value { '32:#{keypath}\\SubKey1\\ValueDword1':
       type => dword,
-      data => $::fact_phase,
+      data => #{phase},
     }
   }
 
   # QWORD Values
   registry_value { '#{keypath}\\SubKey1\\ValueQword1':
     type => qword,
-    data => $::fact_phase,
+    data => #{phase},
   }
   if $architecture == 'x64' {
     registry_value { '32:#{keypath}\\SubKey1\\ValueQword1':
       type => qword,
-      data => $::fact_phase,
+      data => #{phase},
     }
   }
 
   # Binary Values
   registry_value { '#{keypath}\\SubKey1\\ValueBinary1':
     type => binary,
-    data => "${::fact_phase}",
+    data => "#{phase}",
   }
   registry_value { '#{keypath}\\SubKey1\\ValueBinary2':
     type => binary,
-    data => "DE AD BE EF CA F${::fact_phase}"
+    data => "DE AD BE EF CA F#{phase}"
   }
   if $architecture == 'x64' {
     registry_value { '32:#{keypath}\\SubKey1\\ValueBinary1':
       type => binary,
-      data => "0${::fact_phase}",
+      data => "0#{phase}",
     }
     registry_value { '32:#{keypath}\\SubKey1\\ValueBinary2':
       type => binary,
-      data => "DEAD BEEF CAF${::fact_phase}"
+      data => "DEAD BEEF CAF#{phase}"
     }
   }
 P1
-
+end
 
 step "Start testing should_manage_values" do
   windows_agents.each do |agent|
@@ -273,7 +274,7 @@ step "Start testing should_manage_values" do
 
 
     step "Registry Values - Phase 1.a - Create some values"
-    apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), :acceptable_exit_codes => agent_exit_codes do
       assert_no_match(/err:/, result.stdout, "Expected no error messages.")
       phase1_resources_created.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -281,7 +282,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 1.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), :acceptable_exit_codes => agent_exit_codes do
       phase1_resources_created.each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
@@ -289,7 +290,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 2.a - Change some values"
-    apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '2'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path, '2'), :acceptable_exit_codes => agent_exit_codes do
       assert_no_match(/err:/, result.stdout, "Expected no error messages.")
       phase2_resources_changed.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -297,7 +298,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 2.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '2'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'2'), :acceptable_exit_codes => agent_exit_codes do
       phase2_resources_changed.each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
