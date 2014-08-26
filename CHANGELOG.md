@@ -1,3 +1,8 @@
+##2014-08-25 - Supported Release 1.0.3
+###Summary
+
+This release adds support for native x64 ruby and puppet 3.7, and bugfixes issues with non-leading-zero binary values in regestry keys.
+
 ##2014-07-15 - Supported Release 1.0.2
 ###Summary
 
