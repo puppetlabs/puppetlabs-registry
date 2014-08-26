@@ -126,7 +126,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     pdata =
       case type2name(ntype)
       when :binary
-        ndata.scan(/./).map{ |byte| byte.unpack('H2')[0]}.join(' ')
+        ndata.bytes.map{ |byte| "%02x" % byte }.join(' ')
       when :array
         # We get the data from the registry in Array form.
         ndata
