@@ -25,5 +25,17 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       reg_value.provider.data.should eq ['System']
       reg_value.provider.type.should eq :string
     end
+
+    it "returns a string of lowercased hex encoded bytes" do
+      reg = described_class.new
+      type, data = reg.from_native([3, "\u07AD"])
+      data.should eq ['de ad']
+    end
+
+    it "left pads binary strings" do
+      reg = described_class.new
+      type, data = reg.from_native([3, "\x1"])
+      data.should eq ['01']
+    end
   end
 end

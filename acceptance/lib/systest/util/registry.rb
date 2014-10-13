@@ -41,13 +41,15 @@ module Systest::Util::Registry
   def all_hosts
     # we need one list of all of the hosts, to assist in managing temp dirs.  It's possible
     # that the master is also an agent, so this will consolidate them into a unique set
-    @all_hosts ||= Set[master, *agents]
+    hosts
   end
 
   def host_test_tmp_dirs
     # now we can create a hash of temp dirs--one per host, and unique to this test--without worrying about
     # doing it twice on any individual host
-    @host_test_tmp_dirs ||= Hash[all_hosts.map do |host| [host.name, tmpdir(host, cur_test_file_shortname)] end ]
+    @host_test_tmp_dirs ||= Hash[all_hosts.map do |host|
+      [host.name, tmpdir(host, cur_test_file_shortname)]
+    end]
   end
 
   def master_manifest_dir
@@ -71,7 +73,7 @@ module Systest::Util::Registry
   end
 
   def masters
-    @masters ||= hosts.select { |host| host['roles'].include? 'master' }
+    @masters ||= hosts.select { |host| host['roles'].include? 'master' } || []
   end
 
   def windows_agents
@@ -80,14 +82,15 @@ module Systest::Util::Registry
 
   def master_options
     @master_options ||= "--manifest=\"#{get_test_file_path(master, master_manifest_file)}\" " +
-    "--modulepath=\"#{get_test_file_path(master, master_module_dir)}\" " +
-    "--autosign true --pluginsync"
+        "--modulepath=\"#{get_test_file_path(master, master_module_dir)}\" " +
+        "--autosign true --pluginsync"
   end
+
   def master_options_hash
     @master_options_hash ||= {
-        :manifest   => "#{get_test_file_path(master, master_manifest_file)}",
+        :manifest => "#{get_test_file_path(master, master_manifest_file)}",
         :modulepath => "#{get_test_file_path(master, master_module_dir)} ",
-        :autosign   => true,
+        :autosign => true,
         :pluginsync => true
     }
   end
@@ -145,57 +148,67 @@ module Systest::Util::Registry
     mkdirs(host, File.dirname(file_path)) if (options[:mkdirs] == true)
     create_remote_file(host, file_path, file_content)
     #
-    # NOTE: we need these chown/chmod calls because the acceptance framework connects to the nodes as "root", but
+    # NOTE: we need these `chown/chmod calls because the acceptance framework connects to the nodes as "root", but
     #  puppet 'master' runs as user 'puppet'.  Therefore, in order for puppet master to be able to read any files
     #  that we've created, we have to carefully set their permissions
     #
     chown(host, options[:owner], options[:group], file_path)
     chmod(host, options[:mode], file_path)
   end
+
   def puppet_module_install(host = nil, source = nil, module_name = nil, module_path = '/etc/puppet/modules')
-    opts = {:source => source, :module_name => module_name,:target_module_path => module_path}
-    copy_root_module_to(host,opts)
+    opts = {:source => source, :module_name => module_name, :target_module_path => module_path}
+    copy_root_module_to(host, opts)
   end
+
   def setup_master(master_manifest_content="# Intentionally Blank\n")
     step "Setup Puppet Master Manifest" do
-      proj_root = File.expand_path(File.join(File.dirname(__FILE__),'../../../../'))
-      masters.each do |host|
-        puppet_module_install(host,proj_root,'registry',File.join(host['puppetpath'],"modules"))
-        create_test_file(host, master_manifest_file, master_manifest_content, :mkdirs => true)
-        puppet_conf_update_ini = <<-MANIFEST
-        ini_setting{'Update Puppet.Conf':
-            ensure             => present,
-            section            => 'main',
-            key_val_separator  => '=',
-            path               => '#{host['puppetpath']}/puppet.conf',
-            setting            => 'manifestdir',
-            value              => '#{host_test_tmp_dirs[host.name]}/master_manifest/' }
-        MANIFEST
-        on host, puppet('apply','--debug'), :stdin => puppet_conf_update_ini
+      proj_root = File.expand_path(File.join(File.dirname(__FILE__), '../../../'))
+      if any_hosts_as?('master') do
+        masters.each do |host|
+          puppet_module_install(host, proj_root, 'registry', File.join(host['puppetpath'], "modules"))
+          create_test_file(host, master_manifest_file, master_manifest_content, :mkdirs => true)
+          puppet_conf_update_ini = <<-MANIFEST
+          ini_setting{'Update Puppet.Conf':
+              ensure             => present,
+              section            => 'main',
+              key_val_separator  => '=',
+              path               => '#{host['puppetpath']}/puppet.conf',
+              setting            => 'manifestdir',
+              value              => '#{host_test_tmp_dirs[host.name]}/master_manifest/' }
+          MANIFEST
+          on host, puppet('apply', '--debug'), :stdin => puppet_conf_update_ini
+        end
+      end
       end
     end
     step "Symlink the module(s) into the master modulepath" do
-      masters.each do |host|
-        moddir = get_test_file_path(host, master_module_dir)
-        mkdirs(host, moddir)
-        #on host, "ln -s /opt/puppet-git-repos/stdlib \"#{moddir}/stdlib\"; ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
+      if any_hosts_as?('master') do
+        masters.each do |host|
+          moddir = get_test_file_path(host, master_module_dir)
+          mkdirs(host, moddir)
+          #on host, "ln -s /opt/puppet-git-repos/stdlib \"#{moddir}/stdlib\"; ln -s /opt/puppet-git-repos/registry \"#{moddir}/registry\""
+        end
+      end
       end
     end
   end
 
   def clean_up
     step "Clean Up" do
-      masters.each do |host|
-        puppet_conf_update_ini = <<-MANIFEST
-        ini_setting{'Revert Puppet.Conf':
-            ensure             => absent,
-            section            => 'main',
-            key_val_separator  => '=',
-            path               => '#{host['puppetpath']}/puppet.conf',
-            setting            => 'manifestdir' }
-        MANIFEST
-        on host, puppet('apply','--debug'), :stdin => puppet_conf_update_ini
-        on host, "rm -rf \"%s\"" % get_test_file_path(host, '')
+      if any_hosts_as?(:master)
+        masters.each do |host|
+          puppet_conf_update_ini = <<-MANIFEST
+            ini_setting{'Revert Puppet.Conf':
+              ensure             => absent,
+              section            => 'main',
+              key_val_separator  => '=',
+              path               => '#{host['puppetpath']}/puppet.conf',
+              setting            => 'manifestdir' }
+          MANIFEST
+          on host, puppet('apply', '--debug'), :stdin => puppet_conf_update_ini
+          on host, "rm -rf \"%s\"" % get_test_file_path(host, '')
+        end
       end
       agents.each do |host|
         on host, "rm -rf \"%s\"" % get_test_file_path(host, '')

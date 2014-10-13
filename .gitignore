@@ -6,3 +6,5 @@ coverage/
 acceptance/log/*
 .vagrant
 Gemfile.lock
+Gemfile.local
+.bundle
