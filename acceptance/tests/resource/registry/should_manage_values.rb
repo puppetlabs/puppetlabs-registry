@@ -274,7 +274,7 @@ step "Start testing should_manage_values" do
 
 
     step "Registry Values - Phase 1.a - Create some values"
-    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), get_apply_opts do
       assert_no_match(/err:/, result.stdout, "Expected no error messages.")
       phase1_resources_created.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -282,7 +282,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 1.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'1'), get_apply_opts do
       phase1_resources_created.each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
@@ -290,7 +290,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 2.a - Change some values"
-    apply_manifest_on agent, getManifest(keypath, vendor_path, '2'), :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
       assert_no_match(/err:/, result.stdout, "Expected no error messages.")
       phase2_resources_changed.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -298,7 +298,7 @@ step "Start testing should_manage_values" do
     end
 
     step "Registry Values - Phase 2.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, getManifest(keypath, vendor_path,'2'), :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, getManifest(keypath, vendor_path,'2'), get_apply_opts do
       phase2_resources_changed.each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end

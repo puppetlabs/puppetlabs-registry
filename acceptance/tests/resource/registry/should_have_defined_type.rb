@@ -55,7 +55,7 @@ step "Start testing should_have_defined_type" do
   ]
   windows_agents.each do |agent|
     step "Phase 1.a - Create some values"
-    apply_manifest_on agent, manifest, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}, agent_exit_codes) do
       phase1_resources_created.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
@@ -63,7 +63,7 @@ step "Start testing should_have_defined_type" do
     end
 
     step "Phase 1.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, manifest, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}, agent_exit_codes) do
       phase1_resources_created.each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output not to contain #{val_re.inspect}.")
       end
@@ -71,7 +71,7 @@ step "Start testing should_have_defined_type" do
     end
 
     step "Phase 2.a - Change some values"
-    apply_manifest_on agent, manifest, :environment => {'FACTER_FACT_PHASE' => '2'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}, agent_exit_codes) do
       phase2_resources_changed.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
@@ -79,7 +79,7 @@ step "Start testing should_have_defined_type" do
     end
 
     step "Phase 2.b - Make sure Puppet is idempotent"
-    apply_manifest_on agent, manifest, :environment => {'FACTER_FACT_PHASE' => '2'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}, agent_exit_codes) do
       (phase1_resources_created + phase2_resources_changed).each do |val_re|
         assert_no_match(val_re, result.stdout, "Expected output not to contain #{val_re.inspect}.")
       end

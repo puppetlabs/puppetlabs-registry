@@ -132,7 +132,7 @@ step "Start the master" do
   phase1_resources_created = [
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\].ensure: created/,
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SUBKEY1\].ensure: created/,
-      /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\\\\].ensure: created/,
+      /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString1\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString2\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString3\].ensure: created/,
@@ -148,7 +148,7 @@ step "Start the master" do
     end
 
     step "Registry Tolerate Mixed Case Values - Phase 1.a - Create some values"
-    apply_manifest_on agent, phase1, :environment => {'FACTER_FACT_PHASE' => '1'}, :acceptable_exit_codes => agent_exit_codes do
+    apply_manifest_on agent, phase1, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do |result|
       phase1_resources_created.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end

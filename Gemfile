@@ -10,7 +10,7 @@ def location_for(place, fake_version = nil)
   end
 end
 
-beaker_version = ENV['BEAKER_VERSION'] || '~>1.16.0'
+beaker_version = ENV['BEAKER_VERSION'] || '>=1.19.0'
 group :development, :test do
   gem 'rake',                    :require => false
   gem 'mocha', '~>0.10.5',       :require => false

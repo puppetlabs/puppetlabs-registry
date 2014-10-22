@@ -4,6 +4,8 @@ require Pathname.new(__FILE__).dirname
 # This module is meant to be mixed into the individual test cases for the
 # registry module.
 module Systest::Util::Registry
+  FUTURE_PARSER = ENV['FUTURE_PARSER'] == 'true'
+
   # Given a relative path, returns an absolute path for a test file.
   # Basically, this just prepends the a unique temp dir path (specific to the
   # current test execution) to your relative path.
@@ -215,5 +217,16 @@ module Systest::Util::Registry
       end
     end
   end
+
+  def get_apply_opts(environment_hash = nil, acceptable_exit_codes = agent_exit_codes)
+    opts = {
+        :catch_failures => true,
+        :future_parser => FUTURE_PARSER,
+        :acceptable_exit_codes => agent_exit_codes,
+    }
+    opts.merge!(:environment => environment_hash) if environment_hash
+    opts
+  end
+
 end
 
