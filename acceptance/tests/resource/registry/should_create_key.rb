@@ -125,7 +125,7 @@ step "Start should_create_key test" do
 
     # Do the first run and make sure the key gets created.
     step "Registry - Phase 1.a - Create some keys"
-    apply_manifest_on(agent, phase1, :acceptable_exit_codes => agent_exit_codes) do
+    apply_manifest_on(agent, phase1, apply_opts) do
       keys_created.each do |key_re|
         assert_match(key_re, result.stdout,
                      "Expected #{key_re.inspect} to match the output. (First Run)")
@@ -135,7 +135,7 @@ step "Start should_create_key test" do
 
     step "Registry - Phase 1.b - Make sure Puppet is idempotent"
     # Do a second run and make sure the key isn't created a second time.
-    apply_manifest_on(agent, phase1, :acceptable_exit_codes => agent_exit_codes) do
+    apply_manifest_on(agent, phase1, apply_opts) do
       keys_created.each do |key_re|
         assert_no_match(key_re, result.stdout,
                         "Expected #{key_re.inspect} NOT to match the output. (First Run)")
@@ -144,7 +144,7 @@ step "Start should_create_key test" do
     end
 
     step "Registry - Phase 2 - Make sure purge_values works"
-    apply_manifest_on(agent, phase2, :acceptable_exit_codes => agent_exit_codes, :environment => {'FACTER_FACT_PHASE' => '2'}) do
+    apply_manifest_on(agent, phase2, apply_opts({'FACTER_FACT_PHASE' => '2'})) do
       values_purged.each do |val_re|
         assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
       end
@@ -152,7 +152,7 @@ step "Start should_create_key test" do
     end
 
     step "Registry - Phase 3 - Clean up"
-    apply_manifest_on(agent, phase3, :acceptable_exit_codes => agent_exit_codes, :environment => {'FACTER_FACT_PHASE' => '3'}) do
+    apply_manifest_on(agent, phase3, apply_opts({'FACTER_FACT_PHASE' => '3'})) do
       assert_no_match(/err:/, result.stdout, "Expected no error messages.")
     end
   end
