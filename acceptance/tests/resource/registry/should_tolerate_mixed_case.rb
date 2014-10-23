@@ -132,7 +132,7 @@ step "Start the master" do
   phase1_resources_created = [
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\].ensure: created/,
       /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SUBKEY1\].ensure: created/,
-      /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\\].ensure: created/,
+      /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\\W+.ensure: created.*$/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString1\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString2\].ensure: created/,
       /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest_MixedCase_\w+\\SubKey1\\ValueString3\].ensure: created/,
