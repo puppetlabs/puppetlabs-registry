@@ -14,7 +14,6 @@ group :development, :test do
   gem 'rake',                    :require => false
   gem 'mocha', '~>0.10.5',       :require => false
   gem 'puppetlabs_spec_helper',  :require => false
-  gem 'serverspec',              :require => false
   gem 'puppet-lint',             :require => false
   gem 'simplecov',               :require => false
   gem 'rspec', '~>2.14.0',       :require => false
