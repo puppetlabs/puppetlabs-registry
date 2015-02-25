@@ -1,6 +1,10 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
-require 'beaker/tasks/test'
+begin
+  require 'beaker/tasks/test'
+rescue LoadError
+ #Do nothing, rescue for Windows as beaker does not work and will not be installed
+end
 
 #Due to puppet-lint not ignoring tests folder or the ignore paths attribute
 #we have to ignore many things
