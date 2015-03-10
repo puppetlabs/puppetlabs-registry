@@ -38,9 +38,11 @@ Puppet::Type.type(:registry_key).provide(:registry) do
 
     raise ArgumentError, "Cannot delete root key: #{path}" unless subkey
 
-    # hive.hkey returns an integer value that's like a FD
-    if RegDeleteKeyExA(hive.hkey, subkey, access, 0) != 0
-      raise "Failed to delete registry key: #{self}"
+    from_string_to_wide_string(subkey) do |subkey_ptr|
+      # hive.hkey returns an integer value that's like a FD
+      if RegDeleteKeyExW(hive.hkey, subkey_ptr, access, 0) != 0
+        raise "Failed to delete registry key: #{self}"
+      end
     end
   end
 
@@ -49,7 +51,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     # Only try and get the values for this key if the key itself exists.
     if exists? then
       hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
-        reg.each_value do |name, type, data| names << name end
+        each_value(reg) do |name, type, data| names << name end
       end
     end
     names
