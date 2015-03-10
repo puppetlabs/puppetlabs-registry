@@ -7,11 +7,14 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
   let (:catalog) do Puppet::Resource::Catalog.new end
   let (:type) { Puppet::Type.type(:registry_key) }
 
+  puppet_key = "SOFTWARE\\Puppet Labs"
+  subkey_name ="PuppetRegProviderTest"
+
   describe "#destroy" do
     it "can destroy a randomly created key" do
 
       guid = SecureRandom.uuid
-      reg_key = type.new(:path => "hklm\\SOFTWARE\\Puppet Labs\\PuppetRegProviderTest\\#{guid}", :provider => described_class.name)
+      reg_key = type.new(:path => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}", :provider => described_class.name)
       already_exists = reg_key.provider.exists?
       already_exists.should be_false
 
@@ -24,6 +27,49 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       # test FFI code
       reg_key.provider.destroy
       reg_key.provider.exists?.should be_false
+    end
+  end
+
+  describe "#purge_values", :if => Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./ do
+    let (:guid) { SecureRandom.uuid }
+    let (:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
+
+    def bytes_to_utf8(bytes)
+      bytes.pack('c*').force_encoding(Encoding::UTF_8)
+    end
+
+    after(:each) do
+      reg_key = type.new(:path => "hklm\\#{reg_path}", :provider => described_class.name)
+      reg_key.provider.destroy
+
+      reg_key.provider.exists?.should be_false
+    end
+
+    before(:each) do
+      # create temp registry key with Unicode values
+      Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
+        Win32::Registry::KEY_ALL_ACCESS |
+        PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY) do |reg_key|
+          endash = bytes_to_utf8([0xE2, 0x80, 0x93])
+          tm = bytes_to_utf8([0xE2, 0x84, 0xA2])
+
+          reg_key.write(endash, Win32::Registry::REG_SZ, tm)
+      end
+    end
+
+    it "does not use Rubys each_value, which unnecessarily string encodes" do
+      # endash and tm undergo LOCALE conversion during Rubys each_value
+      # which will generally lead to a conversion exception
+      reg_key = type.new(:catalog => catalog,
+                         :ensure => :absent,
+                         :name => "hklm\\#{reg_path}",
+                         :purge_values => true,
+                         :provider => described_class.name)
+
+      catalog.add_resource(reg_key)
+
+      # this will trigger
+      expect { reg_key.eval_generate }.to_not raise_error
     end
   end
 end
