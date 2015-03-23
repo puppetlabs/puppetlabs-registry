@@ -47,7 +47,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
     end
   end
 
-  describe "#purge_values", :if => Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./ do
+  describe "#purge_values", :if => Puppet.features.microsoft_windows? do
     let (:guid) { SecureRandom.uuid }
     let (:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
 
@@ -62,17 +62,40 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       reg_key.provider.exists?.should be_false
     end
 
-    before(:each) do
-      # create temp registry key with Unicode values
-      Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
-        Win32::Registry::KEY_ALL_ACCESS |
-        PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY) do |reg_key|
-          endash = bytes_to_utf8([0xE2, 0x80, 0x93])
-          tm = bytes_to_utf8([0xE2, 0x84, 0xA2])
+    context "with ANSI strings on all Ruby platforms" do
+      before(:each) do
+        Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
+          Win32::Registry::KEY_ALL_ACCESS |
+          PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY) do |reg_key|
+            reg_key.write('hi', Win32::Registry::REG_SZ, 'yes')
+        end
+      end
 
-          reg_key.write(endash, Win32::Registry::REG_SZ, tm)
+      it "does not raise an error" do
+        reg_key = type.new(:catalog => catalog,
+                           :ensure => :absent,
+                           :name => "hklm\\#{reg_path}",
+                           :purge_values => true,
+                           :provider => described_class.name)
+
+        catalog.add_resource(reg_key)
+
+        expect { reg_key.eval_generate }.to_not raise_error
       end
     end
+
+    context "with unicode", :if => Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./ do
+      before(:each) do
+        # create temp registry key with Unicode values
+        Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
+          Win32::Registry::KEY_ALL_ACCESS |
+          PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY) do |reg_key|
+            endash = bytes_to_utf8([0xE2, 0x80, 0x93])
+            tm = bytes_to_utf8([0xE2, 0x84, 0xA2])
+
+          reg_key.write(endash, Win32::Registry::REG_SZ, tm)
+        end
+      end
 
     it "does not use Rubys each_value, which unnecessarily string encodes" do
       # endash and tm undergo LOCALE conversion during Rubys each_value
@@ -83,10 +106,11 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
                          :purge_values => true,
                          :provider => described_class.name)
 
-      catalog.add_resource(reg_key)
+        catalog.add_resource(reg_key)
 
-      # this will trigger
-      expect { reg_key.eval_generate }.to_not raise_error
+        # this will trigger
+        expect { reg_key.eval_generate }.to_not raise_error
+      end
     end
   end
 end
