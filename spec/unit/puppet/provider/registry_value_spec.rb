@@ -16,6 +16,23 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY)
   end
 
+  before(:each) do
+    if RUBY_VERSION >= '2.1'
+      # problematic Ruby codepath triggers a conversion of UTF-16LE to
+      # a local codepage which can totally break when that codepage has no
+      # conversion from the given UTF-16LE characters to local codepage
+      # a prime example is that IBM437 has no conversion from a Unicode en-dash
+      Win32::Registry.any_instance.expects(:export_string).never
+
+      Win32::Registry.any_instance.expects(:delete_value).never
+      Win32::Registry.any_instance.expects(:delete_key).never
+
+      # also, expect that we're not using Rubys each_key / each_value which exhibit bad behavior
+      Win32::Registry.any_instance.expects(:each_key).never
+      Win32::Registry.any_instance.expects(:each_value).never
+    end
+  end
+
   after(:all) do
     # Ruby 2.1.5 has bugs with deleting registry keys due to using ANSI
     # character APIs, but passing wide strings to them (facepalm)
