@@ -1,3 +1,15 @@
+##2015-03-24 - Supported Release 1.1.0
+###Summary 
+
+This release adds support for Ruby 2.1.5 and issues with how Ruby reads back the registry in certain scenarios, see MODULES-1723 for more details.
+
+####Bugfixes 
+- Additional tests for purge_values 
+- Use wide character registry APIs 
+- Test Ruby Registry methods uncalled 
+- Introduce Ruby 2.1.5 failing tests 
+
+
 ##2014-08-25 - Supported Release 1.0.3
 ###Summary
 
