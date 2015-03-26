@@ -24,12 +24,14 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     found = false
     begin
       hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
-        status = RegQueryValueExA(reg.hkey, valuename,
-          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
-          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL)
+        from_string_to_wide_string(valuename) do |valuename_ptr|
+          status = RegQueryValueExW(reg.hkey, valuename_ptr,
+            FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
+            FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL)
 
-        found = status == 0
-        raise Win32::Registry::Error.new(status) if !found
+          found = status == 0
+          raise Win32::Registry::Error.new(status) if !found
+        end
       end
     rescue Win32::Registry::Error => detail
       case detail.code
@@ -61,8 +63,15 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   def destroy
     Puppet.debug("Destroying registry value: #{self}")
+    # On Ruby 2.1.x, due to https://bugs.ruby-lang.org/issues/10820, we see
+    # a FileNotFound error - hence an FFI re-implementation inside destroy
     hive.open(subkey, Win32::Registry::KEY_ALL_ACCESS | access) do |reg|
-      reg.delete_value(valuename)
+      from_string_to_wide_string(valuename) do |valuename_ptr|
+        if RegDeleteValueW(reg.hkey, valuename_ptr) != 0
+          msg = "Failed to delete registry value #{valuename} at #{reg.keyname}"
+          raise Puppet::Util::Windows::Error.new(msg)
+        end
+      end
     end
   end
 
@@ -86,10 +95,12 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     unless @regvalue
       @regvalue = {}
       hive.open(subkey, Win32::Registry::KEY_READ | access) do |reg|
-        if RegQueryValueExA(reg.hkey, valuename,
-          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
-          FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL) == 0
-          @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuename))
+        from_string_to_wide_string(valuename) do |valuename_ptr|
+          if RegQueryValueExW(reg.hkey, valuename_ptr,
+            FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
+            FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL) == 0
+            @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuename))
+          end
         end
       end
     end
