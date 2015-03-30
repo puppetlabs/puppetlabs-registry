@@ -203,7 +203,7 @@ end
 
 step "Start testing should_manage_values" do
   windows_agents.each do |agent|
-    x64 = x64?(default)
+    x64 = x64?(agent)
 
     # A set of keys we expect Puppet to create
     phase1_resources_created = [
@@ -212,7 +212,7 @@ step "Start testing should_manage_values" do
         /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey2\].ensure: created/,
     ]
 
-    if x64?(agent)
+    if x64
       phase1_resources_created += [
           /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
           /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created/,
