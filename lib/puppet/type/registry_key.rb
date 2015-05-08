@@ -84,6 +84,18 @@ EOT
     end
   end
 
+  newparam(:user) do
+    desc "Use this username for when we lookup for SID in HKU"
+    validate do |value|
+      if value.is_a? String
+        true
+      else
+        raise ArgumentError.new("Validation Error: user must be a string in the format of domain\\username")
+      end
+    end
+
+  end
+
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
