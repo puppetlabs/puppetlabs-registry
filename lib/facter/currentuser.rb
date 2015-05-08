@@ -15,12 +15,21 @@ Facter.add("windows_currentuser_username") do
     ## First find out
     query1 = "select Username from win32_computersystem"
     wmi.ExecQuery(query1).each do |data|
-      domain, name = data.Username.split("\\")
-      username = data.Username
+      if data.Username.nil?
+        username = nil
+      else
+        domain, name = data.Username.split("\\")
+        username = data.Username
+      end
+
     end
-    query2 = "select sid from win32_useraccount where name='"+ name +"' and domain='"+ domain +"'"
-    wmi.ExecQuery(query2).each do |data|
-      sid = data.SID
+    if username.nil?
+      sid = nil
+    else
+      query2 = "select sid from win32_useraccount where name='"+ name +"' and domain='"+ domain +"'"
+      wmi.ExecQuery(query2).each do |data|
+        sid = data.SID
+      end
     end
     username
   end
