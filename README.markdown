@@ -74,9 +74,9 @@ You can still add values in a string (or array) beyond the default, but you can 
 
 ###HKEY_USERS and HKEY_CURRENT_USER support
 
-HKEY_USERS is a root level registry hive that contains user specific keys and values, organized by their unique SID. 
- 
-HKEY_CURRENT_USER is a root level hive that is a mapping to the HKEY_USER\SID of the current user (logged in, or even as a service).
+- HKEY_USERS is a root level registry hive that contains user specific keys and values, organized by their unique SID. 
+- HKEY_CURRENT_USER is a root level hive that is a mapping to the HKEY_USER\SID of the current processes user.
+
 
 To use HKEY_USERS you must supply the SID of the user you wish to effect, for example:
 
@@ -84,7 +84,7 @@ To use HKEY_USERS you must supply the SID of the user you wish to effect, for ex
       ensure => present
     }
 
-As puppet often runs as SYSTEM, it's HKEY_CURRENT_USER will always match to SYSTEM's Key (S-1-5-18), thus limiting the impact of actually interacting with real users.  To get past that this module has a custom fact called `$windows_currentuser_sid` which grabs logged in user(user on the console, not a terminal).
+As puppet often runs as SYSTEM, it's HKEY_CURRENT_USER will always match to SYSTEM's Key (S-1-5-18), thus limiting the impact of actually interacting with real users.  To get past that this module has a custom fact called `$windows_currentuser_sid` which grabs the logged in user's SID (user on the console, not via a terminal session).
 
 
     registry_key { 'HKU\\${windows_currentuser_sid}\Software\PuppetLabs':
