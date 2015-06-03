@@ -1,0 +1,23 @@
+---
+.travis.yml:
+  script: "\"bundle exec rake validate && bundle exec rake lint && bundle exec rake spec SPEC_OPTS='--color --format documentation'\""
+Gemfile:
+  required:
+    ':development':
+      - gem: rspec
+        version: '~>2.0'
+      - gem: puppetlabs_spec_helper
+      - gem: puppet_facts
+      - gem: mocha
+        version: '~>0.10.5'
+    ':system_tests':
+      - gem: beaker
+Rakefile:
+  unmanaged: true
+spec/spec_helper.rb:
+  unmanaged: true
+.gitignore:
+  unmanaged: true
+appveyor.yml:
+  test_scripts:
+    - 'bundle exec rspec spec/unit -fd -b'
