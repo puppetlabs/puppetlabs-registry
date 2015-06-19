@@ -26,6 +26,7 @@ group :system_tests do
   else
     gem 'beaker',                :require => false, :platforms => :ruby
   end
+  gem 'beaker-puppet_install_helper', :require => false
 end
 
 is_x64 = Gem::Platform.local.cpu == 'x64'
