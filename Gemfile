@@ -42,7 +42,9 @@ else
     gem "win32-process", "~> 0.6.5", :require => false
     gem "win32-service", "~> 0.7.2", :require => false
     gem "minitar", "~> 0.5.4", :require => false
-    gem "win32console", :require => false
+    if RUBY_VERSION =~ /^1\./ then
+      gem "win32console", :require => false
+    end
   end
 end
 
