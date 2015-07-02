@@ -10,22 +10,22 @@ init:
 - 'mkdir C:\ProgramData\PuppetLabs\puppet\var && exit 0'
 environment:
   matrix:
-  - PUPPET_GEM_VERSION: ~> 4.0
-    RUBY_VER: 21
-  - PUPPET_GEM_VERSION: ~> 4.0
-    RUBY_VER: 21-x64
   - PUPPET_GEM_VERSION: ~> 3.0
     RUBY_VER: 193
   - PUPPET_GEM_VERSION: ~> 3.0
     RUBY_VER: 200-x64
-  - PUPPET_GEM_VERSION: 3.3.2
+  - PUPPET_GEM_VERSION: ~> 4.0
+    RUBY_VER: 21
+  - PUPPET_GEM_VERSION: ~> 4.0
+    RUBY_VER: 21-x64
+  - PUPPET_GEM_VERSION: 3.3.0
     RUBY_VER: 193
 matrix:
   fast_finish: true
 install:
 - SET PATH=C:\Ruby%RUBY_VER%\bin;%PATH%
 - gem install bundler --quiet --no-ri --no-rdoc
-- bundle install --jobs 4 --retry 2 --without development system_tests
+- bundle install --jobs 4 --retry 2 --without system_tests
 - type Gemfile.lock
 build: off
 test_script:
@@ -39,4 +39,3 @@ notifications:
   on_build_success: false
   on_build_failure: false
   on_build_status_changed: false
-
