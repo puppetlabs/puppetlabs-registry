@@ -1,4 +1,4 @@
-source ENV['GEM_SOURCE'] || 'https://rubygems.org'
+source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
 # Determines what type of gem is requested based on place_or_version.
 def gem_type(place_or_version)
@@ -25,22 +25,22 @@ def location_for(place_or_version, fake_version = nil)
   end
 end
 
-group :development, :test do
+group :development do
   gem 'rake',                    :require => false
-  gem 'mocha', '~>0.10.5',       :require => false
-  gem 'puppetlabs_spec_helper',  :require => false
-  gem 'puppet-lint',             :require => false
   gem 'rspec', '~>2.14.0',       :require => false
+  gem 'puppet-lint',             :require => false
+  gem 'puppetlabs_spec_helper',  :require => false
+  gem 'puppet_facts',            :require => false
+  gem 'mocha', '~>0.10.5',       :require => false
 end
-
-beaker_version = ENV['BEAKER_VERSION'] || '~> 2.2'
 group :system_tests do
+  beaker_version = ENV['BEAKER_VERSION'] || '~> 2.2'
   if beaker_version
     gem 'beaker', *location_for(beaker_version)
   else
-    gem 'beaker',                :require => false, :platforms => :ruby
+    gem 'beaker', :require => false, :platforms => :ruby
   end
-  gem 'beaker-puppet_install_helper', :require => false
+  gem 'beaker-puppet_install_helper',  :require => false
 end
 
 # The recommendation is for PROJECT_GEM_VERSION, although there are older ways
@@ -50,14 +50,13 @@ puppetversion = ENV['PUPPET_GEM_VERSION'] || ENV['GEM_PUPPET_VERSION'] || ENV['P
 gem 'puppet', *location_for(puppetversion)
 
 # Only explicitly specify Facter/Hiera if a version has been specified.
-# Otherwise it can lead to strange bundler behavior. If you are seeing this
-# behavior, set `DEBUG_RESOLVER` environment variable to `1` and run bundle
-# install.
+# Otherwise it can lead to strange bundler behavior. If you are seeing weird
+# gem resolution behavior, try setting `DEBUG_RESOLVER` environment variable
+# to `1` and then run bundle install.
 facterversion = ENV['FACTER_GEM_VERSION'] || ENV['GEM_FACTER_VERSION'] || ENV['FACTER_LOCATION']
 gem "facter", *location_for(facterversion) if facterversion
 hieraversion = ENV['HIERA_GEM_VERSION'] || ENV['GEM_HIERA_VERSION'] || ENV['HIERA_LOCATION']
 gem "hiera", *location_for(hieraversion) if hieraversion
-
 
 # For Windows dependencies, these could be required based on the version of
 # Puppet you are requiring. Anything greater than v3.5.0 is going to have
@@ -67,15 +66,8 @@ explicitly_require_windows_gems = false
 puppet_gem_location = gem_type(puppetversion)
 # This is not a perfect answer to the version check
 if puppet_gem_location != :gem || puppetversion < '3.5.0'
-  is_x64 = Gem::Platform.local.cpu == 'x64'
-  if is_x64
-    platform(:x64_mingw) do
-      explicitly_require_windows_gems = true
-    end
-  else
-    platform (:mingw) do
-      explicitly_require_windows_gems = true
-    end
+  if Gem::Platform.local.os == 'mingw32'
+    explicitly_require_windows_gems = true
   end
 end
 
@@ -87,10 +79,7 @@ if explicitly_require_windows_gems
   gem "win32-security", "~> 0.1", :require => false
   gem "win32-service", "~> 0.7", :require => false
   gem "minitar", "~> 0.5.4", :require => false
-
-  if RUBY_VERSION =~ /^1\./ then
-    gem "win32console", :require => false
-  end
+  gem "win32console", :require => false if RUBY_VERSION =~ /^1\./
 
   # Puppet less than 3.7.0 requires these.
   # Puppet 3.5.0+ will control the actual requirements.
