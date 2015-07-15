@@ -60,8 +60,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
   describe "#regvalue" do
     it "should return a valid string for a well known key" do
-      reg_value = type.new(:path => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType', :provider => described_class.name)
-      reg_value.provider.data.should eq ['System']
+      reg_value = type.new(:path => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRoot', :provider => described_class.name)
+      reg_value.provider.data.should eq [ENV['SystemRoot']]
       reg_value.provider.type.should eq :string
     end
 
