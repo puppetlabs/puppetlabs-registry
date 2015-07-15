@@ -33,13 +33,9 @@ group :development do
   gem 'puppet_facts',            :require => false
   gem 'mocha', '~>0.10.5',       :require => false
 end
+
 group :system_tests do
-  beaker_version = ENV['BEAKER_VERSION'] || '~> 2.2'
-  if beaker_version
-    gem 'beaker', *location_for(beaker_version)
-  else
-    gem 'beaker', :require => false, :platforms => :ruby
-  end
+  gem 'beaker', *location_for(ENV['BEAKER_VERSION'] || '~> 2.18')
   gem 'beaker-puppet_install_helper',  :require => false
 end
 
