@@ -68,22 +68,39 @@ if puppet_gem_location != :gem || puppetversion < '3.5.0'
 end
 
 if explicitly_require_windows_gems
-  gem "ffi", "~> 1.9.0", :require => false
-  gem "win32-dir", "~> 0.3", :require => false
-  gem "win32-eventlog", "~> 0.5", :require => false
-  gem "win32-process", "~> 0.6", :require => false
-  gem "win32-security", "~> 0.1", :require => false
-  gem "win32-service", "~> 0.7", :require => false
-  gem "minitar", "~> 0.5.4", :require => false
-  gem "win32console", :require => false if RUBY_VERSION =~ /^1\./
+  # This also means Puppet Gem less than 3.5.0 - this has been tested back
+  # to 3.0.0. Any further back is likely not supported.
+  if puppet_gem_location == :gem
+    gem "ffi", "1.9.0",               :require => false
+    gem "win32-eventlog", "0.5.3",    :require => false
+    gem "win32-process", "0.6.5",     :require => false
+    gem "win32-security", "~> 0.1.2", :require => false
+    gem "win32-service", "0.7.2",     :require => false
+    gem "minitar", "0.5.4",           :require => false
+  else
+    gem "ffi", "~> 1.9.0",            :require => false
+    gem "win32-eventlog", "~> 0.5",   :require => false
+    gem "win32-process", "~> 0.6",    :require => false
+    gem "win32-security", "~> 0.1",   :require => false
+    gem "win32-service", "~> 0.7",    :require => false
+    gem "minitar", "~> 0.5.4",        :require => false
+  end
+
+  gem "win32-dir", "~> 0.3",          :require => false
+  gem "win32console", "1.3.2",        :require => false if RUBY_VERSION =~ /^1\./
 
   # Puppet less than 3.7.0 requires these.
   # Puppet 3.5.0+ will control the actual requirements.
-  gem "sys-admin", "~> 1.5", :require => false
-  gem "win32-api", "~> 1.4.8", :require => false
-  gem "win32-taskscheduler", "~> 0.2", :require => false
-  gem "windows-api", "~> 0.4", :require => false
-  gem "windows-pr", "~> 1.2", :require => false
+  # These are listed in formats that work with all versions of
+  # Puppet from 3.0.0 to 3.6.x. After that, these were no longer used.
+  # We do not want to allow newer versions than what came out after
+  # 3.6.x to be used as they constitute some risk in breaking older
+  # functionality. So we set these to exact versions.
+  gem "sys-admin", "1.5.6",           :require => false
+  gem "win32-api", "1.4.8",           :require => false
+  gem "win32-taskscheduler", "0.2.2", :require => false
+  gem "windows-api", "0.4.3",         :require => false
+  gem "windows-pr",  "1.2.3",         :require => false
 end
 
 if File.exists? "#{__FILE__}.local"
