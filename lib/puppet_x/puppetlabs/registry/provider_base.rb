@@ -51,6 +51,19 @@ module ProviderBase
     attach_function :RegDeleteValueW,
       [:handle, :pointer], :win32_long
 
+    # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724923(v=vs.85).aspx
+    # LONG WINAPI RegSetValueEx(
+    #   _In_             HKEY    hKey,
+    #   _In_opt_         LPCTSTR lpValueName,
+    #   _Reserved_       DWORD   Reserved,
+    #   _In_             DWORD   dwType,
+    #   _In_       const BYTE    *lpData,
+    #   _In_             DWORD   cbData
+    # );
+    ffi_lib :advapi32
+    attach_function :RegSetValueExW,
+      [:handle, :pointer, :dword, :dword, :pointer, :dword], :win32_long
+
     # this duplicates code found in puppet, but necessary for backwards compat
     class << base
       # note that :uchar is aliased in Puppet to :byte
@@ -138,6 +151,10 @@ module ProviderBase
   # specific module, ProviderKeyBase or ProviderValueBase
   def from_string_to_wide_string(str, &block)
     self.class.from_string_to_wide_string(str, &block)
+  end
+
+  def wide_string(str)
+    self.class.wide_string(str)
   end
 
   def hkeys
