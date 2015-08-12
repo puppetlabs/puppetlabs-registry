@@ -93,6 +93,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
       reg_value.provider.create
       reg_value.provider.exists?.should be_true
+      expect(reg_value.provider.data).to eq([data].flatten)
 
       reg_value.provider.destroy
       reg_value.provider.exists?.should be_false
@@ -107,7 +108,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
     end
 
     it "can destroy a randomly created REG_BINARY value" do
-      create_and_destroy(path, :binary, '01011010')
+      create_and_destroy(path, :binary, '01 01 10 10')
     end
 
     it "can destroy a randomly created REG_DWORD value" do
@@ -120,6 +121,46 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
     it "can destroy a randomly created REG_MULTI_SZ value" do
       create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])
+    end
+  end
+
+  context "when writing numeric values" do
+    let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
+
+    after(:each) do
+      reg_value = type.new(:path => path, :provider => described_class.name)
+
+      reg_value.provider.destroy
+      expect(reg_value.provider).to_not be_exists
+    end
+
+    def write_and_read_value(path, reg_type, value)
+      reg_value = type.new(:path => path,
+        :type => reg_type,
+        :data => value,
+        :provider => described_class.name)
+
+      reg_value.provider.create
+      expect(reg_value.provider).to be_exists
+      expect(reg_value.provider.type).to eq(reg_type)
+
+      written = reg_value.provider.data.first
+      expect(written).to eq(value)
+    end
+
+
+    # values chosen at 1 bit past previous byte boundary
+    [0xFF + 1, 0xFFFF + 1, 0xFFFFFF + 1, 0xFFFFFFFF].each do |value|
+      it "properly round-trips written values by converting endianness properly" do
+        write_and_read_value(path, :dword, value)
+        write_and_read_value(path, :qword, value)
+      end
+    end
+
+    [0xFFFFFFFFFF + 1, 0xFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFFFF].each do |value|
+      it "properly round-trips written values by converting endianness properly" do
+        write_and_read_value(path, :qword, value)
+      end
     end
   end
 
