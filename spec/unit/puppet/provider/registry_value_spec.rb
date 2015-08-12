@@ -30,6 +30,9 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       # also, expect that we're not using Rubys each_key / each_value which exhibit bad behavior
       Win32::Registry.any_instance.expects(:each_key).never
       Win32::Registry.any_instance.expects(:each_value).never
+
+      # this covers []= write_s write_i and write_bin
+      Win32::Registry.any_instance.expects(:write).never
     end
   end
 
