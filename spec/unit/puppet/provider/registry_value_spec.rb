@@ -79,24 +79,47 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
   end
 
   describe "#destroy" do
-    it "can destroy a randomly created value" do
-
-      guid = SecureRandom.uuid
-      reg_value = type.new(:path => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}",
-        :type => 'string',
-        :data => guid,
+    let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
+    def create_and_destroy(path, reg_type, data)
+      reg_value = type.new(:path => path,
+        :type => reg_type,
+        :data => data,
         :provider => described_class.name)
       already_exists = reg_value.provider.exists?
       already_exists.should be_false
 
       # something has gone terribly wrong here, pull the ripcord
-      break if already_exists
+      fail if already_exists
 
       reg_value.provider.create
       reg_value.provider.exists?.should be_true
 
       reg_value.provider.destroy
       reg_value.provider.exists?.should be_false
+    end
+
+    it "can destroy a randomly created REG_SZ value" do
+      create_and_destroy(path, :string, SecureRandom.uuid)
+    end
+
+    it "can destroy a randomly created REG_EXPAND_SZ value" do
+      create_and_destroy(path, :expand, "#{SecureRandom.uuid} system root is %SystemRoot%")
+    end
+
+    it "can destroy a randomly created REG_BINARY value" do
+      create_and_destroy(path, :binary, '01011010')
+    end
+
+    it "can destroy a randomly created REG_DWORD value" do
+      create_and_destroy(path, :dword, rand(2 ** 32 - 1))
+    end
+
+    it "can destroy a randomly created REG_QWORD value" do
+      create_and_destroy(path, :qword, rand(2 ** 64 - 1))
+    end
+
+    it "can destroy a randomly created REG_MULTI_SZ value" do
+      create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])
     end
   end
 
