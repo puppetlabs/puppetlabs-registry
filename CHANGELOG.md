@@ -1,3 +1,12 @@
+##2015-07-38 - Supported Release 1.1.1
+###Summary
+
+This release adds Puppet Enterprise 2015.2.0 to metadata
+
+####Features
+- Testcase fixes
+- Gemfile updates
+
 ##2015-03-24 - Supported Release 1.1.0
 ###Summary 
 
