@@ -1,4 +1,4 @@
-##2015-07-38 - Supported Release 1.1.1
+##2015-08-12 - Supported Release 1.1.1
 ###Summary
 
 This release adds Puppet Enterprise 2015.2.0 to metadata
