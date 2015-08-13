@@ -174,28 +174,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     end
   end
 
-  BITS_PER_BYTE = 8
-  BYTE_MASK = 0xFF
-
-  def to_byte_array(num, of_length)
-    bytes = []
-    while
-      # mask only least significant byte and prepend
-      bytes.unshift(num & BYTE_MASK)
-
-      # nothing left to shave off
-      break if (num <= BYTE_MASK)
-
-      # shift off the least significant byte and continue
-      num >>= BITS_PER_BYTE
-    end
-
-    pad = of_length - bytes.length
-    bytes.concat([0] * pad) if pad > 0
-
-    bytes
-  end
-
   def data_to_bytes(type, data)
     bytes = []
 
@@ -210,9 +188,11 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       when Win32::Registry::REG_BINARY
         bytes = data.bytes.to_a
       when Win32::Registry::REG_DWORD
-        bytes = to_byte_array(data, FFI::Type::UINT32.size)
+        # L is 32-bit unsigned native (little) endian order
+        bytes = [data].pack('L').unpack('C*')
       when Win32::Registry::REG_QWORD
-        bytes = to_byte_array(data, FFI::Type::UINT64.size)
+        # Q is 64-bit unsigned native (little) endian order
+        bytes = [data].pack('Q').unpack('C*')
       else
         raise TypeError, "Unsupported type #{type}"
     end
