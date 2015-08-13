@@ -1,4 +1,14 @@
-##2015-08-12 - Supported Release 1.1.1
+##2015-08-13 - SUpported Release 1.1.2
+###Summary
+
+Fix critical bug when writing dword and qword values 
+
+####Bugfixes
+- Fix the way we write dword and qword values [MODULES-2409](https://tickets.puppetlabs.com/browse/MODULES-2409)
+- changed byte conversion to use pack instead
+- Added tests to catch scenario
+
+##~~2015-08-12 - Supported Release 1.1.1~~ - Deleted
 ###Summary
 
 This release adds Puppet Enterprise 2015.2.0 to metadata
@@ -6,6 +16,9 @@ This release adds Puppet Enterprise 2015.2.0 to metadata
 ####Features
 - Testcase fixes
 - Gemfile updates
+- Updated the logic used to convert to byte arrays
+- [MODULES-1921](https://tickets.puppetlabs.com/browse/MODULES-1921) Fixes for:
+-- Ruby registry writes corrupt string [PR # 93](https://github.com/puppetlabs/puppetlabs-registry/commit/0b99718bc7f2d48752aa976d1ba30e49803e97f1)
 
 ##2015-03-24 - Supported Release 1.1.0
 ###Summary 
