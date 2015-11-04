@@ -33,17 +33,17 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       guid = SecureRandom.uuid
       reg_key = type.new(:path => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}", :provider => described_class.name)
       already_exists = reg_key.provider.exists?
-      already_exists.should be_false
+      already_exists.should be_falsey
 
       # something has gone terribly wrong here, pull the ripcord
       break if already_exists
 
       reg_key.provider.create
-      reg_key.provider.exists?.should be_true
+      reg_key.provider.exists?.should be true
 
       # test FFI code
       reg_key.provider.destroy
-      reg_key.provider.exists?.should be_false
+      reg_key.provider.exists?.should be false
     end
   end
 
@@ -59,7 +59,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       reg_key = type.new(:path => "hklm\\#{reg_path}", :provider => described_class.name)
       reg_key.provider.destroy
 
-      reg_key.provider.exists?.should be_false
+      reg_key.provider.exists?.should be_falsey
     end
 
     context "with ANSI strings on all Ruby platforms" do

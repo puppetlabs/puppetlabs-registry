@@ -25,16 +25,28 @@ def location_for(place_or_version, fake_version = nil)
   end
 end
 
+# The following gems are not included by default as they require DevKit on Windows.
+# You should probably include them in a Gemfile.local or a ~/.gemfile
+#gem 'pry' #this may already be included in the gemfile
+#gem 'pry-stack_explorer', :require => false
+#if RUBY_VERSION =~ /^2/
+#  gem 'pry-byebug'
+#else
+#  gem 'pry-debugger'
+#end
+
 group :development do
   gem 'rake',                                :require => false
-  gem 'rspec', '~>2.14.1',                   :require => false
+  gem 'rspec', '~>3.0',                      :require => false
   gem 'puppet-lint',                         :require => false
   gem 'puppetlabs_spec_helper', '~>0.10.3',  :require => false
   gem 'puppet_facts',                        :require => false
   gem 'mocha', '~>0.10.5',                   :require => false
+  gem 'pry',                                 :require => false
 end
 
 group :system_tests do
+  gem 'beaker-rspec', *location_for(ENV['BEAKER_RSPEC_VERSION'] || '~> 5.1')
   gem 'beaker', *location_for(ENV['BEAKER_VERSION'] || '~> 2.20')
   gem 'beaker-puppet_install_helper',  :require => false
 end
@@ -107,8 +119,14 @@ if explicitly_require_windows_gems
   gem "windows-pr",  "1.2.3",           :require => false
 end
 
+# Evaluate Gemfile.local if it exists
 if File.exists? "#{__FILE__}.local"
   eval(File.read("#{__FILE__}.local"), binding)
+end
+
+# Evaluate ~/.gemfile if it exists
+if File.exists?(File.join(Dir.home, '.gemfile'))
+  eval(File.read(File.join(Dir.home, '.gemfile')), binding)
 end
 
 # vim:ft=ruby

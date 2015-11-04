@@ -52,12 +52,12 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
   describe "#exists?" do
     it "should return true for a well known hive" do
       reg_value = type.new(:path => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType', :provider => described_class.name)
-      reg_value.provider.exists?.should be_true
+      reg_value.provider.exists?.should be true
     end
 
     it "should return false for a bogus hive/path" do
       reg_value = type.new(:path => 'hklm\foobar5000', :catalog => catalog, :provider => described_class.name)
-      reg_value.provider.exists?.should be_false
+      reg_value.provider.exists?.should be false
     end
   end
 
@@ -89,17 +89,17 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
         :data => data,
         :provider => described_class.name)
       already_exists = reg_value.provider.exists?
-      already_exists.should be_false
+      already_exists.should be_falsey
 
       # something has gone terribly wrong here, pull the ripcord
       fail if already_exists
 
       reg_value.provider.create
-      reg_value.provider.exists?.should be_true
+      reg_value.provider.exists?.should be true
       expect(reg_value.provider.data).to eq([data].flatten)
 
       reg_value.provider.destroy
-      reg_value.provider.exists?.should be_false
+      reg_value.provider.exists?.should be false
     end
 
     it "can destroy a randomly created REG_SZ value" do
@@ -185,7 +185,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
         :provider => described_class.name)
 
       reg_value.provider.destroy
-      reg_value.provider.exists?.should be_false
+      reg_value.provider.exists?.should be_falsey
     end
 
     # proof that there is no conversion to local encodings like IBM437
@@ -206,10 +206,10 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
         :provider => described_class.name)
 
       already_exists = reg_value.provider.exists?
-      already_exists.should be_false
+      already_exists.should be_falsey
 
       reg_value.provider.create
-      reg_value.provider.exists?.should be_true
+      reg_value.provider.exists?.should be true
 
       reg_value.provider.data.length.should eq 1
       reg_value.provider.type.should eq :string

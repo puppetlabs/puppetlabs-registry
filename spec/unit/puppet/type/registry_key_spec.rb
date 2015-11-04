@@ -7,10 +7,16 @@ require 'puppet/type/registry_key'
 describe Puppet::Type.type(:registry_key) do
   let (:catalog) do Puppet::Resource::Catalog.new end
 
+
   # This is overridden here so we get a consistent association with the key
   # and a catalog using memoized let methods.
   let (:key) do
     Puppet::Type.type(:registry_key).new(:name => 'HKLM\Software', :catalog => catalog)
+  end
+  let(:provider) { Puppet::Provider.new(key) }
+
+  before :each do
+    key.provider = provider
   end
 
   [:ensure].each do |property|
