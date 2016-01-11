@@ -50,6 +50,17 @@ Puppet::Type.newtype(:registry_value) do
     end
   end
 
+  # todo: if value_name is not set - during the right time - we will take the last value off of path and set it
+  newproperty(:value_name) do
+    desc "The name of the registry value to manage.  For example:
+      'Value1'. This is typically specified separately when the value
+      name includes backslashes. "
+
+    validate do |path|
+      # what validation should occur here
+    end
+  end
+
   newproperty(:type) do
     desc "The Windows data type of the registry value.  Puppet provides
       helpful names for these types as follows:
