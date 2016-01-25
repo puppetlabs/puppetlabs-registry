@@ -129,6 +129,13 @@ module Registry
   end
 
   class RegistryValuePath < RegistryPathBase
+    attr_reader :value_name
+    def initialize(path)
+      @filter_path_memo = nil
+      @path ||= path
+      @value_name ||= value_name
+      super(path)
+
     def canonical
       # This method gets called in the type and the provider.  We need to
       # preserve the trailing backslash for the provider, otherwise it won't
@@ -149,7 +156,11 @@ module Registry
     end
 
     def valuename
-      filter_path[:valuename]
+      if @valuename.nil?
+        filter_path[:valuename]
+      else
+        @valuename
+      end
     end
 
     def default?
