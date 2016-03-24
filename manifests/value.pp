@@ -39,7 +39,13 @@
 #     }
 #   }
 #
-define registry::value($key, $value=undef, $type='string', $data=undef) {
+define registry::value (
+  $key,
+  $value = undef,
+  $type  = 'string',
+  $data  = undef,
+) {
+
   # ensure windows os
   if $::operatingsystem != 'windows'{
     fail("Unsupported OS ${::operatingsystem}")
