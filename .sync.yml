@@ -4,6 +4,11 @@
   extras:
   - rvm: 1.9.3
     env: PUPPET_GEM_VERSION="3.3.0"
+  # The allow_failures section should not be here
+  # Only exists as part of modsync update for puppet branding
+  allow_failures:
+  - rvm: 2.1.5
+    env: PUPPET_GEM_VERSION="~> 4.0"
 Gemfile:
   supports_windows: true
   required:
@@ -30,3 +35,11 @@ appveyor.yml:
       RUBY_VER: 193
   test_script:
     - 'bundle exec rspec spec/unit -fd -b'
+MAINTAINERS.md:
+  maintainers:
+    - "Puppet Windows Team `windows |at| puppet |dot| com`"
+NOTICE:
+  copyright_holders:
+    - name: 'Puppet, Inc.'
+      begin: 2012
+      end: 'latest'
