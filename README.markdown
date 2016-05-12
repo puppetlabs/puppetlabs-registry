@@ -52,11 +52,11 @@ The registry module works mainly through two types: `registry_key` and `registry
     class myapp {
       registry::value { 'puppetmaster':
         key  => 'HKLM\Software\Vendor\PuppetLabs',
-        data => 'puppet.puppetlabs.com',
+        data => 'puppet.puppet.com',
       }
     }
 
-Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it contains a value named 'puppetmaster' containing the string 'puppet.puppetlabs.com'.
+Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it contains a value named 'puppetmaster' containing the string 'puppet.puppet.com'.
 
 **Note:** the `registry::value` define only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS aren't managed by this define; instead, you must use the types, [`registry_key`](#type-registry_key) and [`registry_value`](#type-registry_value) individually.
 
@@ -213,22 +213,22 @@ Tells Puppet whether the service should or shouldn't exist. Valid options: 'pres
 
 *Required.* Specifies the starting mode of the service. Valid options: 'automatic', 'manual', and 'disabled'.
 
-Puppet's [native service resource](http://docs.puppetlabs.com/references/latest/type.html#service) can also be used to manage this setting.
+Puppet's [native service resource](http://docs.puppet.com/references/latest/type.html#service) can also be used to manage this setting.
 
 ##Limitations
 
 * Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported. Other predefined root keys (e.g., HKEY_USERS) are not currently supported.
 * Puppet doesn't recursively delete Registry keys.
 
-Please report any issues through our [Module Issue Tracker](https://tickets.puppetlabs.com/browse/MODULES).
+Please report any issues through our [Module Issue Tracker](https://tickets.puppet.com/browse/MODULES).
 
 ##Development
 
-Puppet Labs modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can't access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
+Puppet Inc modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can't access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
 
 We want to keep it as easy as possible to contribute changes so that our modules work in your environment. There are a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
 
-For more information, see our [module contribution guide.](https://docs.puppetlabs.com/forge/contributing.html)
+For more information, see our [module contribution guide.](https://docs.puppet.com/forge/contributing.html)
 
 ###Contributors
 
