@@ -72,6 +72,27 @@ Within this define, you can specify multiple Registry values for one Registry ke
 
 You can still add values in a string (or array) beyond the default, but you can only set one default value per key.
 
+###HKEY_USERS and HKEY_CURRENT_USER support
+
+- HKEY_USERS is a root level registry hive that contains user specific keys and values, organized by their unique SID. 
+- HKEY_CURRENT_USER is a root level hive that is a mapping to the HKEY_USER\SID of the current processes user.
+
+
+To use HKEY_USERS you must supply the SID of the user you wish to effect, for example:
+
+    registry_key { 'HKU\\S-1-5-21-123456789-987654321-123456789-9876\\PuppetLabs':
+      ensure => present
+    }
+
+As puppet often runs as SYSTEM, it's HKEY_CURRENT_USER will always match to SYSTEM's Key (S-1-5-18), thus limiting the impact of actually interacting with real users.  To get past that this module has a custom fact called `$windows_currentuser_sid` which grabs the logged in user's SID (user on the console, not via a terminal session).
+
+
+    registry_key { 'HKU\\${windows_currentuser_sid}\Software\PuppetLabs':
+      ensure => present
+    }
+    
+**Note:** This module currently does not create new Users HKEY_USERS branch, or support accounts that have never logged in.  The best usage for this is with managed endpoints.
+
 
 ###Purge existing values
 
@@ -217,7 +238,7 @@ Puppet's [native service resource](http://docs.puppet.com/references/latest/type
 
 ##Limitations
 
-* Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported. Other predefined root keys (e.g., HKEY_USERS) are not currently supported.
+* Keys within HKEY_LOCAL_MACHINE (hklm), HKEY_CLASSES_ROOT (hkcr), HKEY_USERS (hku), and HKEY_CURRENT_USER (by using HKU\${windows_currentuser_sid} ) are supported. Other predefined root keys (e.g., HKEY_CURRENT_CONFIG) are not currently supported.
 * Puppet doesn't recursively delete Registry keys.
 
 Please report any issues through our [Module Issue Tracker](https://tickets.puppet.com/browse/MODULES).

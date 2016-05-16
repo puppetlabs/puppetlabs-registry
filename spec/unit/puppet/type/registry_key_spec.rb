@@ -40,6 +40,12 @@ describe Puppet::Type.type(:registry_key) do
       end
     end
 
+    %w[hku hku\S-1-5-18\software hku\S-1-5-18\software\vendor].each do |path|
+      it "should accept #{path}" do
+        key[:path] = path
+      end
+    end
+
     %w[HKEY_DYN_DATA HKEY_PERFORMANCE_DATA].each do |path|
       it "should reject #{path} as unsupported case insensitively" do
         expect { key[:path] = path }.to raise_error(Puppet::Error, /Unsupported/)
