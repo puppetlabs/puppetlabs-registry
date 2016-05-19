@@ -57,7 +57,8 @@ define registry::value (
   validate_re($type, '^\w+',
     'type parameter must not be empty but it is type => "$type"')
 
-
+  # normalize the case so that our defined() check is more consistent
+  $key_normalized = downcase($key)
 
   $value_real = $value ? {
     undef       => $name,
@@ -69,13 +70,13 @@ define registry::value (
   Registry_key { ensure => present }
   Registry_value { ensure => present }
 
-  if !defined(Registry_key[$key]) {
-    registry_key { $key: }
+  if !defined(Registry_key[$key_normalized]) {
+    registry_key { $key_normalized: }
   }
 
   # If value_real is an empty string then the default value of the key will be
   # managed.
-  registry_value { "${key}\\${value_real}":
+  registry_value { "${key_normalized}\\${value_real}":
     type => $type,
     data => $data,
   }
