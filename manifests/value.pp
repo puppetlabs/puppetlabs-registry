@@ -53,9 +53,9 @@ define registry::value (
 
   # validate our inputs.
   validate_re($key, '^\w+',
-    'key parameter must not be empty but it is key => "$key""')
+    "key parameter must not be empty but it is key => '${key}'")
   validate_re($type, '^\w+',
-    'type parameter must not be empty but it is type => "$type"')
+    "type parameter must not be empty but it is type => '${type}'")
 
 
 
