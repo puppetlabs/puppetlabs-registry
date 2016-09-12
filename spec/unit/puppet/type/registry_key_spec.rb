@@ -39,6 +39,12 @@ describe Puppet::Type.type(:registry_key) do
         key[:path] = path
       end
     end
+    
+    %w[hku hku\.DEFAULT hku\.DEFAULT\software hku\.DEFAULT\software\vendor].each do |path|
+      it "should accept #{path}" do
+        key[:path] = path
+      end
+    end
 
     %w[HKEY_DYN_DATA HKEY_PERFORMANCE_DATA].each do |path|
       it "should reject #{path} as unsupported case insensitively" do
