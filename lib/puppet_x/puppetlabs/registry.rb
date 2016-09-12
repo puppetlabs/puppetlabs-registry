@@ -95,8 +95,9 @@ module Registry
                 :hklm
               when /hkey_classes_root/, /hkcr/
                 :hkcr
+              when /hkey_users/, /hku/
+                :hku
               when /hkey_current_user/, /hkcu/,
-                /hkey_users/, /hku/,
                 /hkey_current_config/, /hkcc/,
                 /hkey_performance_data/,
                 /hkey_performance_text/,
