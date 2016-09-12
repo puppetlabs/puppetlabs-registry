@@ -217,7 +217,7 @@ Puppet's [native service resource](http://docs.puppet.com/references/latest/type
 
 ##Limitations
 
-* Keys within HKEY_LOCAL_MACHINE (hklm) or HKEY_CLASSES_ROOT (hkcr) are supported. Other predefined root keys (e.g., HKEY_USERS) are not currently supported.
+* Keys within HKEY_LOCAL_MACHINE (hklm), HKEY_CLASSES_ROOT (hkcr) or HKEY_USERS (hku) are supported. Other predefined root keys (e.g., HKEY_CURRENT_USER) are not currently supported.
 * Puppet doesn't recursively delete Registry keys.
 
 Please report any issues through our [Module Issue Tracker](https://tickets.puppet.com/browse/MODULES).
