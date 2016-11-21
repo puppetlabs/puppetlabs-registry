@@ -2,7 +2,7 @@ module PuppetX
 module Puppetlabs
 module Registry
   # For 64-bit OS, use 64-bit view. Ignored on 32-bit OS
-  KEY_WOW64_64KEY = 0x100 unless defined? KEY_WOW64_64KEY
+  KEY_WOW64_64KEY = 0x100
   # For 64-bit OS, use 32-bit view. Ignored on 32-bit OS
   KEY_WOW64_32KEY = 0x200 unless defined? KEY_WOW64_32KEY
 
