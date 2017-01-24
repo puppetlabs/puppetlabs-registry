@@ -49,19 +49,19 @@ define registry::service(
 ) {
 
   $ensure_real = $ensure ? {
-    UNSET   => present,
+    'UNSET'  => present,
     undef   => present,
     present => present,
     absent  => absent,
   }
 
   $display_name_real = $display_name ? {
-    UNSET   => $name,
+    'UNSET' => $name,
     default => $display_name,
   }
 
   $description_real = $description ? {
-    UNSET   => $display_name_real,
+    'UNSET' => $display_name_real,
     default => $description,
   }
 
