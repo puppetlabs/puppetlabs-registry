@@ -24,7 +24,7 @@ Puppet::Type.newtype(:registry_value) do
 
   ensurable
 
-  newparam(:path, :namevar => true) do
+  newparam(:path) do
     desc "The path to the registry value to manage.  For example:
       'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'.
       If Puppet is running on a 64-bit system, the 32-bit registry key can
@@ -32,10 +32,10 @@ Puppet::Type.newtype(:registry_value) do
       '32:HKLM\Software\Value3'"
 
     validate do |path|
-      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path).valid?
+      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path, 'test').valid?
     end
     munge do |path|
-      reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path)
+      reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path, 'test')
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
@@ -47,6 +47,18 @@ Puppet::Type.newtype(:registry_value) do
         Puppet.debug "Resource has no associated catalog.  Aliases are not being set for #{@resource.to_s}"
       end
       reg_path.canonical
+    end
+  end
+
+  newproperty(:value_name) do
+    desc "The name of the registry value to manage.  For example:
+      'Value1'. This is typically specified separately when the value
+      name includes backslashes. "
+
+    defaultto ''
+
+    munge do |value|
+      value
     end
   end
 
@@ -126,7 +138,7 @@ Puppet::Type.newtype(:registry_value) do
     req = []
     # This is a value path and not a key path because it's based on the path of
     # the value resource.
-    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path))
+    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path), value(:value_name))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.

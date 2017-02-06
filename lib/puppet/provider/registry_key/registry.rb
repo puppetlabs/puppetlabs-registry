@@ -60,6 +60,6 @@ Puppet::Type.type(:registry_key).provide(:registry) do
   private
 
   def path
-    @path ||= PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(resource.parameter(:path).value)
+    @path ||= PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(resource.parameter(:path).value, resource.parameter(:value_name).value)
   end
 end

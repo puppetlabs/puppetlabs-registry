@@ -28,7 +28,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
           status = RegQueryValueExW(reg.hkey, valuename_ptr,
             FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
             FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL)
-
           found = status == 0
           raise Win32::Registry::Error.new(status) if !found
         end
@@ -74,6 +73,16 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       end
     end
   end
+
+  def value_name
+    regvalue[:value_name] || :absent
+  end
+
+  def value_name=(value)
+    puts value
+    regvalue[:value_name] = value
+  end
+
 
   def type
     regvalue[:type] || :absent
@@ -214,6 +223,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   end
 
   def path
-    @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value)
+    @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value, resource.parameter(:value_name).value)
   end
 end
