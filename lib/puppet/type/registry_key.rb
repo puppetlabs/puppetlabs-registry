@@ -102,9 +102,11 @@ EOT
     return [] unless value(:purge_values)
 
     # get the "should" names of registry values associated with this key
-    should_values = catalog.relationship_graph.direct_dependents_of(self).select {|dep| dep.type == :registry_value }.map do |reg|
-      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(reg.parameter(:path).value).valuename
-    end
+    should_values = catalog
+                      .relationship_graph
+                      .direct_dependents_of(self)
+                      .select {|dep| dep.type == :registry_value }
+                      .map { |reg| reg.parameter(:value_name).value }
 
     # get the "is" names of registry values associated with this key
     is_values = provider.values
@@ -112,7 +114,9 @@ EOT
     # create absent registry_value resources for the complement
     resources = []
     (is_values - should_values).each do |name|
-      resources << Puppet::Type.type(:registry_value).new(:path => "#{self[:path]}\\#{name}", :ensure => :absent, :catalog => catalog)
+      # Registry values have a separate Path and Value Name, so just generate a unique title
+      title = "RemoveRegValue#{SecureRandom.uuid}"
+      resources << Puppet::Type.type(:registry_value).new(:title => title, :path => self[:path], :value_name => name, :ensure => :absent, :catalog => catalog)
     end
     resources
   end

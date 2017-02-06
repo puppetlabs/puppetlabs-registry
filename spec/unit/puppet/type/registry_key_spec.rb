@@ -93,8 +93,9 @@ describe Puppet::Type.type(:registry_key) do
       before :each do
         key[:purge_values] = true
         catalog.add_resource(key)
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val1", :catalog => catalog))
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val2", :catalog => catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:title => "#{key[:path]}\\val1", :catalog => catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:title => "#{key[:path]}\\val2", :catalog => catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:title => 'regval3', :path => "#{key[:path]}", :value_name => 'val\3', :catalog => catalog))
       end
 
       it "should return an empty array if the key doesn't have any values" do
@@ -102,12 +103,28 @@ describe Puppet::Type.type(:registry_key) do
         key.eval_generate.must be_empty
       end
 
-      it "should purge existing values that are not being managed" do
-        key.provider.expects(:values).returns(['val1', 'val3'])
-        res = key.eval_generate.first
+      it "should purge existing values that are not being managed (without backslash)" do
+        key.provider.expects(:values).returns(['val1', 'val\3', 'val99'])
+        resources = key.eval_generate
+        resources.count.must == 1
+        res = resources.first
 
         res[:ensure].must == :absent
-        res[:path].must == "#{key[:path]}\\val3"
+        res[:path].must == key[:path]
+        res[:value_name].must == 'val99'
+      end
+
+      it "should purge existing values that are not being managed (with backslash)" do
+        key.provider.expects(:values).returns(['val1', 'val\3', 'val\99'])
+
+        resources = key.eval_generate
+        resources.count.must == 1
+        res = resources.first
+
+        res[:ensure].must == :absent
+        # The path should strip the backslash in the names but the real valuename should appear in value_name
+        res[:path].must == key[:path]
+        res[:value_name].must == 'val\\99'
       end
 
       it "should purge existing values that are not being managed and case insensitive)" do
@@ -123,7 +140,7 @@ describe Puppet::Type.type(:registry_key) do
       end
 
       it "should return an empty array if all existing values are being managed" do
-        key.provider.expects(:values).returns(['val1', 'val2'])
+        key.provider.expects(:values).returns(['val1', 'val2','val\3'])
         key.eval_generate.must be_empty
       end
     end
