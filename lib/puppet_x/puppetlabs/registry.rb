@@ -155,7 +155,7 @@ module Registry
       if default?
         filter_path[:trailing_path]
       else
-        filter_path[:trailing_path].gsub(/#{@value_name}$/, '\1')
+        filter_path[:trailing_path].chomp(@value_name)
       end
     end
 
