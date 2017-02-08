@@ -36,10 +36,10 @@ EOT
       prefix.  For example: '32:HKLM\Software'"
 
     validate do |path|
-      PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path, '').valid?
+      PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      reg_path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path, '')
+      reg_path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
@@ -84,14 +84,10 @@ EOT
     end
   end
 
-  newproperty(:value_name) do
-    defaultto ''
-  end
-
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
-    path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(value(:path), '')
+    path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(value(:path))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.

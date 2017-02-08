@@ -60,7 +60,7 @@ Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it cont
 
 **Note:** the `registry::value` define only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS aren't managed by this define; instead, you must use the types, [`registry_key`](#type-registry_key) and [`registry_value`](#type-registry_value) individually.
 
-Within this define, you can specify multiple Registry values for one Registry key and manage them all at once.
+Within this define, you can specify multiple Registry values for one Registry key and manage them all at once. Puppet also supports managing registry values with a backslash.
 
 ###Set the default value for a key
 

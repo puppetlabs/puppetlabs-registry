@@ -17,14 +17,13 @@ Puppet::Type.newtype(:registry_value) do
     **Autorequires:** Any parent registry key managed by Puppet will be
     autorequired.
   EOT
-
   def self.title_patterns
     [[/^(.*?)\Z/m, [[:path, lambda { |x| x }]]]]
   end
 
   ensurable
 
-  newparam(:path) do
+  newparam(:path, :namevar => true) do
     desc "The path to the registry value to manage.  For example:
       'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'.
       If Puppet is running on a 64-bit system, the 32-bit registry key can
@@ -32,10 +31,10 @@ Puppet::Type.newtype(:registry_value) do
       '32:HKLM\Software\Value3'"
 
     validate do |path|
-      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path, 'test').valid?
+      PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path, 'test')
+      reg_path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
@@ -52,13 +51,20 @@ Puppet::Type.newtype(:registry_value) do
 
   newproperty(:value_name) do
     desc "The name of the registry value to manage.  For example:
-      'Value1'. This is typically specified separately when the value
-      name includes backslashes. "
+      'Value1' or 'Value\1'. This is typically specified 
+      separately when the value name includes backslashes. "
 
     defaultto ''
 
     munge do |value|
-      value
+      # Sets value to last element of path when not set for backwards
+      # compatibility.
+      case value
+      when ''
+        resource[:path].split('\\')[-1]
+      else
+        value
+      end
     end
   end
 

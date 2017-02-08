@@ -74,16 +74,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     end
   end
 
-  def value_name
-    regvalue[:value_name] || :absent
-  end
-
-  def value_name=(value)
-    puts value
-    regvalue[:value_name] = value
-  end
-
-
   def type
     regvalue[:type] || :absent
   end
@@ -98,6 +88,10 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   def data=(value)
     regvalue[:data] = value
+  end
+
+  def value_name
+    @value_name = resource.parameter(:value_name).value
   end
 
   def regvalue

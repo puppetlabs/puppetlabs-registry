@@ -11,11 +11,9 @@ module Registry
   # this class.
   class RegistryPathBase < String
     attr_reader :path
-    attr_reader :value_name
-    def initialize(path, value_name=nil)
+    def initialize(path)
       @filter_path_memo = nil
       @path ||= path
-      @value_name ||= value_name
       super(path)
     end
 
@@ -60,6 +58,7 @@ module Registry
       result = {}
 
       path = @path
+      value_name = @value_name
 
 
       result[:valuename] = case path[-1, 1]
@@ -133,6 +132,13 @@ module Registry
   end
 
   class RegistryValuePath < RegistryPathBase
+    attr_reader :value_name
+    def initialize(path, value_name)
+      @filter_path_memo = nil
+      @path ||= path
+      @value_name ||= value_name
+      super(path)
+    end
 
     def canonical
       # This method gets called in the type and the provider.  We need to
@@ -149,13 +155,12 @@ module Registry
       if default?
         filter_path[:trailing_path]
       else
-        filter_path[:trailing_path].gsub(/^(.*)\\.*$/, '\1')
+        filter_path[:trailing_path].gsub(/#{@value_name}$/, '\1')
       end
     end
 
     def valuename
       if @value_name.nil?
-        puts 'test'
         filter_path[:valuename]
       else
         @value_name
