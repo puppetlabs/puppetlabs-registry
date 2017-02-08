@@ -75,7 +75,7 @@ define registry::value (
 
   # If value_real is an empty string then the default value of the key will be
   # managed.
-  registry_value { "$key\\${value_real}":
+  registry_value { "${key}\\${value_real}":
     value_name => $value_real,
     type       => $type,
     data       => $data,
