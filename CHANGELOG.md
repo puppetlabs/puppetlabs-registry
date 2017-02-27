@@ -1,3 +1,17 @@
+## 2017-03-06 - Supported Release 1.1.4
+### Summary
+
+This release allows `HKEY_USER` registry keys to be managed, removes Windows Server 2003 support and applies a few minor bugfixes.
+
+#### Features
+- Allow keys and values in `HKEY_USERS` (`hku`) to be managed ([MODULES-3865](https://tickets.puppetlabs.com/browse/MODULES-3865))
+- Remove Windows Server 2003 as a supported Operating System
+
+#### Bugfixes
+- Use double quotes so $key is interpolated ([FM-5236](https://tickets.puppetlabs.com/browse/FM-5236))
+- Fix WOW64 Constant Definition ([MODULES-3195](https://tickets.puppetlabs.com/browse/MODULES-3195))
+- Fix UNSET no longer available as a bareword ([MODULES-4331](https://tickets.puppetlabs.com/browse/MODULES-4331))
+
 ## 2015-12-08 - Supported Release 1.1.3
 ### Summary
 
