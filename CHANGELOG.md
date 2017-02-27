@@ -1,78 +1,78 @@
-##2015-12-08 - Supported Release 1.1.3
-###Summary
+## 2015-12-08 - Supported Release 1.1.3
+### Summary
 
 Small release for support of newer PE versions.
 
-##2015-08-13 - Supported Release 1.1.2
-###Summary
+## 2015-08-13 - Supported Release 1.1.2
+### Summary
 
 Fix critical bug when writing dword and qword values.
 
-####Bugfixes
+#### Bugfixes
 - Fix the way we write dword and qword values [MODULES-2409](https://tickets.puppet.com/browse/MODULES-2409)
 - changed byte conversion to use pack instead
 - Added tests to catch scenario
 
-##~~2015-08-12 - Supported Release 1.1.1~~ - Deleted
-###Summary
+## ~~2015-08-12 - Supported Release 1.1.1~~ - Deleted
+### Summary
 
 This release adds Puppet Enterprise 2015.2.0 to metadata
 
-####Features
+#### Features
 - Testcase fixes
 - Gemfile updates
 - Updated the logic used to convert to byte arrays
 - [MODULES-1921](https://tickets.puppet.com/browse/MODULES-1921) Fixes for:
 -- Ruby registry writes corrupt string [PR # 93](https://github.com/puppetlabs/puppetlabs-registry/commit/0b99718bc7f2d48752aa976d1ba30e49803e97f1)
 
-##2015-03-24 - Supported Release 1.1.0
-###Summary
+## 2015-03-24 - Supported Release 1.1.0
+### Summary
 
 This release adds support for Ruby 2.1.5 and issues with how Ruby reads back the registry in certain scenarios, see MODULES-1723 for more details.
 
-####Bugfixes
+#### Bugfixes
 - Additional tests for purge_values
 - Use wide character registry APIs
 - Test Ruby Registry methods uncalled
 - Introduce Ruby 2.1.5 failing tests
 
 
-##2014-08-25 - Supported Release 1.0.3
-###Summary
+## 2014-08-25 - Supported Release 1.0.3
+### Summary
 
-This release adds support for native x64 ruby and puppet 3.7, and bugfixes issues with non-leading-zero binary values in regestry keys.
+This release adds support for native x64 ruby and puppet 3.7, and bugfixes issues with non-leading-zero binary values in registry keys.
 
-##2014-07-15 - Supported Release 1.0.2
-###Summary
+## 2014-07-15 - Supported Release 1.0.2
+### Summary
 
 This release merely updates metadata.json so the module can be uninstalled and
 upgraded via the puppet module command.
 
-##2014-05-20 - Supported Release 1.0.1
-#####Bugfixes
+## 2014-05-20 - Supported Release 1.0.1
+#### Bugfixes
 - Add zero padding to binary single character inputs
 
-##2014-03-04 - Supported Release 1.0.0
-###Summary
+## 2014-03-04 - Supported Release 1.0.0
+### Summary
 This is a supported release.
 
-####Bugfixes
+#### Bugfixes
 - Documentation updates
 - Add license file
 
-####Known Bugs
+#### Known Bugs
 
 * This module does not work if run as non-root. Please see [PE-2772](https://tickets.puppet.com/browse/PE-2772)
 
 ---
 
-##2013-08-01 - Release 0.1.2
-###Summary:
+## 2013-08-01 - Release 0.1.2
+### Summary:
 This is a bugfix release that allows the module to work more reliably on x64
 systems and on older systems such as 2003. Also fixes compilation errors due
 to windows library loading on *nix masters.
 
-####Bugfixes:
+#### Bugfixes:
 - Refactored code into PuppetX namespace
 - Fixed unhandled exception when loading windows code on *nix
 - Updated README and manifest documentation
