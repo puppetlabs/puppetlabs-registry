@@ -2,7 +2,7 @@ module PuppetX
 module Puppetlabs
 module Registry
   # For 64-bit OS, use 64-bit view. Ignored on 32-bit OS
-  KEY_WOW64_64KEY = 0x100 unless defined? KEY_WOW64_64KEY
+  KEY_WOW64_64KEY = 0x100
   # For 64-bit OS, use 32-bit view. Ignored on 32-bit OS
   KEY_WOW64_32KEY = 0x200 unless defined? KEY_WOW64_32KEY
 
@@ -95,8 +95,9 @@ module Registry
                 :hklm
               when /hkey_classes_root/, /hkcr/
                 :hkcr
+              when /hkey_users/, /hku/
+                :hku
               when /hkey_current_user/, /hkcu/,
-                /hkey_users/, /hku/,
                 /hkey_current_config/, /hkcc/,
                 /hkey_performance_data/,
                 /hkey_performance_text/,
