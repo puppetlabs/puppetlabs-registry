@@ -35,3 +35,9 @@ RSpec::Core::RakeTask.new(:coverage) do |t|
   t.rcov = true
   t.rcov_opts = ['--exclude', 'spec']
 end
+
+desc "Run Beaker Puppet-Agent tests"
+Beaker::Tasks::RakeTask.new("beaker:test:puppet-agent",:hosts) do |t,args|
+  t.type = 'puppet-agent'
+  t.hosts = args[:hosts]
+end
