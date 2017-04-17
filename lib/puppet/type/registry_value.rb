@@ -50,6 +50,17 @@ Puppet::Type.newtype(:registry_value) do
     end
   end
 
+  # todo: if value_name is not set - during the right time - we will take the last value off of path and set it
+  newproperty(:value_name) do
+    desc "The name of the registry value to manage.  For example:
+      'Value1'. This is typically specified separately when the value
+      name includes backslashes. "
+
+    validate do |value_name|
+      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource[:path], :value_name).valid?
+    end
+  end
+
   newproperty(:type) do
     desc "The Windows data type of the registry value.  Puppet provides
       helpful names for these types as follows:
@@ -126,7 +137,7 @@ Puppet::Type.newtype(:registry_value) do
     req = []
     # This is a value path and not a key path because it's based on the path of
     # the value resource.
-    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path))
+    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path), value(:value_name))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.

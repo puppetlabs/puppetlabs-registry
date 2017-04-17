@@ -57,8 +57,6 @@ define registry::value (
   validate_re($type, '^\w+',
     "type parameter must not be empty but it is type => '${type}'")
 
-
-
   $value_real = $value ? {
     undef       => $name,
     '(default)' => '',
@@ -76,8 +74,9 @@ define registry::value (
   # If value_real is an empty string then the default value of the key will be
   # managed.
   registry_value { "${key}\\${value_real}":
+    path => $key,
+    value_name => $value_real,
     type => $type,
     data => $data,
   }
 }
-
