@@ -135,7 +135,7 @@ module Registry
       # preserve the trailing backslash for the provider, otherwise it won't
       # think this is a default value.
       if default?
-        filter_path[:canonical] << "\\"
+        filter_path[:canonical] + "\\"
       else
         filter_path[:canonical]
       end
@@ -155,6 +155,16 @@ module Registry
 
     def default?
       !!filter_path[:is_default]
+    end
+
+    def filter_path
+      result = super
+
+      # It's possible to pass in a path of 'hklm' which can still be parsed, but is not valid registry key.  Only the default value 'hklm\'
+      # and named values 'hklm\something' are allowed
+      raise ArgumentError, "Invalid registry key: #{path}" if result[:trailing_path].empty? && result[:valuename].empty? && !result[:is_default]
+
+      result
     end
   end
 end

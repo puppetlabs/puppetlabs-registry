@@ -39,7 +39,7 @@ describe Puppet::Type.type(:registry_key) do
         key[:path] = path
       end
     end
-    
+
     %w[hku hku\.DEFAULT hku\.DEFAULT\software hku\.DEFAULT\software\vendor].each do |path|
       it "should accept #{path}" do
         key[:path] = path
@@ -110,6 +110,18 @@ describe Puppet::Type.type(:registry_key) do
         res[:path].must == "#{key[:path]}\\val3"
       end
 
+      it "should purge existing values that are not being managed and case insensitive)" do
+        pending("eval_generate is currently not case insensitive, but should be")
+        key.provider.expects(:values).returns(['VAL1', 'VaL\3', 'Val99'])
+        resources = key.eval_generate
+        resources.count.must == 1
+        res = resources.first
+
+        res[:ensure].must == :absent
+        res[:path].must == key[:path]
+        res[:value_name].must == 'Val99'
+      end
+
       it "should return an empty array if all existing values are being managed" do
         key.provider.expects(:values).returns(['val1', 'val2'])
         key.eval_generate.must be_empty
@@ -117,7 +129,7 @@ describe Puppet::Type.type(:registry_key) do
     end
   end
 
-  describe "#autorequire" do
+  describe "resource aliases" do
     let :the_catalog do
       Puppet::Resource::Catalog.new
     end
