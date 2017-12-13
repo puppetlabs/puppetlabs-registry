@@ -1,23 +1,18 @@
+---
 HOSTS:
-  centos7-master:
-    roles:
-      - master
-      - database
-      - dashboard
-    platform: el-7-x86_64
-    template: centos-7-x86_64
-    hypervisor: vcloud
-  win2012:
-    roles:
-      - agent
-      - default
-    platform: windows-2012-x86_64
+  windows2012-64-1:
+    pe_dir:
+    pe_ver:
+    pe_upgrade_dir:
+    pe_upgrade_ver:
+    hypervisor: vmpooler
+    platform: windows-2012-64
+    ruby_arch: x64
     template: win-2012-x86_64
-    hypervisor: vcloud
+    roles:
+    - agent
+    - default
 CONFIG:
   nfs_server: none
   consoleport: 443
-  datastore: instance0
-  folder: Delivery/Quality Assurance/FOSS/Dynamic
-  resourcepool: delivery/Quality Assurance/FOSS/Dynamic
-  pooling_api: http://vcloud.delivery.puppetlabs.net/
+  pooling_api: http://vmpooler.delivery.puppetlabs.net/
