@@ -17,7 +17,7 @@ describe Puppet::Type.type(:registry_value) do
 
   describe "path parameter" do
     it "should have a path parameter" do
-      Puppet::Type.type(:registry_key).attrtype(:path).should == :param
+      Puppet::Type.type(:registry_value).attrtype(:path).should == :param
     end
 
     %w[hklm\propname hklm\software\propname].each do |path|
@@ -33,7 +33,9 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     it "should strip trailling slashes from unnamed values" do
-      described_class.new(:path => 'hklm\\software\\\\', :catalog => catalog)
+      value = described_class.new(:path => 'hklm\\software\\\\', :catalog => catalog)
+
+      expect(value[:path]).to eq('hklm\\software\\')
     end
 
     %w[HKEY_DYN_DATA\\ HKEY_PERFORMANCE_DATA\name].each do |path|
@@ -44,8 +46,7 @@ describe Puppet::Type.type(:registry_value) do
 
     %w[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
       it "should reject #{path} as invalid" do
-        pending 'wrong message'
-        expect { described_class.new(:path => path, :catalog => catalog) }.should raise_error(Puppet::Error, /Invalid registry key/)
+        expect { described_class.new(:path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Invalid registry key/)
       end
     end
 
@@ -60,9 +61,52 @@ describe Puppet::Type.type(:registry_value) do
     it 'should validate the length of the value data'
     it 'should be case-preserving'
     it 'should be case-insensitive'
-    it 'should autorequire ancestor keys'
     it 'should support 32-bit values' do
       value = described_class.new(:path => '32:hklm\software\foo', :catalog => catalog)
+    end
+  end
+
+  describe '#autorequire' do
+    let(:subject) { described_class.new(:title => subject_title, :catalog => catalog) }
+    [
+      {
+        :context                => 'with a non-default value_name',
+        :reg_value_title        => 'hklm\software\foo\bar',
+        :expected_reg_key_title => 'hklm\Software\foo',
+      },
+      {
+        :context                => 'with a mixed case path and value_name',
+        :reg_value_title        => 'hkLm\soFtwarE\fOo\Bar',
+        :expected_reg_key_title => 'hklm\Software\foo',
+      },
+      {
+        :context                => 'with a default value_name',
+        :reg_value_title        => 'hklm\software\foo\bar\\',
+        :expected_reg_key_title => 'hklm\Software\foo\bar',
+      },
+      {
+        :context                => 'with a value whose parent key is not managed but does have an ancestor key in the catalog',
+        :reg_value_title        => 'hklm\software\foo\bar\baz\alice',
+        :expected_reg_key_title => 'hklm\Software\foo\bar',
+      }
+    ].each do |testcase|
+      context testcase[:context] do
+        let(:subject) { described_class.new(:title => testcase[:reg_value_title], :catalog => catalog) }
+
+        it 'should not autorequire ancestor keys if none exist' do
+          expect(subject.autorequire).to eq([])
+        end
+
+        it 'should only autorequire the nearest ancestor registry_key resource' do
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software', :catalog => catalog))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software\foo', :catalog => catalog))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software\foo\bar', :catalog => catalog))
+
+          autorequire_array = subject.autorequire
+          expect(autorequire_array.count).to eq(1)
+          expect(autorequire_array[0].to_s).to eq("Registry_key[#{testcase[:expected_reg_key_title]}] => Registry_value[#{testcase[:reg_value_title]}]")
+        end
+      end
     end
   end
 

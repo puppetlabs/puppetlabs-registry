@@ -51,7 +51,12 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
   describe "#exists?" do
     it "should return true for a well known hive" do
-      reg_value = type.new(:path => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType', :provider => described_class.name)
+      reg_value = type.new(:title => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType', :provider => described_class.name)
+      reg_value.provider.exists?.should be true
+    end
+
+    it "should return true for a well known hive with mixed case name" do
+      reg_value = type.new(:title => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType'.upcase, :provider => described_class.name)
       reg_value.provider.exists?.should be true
     end
 
@@ -82,6 +87,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
   end
 
   describe "#destroy" do
+    let (:default_path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\" }
     let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
     def create_and_destroy(path, reg_type, data)
       reg_value = type.new(:path => path,
@@ -100,6 +106,10 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
       reg_value.provider.destroy
       reg_value.provider.exists?.should be false
+    end
+
+    it "can destroy a randomly created default REG_SZ value" do
+      create_and_destroy(default_path, :string, SecureRandom.uuid)
     end
 
     it "can destroy a randomly created REG_SZ value" do
