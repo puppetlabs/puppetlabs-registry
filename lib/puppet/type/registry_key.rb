@@ -106,17 +106,19 @@ EOT
                       .relationship_graph
                       .direct_dependents_of(self)
                       .select {|dep| dep.type == :registry_value }
-                      .map { |reg| reg.parameter(:value_name).value }
+                      .map { |reg| reg.parameter(:value_name).value.downcase }
 
     # get the "is" names of registry values associated with this key
     is_values = provider.values
 
     # create absent registry_value resources for the complement
     resources = []
-    (is_values - should_values).each do |name|
-      # Registry values have a separate Path and Value Name, so just generate a unique title
-      title = "RemoveRegValue#{SecureRandom.uuid}"
-      resources << Puppet::Type.type(:registry_value).new(:title => title, :path => self[:path], :value_name => name, :ensure => :absent, :catalog => catalog)
+    is_values.each do |is_value|
+      unless should_values.include?(is_value.downcase)
+        # Registry values have a separate Path and Value Name, so just generate a unique title
+        title = "Generated_#{self[:path]}\\#{is_value}_#{SecureRandom.uuid}"
+        resources << Puppet::Type.type(:registry_value).new(:title => title, :path => self[:path], :value_name => is_value, :ensure => :absent, :catalog => catalog)
+      end
     end
     resources
   end
