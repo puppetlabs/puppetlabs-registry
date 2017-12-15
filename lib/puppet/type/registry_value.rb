@@ -17,7 +17,6 @@ Puppet::Type.newtype(:registry_value) do
     **Autorequires:** Any parent registry key managed by Puppet will be
     autorequired.
   EOT
-
   def self.title_patterns
     [[/^(.*?)\Z/m, [[:path, lambda { |x| x }]]]]
   end
@@ -32,10 +31,10 @@ Puppet::Type.newtype(:registry_value) do
       '32:HKLM\Software\Value3'"
 
     validate do |path|
-      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path).valid?
+      PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
     munge do |path|
-      reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path)
+      reg_path = PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path)
       # Windows is case insensitive and case preserving.  We deal with this by
       # aliasing resources to their downcase values.  This is inspired by the
       # munge block in the alias metaparameter.
@@ -47,6 +46,25 @@ Puppet::Type.newtype(:registry_value) do
         Puppet.debug "Resource has no associated catalog.  Aliases are not being set for #{@resource.to_s}"
       end
       reg_path.canonical
+    end
+  end
+
+  newproperty(:value_name) do
+    desc "The name of the registry value to manage.  For example:
+      'Value1' or 'Value\1'. This is typically specified 
+      separately when the value name includes backslashes. "
+
+    defaultto ''
+
+    munge do |value|
+      # Sets value to last element of path when not set for backwards
+      # compatibility.
+      case value
+      when ''
+        resource[:path].split('\\')[-1]
+      else
+        value
+      end
     end
   end
 
@@ -126,7 +144,7 @@ Puppet::Type.newtype(:registry_value) do
     req = []
     # This is a value path and not a key path because it's based on the path of
     # the value resource.
-    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path))
+    path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path), value(:value_name))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.

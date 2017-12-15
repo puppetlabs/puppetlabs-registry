@@ -58,6 +58,8 @@ module Registry
       result = {}
 
       path = @path
+      value_name = @value_name
+
 
       result[:valuename] = case path[-1, 1]
       when '\\'
@@ -130,6 +132,14 @@ module Registry
   end
 
   class RegistryValuePath < RegistryPathBase
+    attr_reader :value_name
+    def initialize(path, value_name)
+      @filter_path_memo = nil
+      @path ||= path
+      @value_name ||= value_name
+      super(path)
+    end
+
     def canonical
       # This method gets called in the type and the provider.  We need to
       # preserve the trailing backslash for the provider, otherwise it won't
@@ -145,12 +155,16 @@ module Registry
       if default?
         filter_path[:trailing_path]
       else
-        filter_path[:trailing_path].gsub(/^(.*)\\.*$/, '\1')
+        filter_path[:trailing_path].chomp(@value_name)
       end
     end
 
     def valuename
-      filter_path[:valuename]
+      if @value_name.nil?
+        filter_path[:valuename]
+      else
+        @value_name
+      end
     end
 
     def default?

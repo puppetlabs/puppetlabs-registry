@@ -103,7 +103,7 @@ EOT
 
     # get the "should" names of registry values associated with this key
     should_values = catalog.relationship_graph.direct_dependents_of(self).select {|dep| dep.type == :registry_value }.map do |reg|
-      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(reg.parameter(:path).value).valuename
+      PuppetX::Puppetlabs::Registry::RegistryValuePath.new(reg.parameter(:path).value, reg.parameter(:value_name).value).valuename
     end
 
     # get the "is" names of registry values associated with this key
