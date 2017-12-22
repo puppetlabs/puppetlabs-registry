@@ -1,4 +1,4 @@
-class mixed_default_settings {
+class test_registry::mixed_default_settings {
   registry_value { 'hklm\Software\foo\\':
     ensure => present,
     type   => string,

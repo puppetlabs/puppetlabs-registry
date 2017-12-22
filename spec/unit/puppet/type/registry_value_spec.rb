@@ -154,17 +154,17 @@ describe Puppet::Type.type(:registry_value) do
       # Explicit value names should overried title
       { :title => 'hklm\software\foo',
         :value_name          => 'value1',
-        :expected_path       => 'hklm\software',
+        :expected_path       => 'hklm\software\foo',
         :expected_value_name => 'value1',
       },
       { :title => 'hklm\software\foo',
         :value_name          => 'value\1',
-        :expected_path       => 'hklm\software',
+        :expected_path       => 'hklm\software\foo',
         :expected_value_name => 'value\1',
       },
       { :title => 'hklm\software\foo',
         :value_name          => 'value1\\',
-        :expected_path       => 'hklm\software',
+        :expected_path       => 'hklm\software\foo',
         :expected_value_name => 'value1\\',
       }].each do |testcase|
 
