@@ -18,20 +18,20 @@ describe 'Registry Key Management' do
       registry_key { 'HKLM\\Software\\Vendor': ensure => present }
       Registry_key { ensure => present }
       Registry_value { ensure => present, data => 'Puppet Default Data' }
-    
+
       registry_key { '#{keypath}': }
       registry_key { '#{keypath}\\SubKey1': }
-    
+
       if $architecture == 'x64' {
         registry_key { '32:#{keypath}': }
         registry_key { '32:#{keypath}\\SubKey1': }
       }
-    
+
       registry_key   { '#{keypath}\\SubKeyToPurge': }
       registry_value { '#{keypath}\\SubKeyToPurge\\Value1': }
       registry_value { '#{keypath}\\SubKeyToPurge\\Value2': }
       registry_value { '#{keypath}\\SubKeyToPurge\\Value3': }
-    
+
       if $architecture == 'x64' {
         registry_key   { '32:#{keypath}\\SubKeyToPurge': }
         registry_value { '32:#{keypath}\\SubKeyToPurge\\Value1': }
@@ -44,7 +44,7 @@ PHASE1
     phase2 = <<PHASE2
       registry_key { 'HKLM\\Software\\Vendor': ensure => present }
       Registry_key { ensure => present, purge_values => true }
-    
+
       registry_key { '#{keypath}\\SubKeyToPurge': }
       if $architecture == 'x64' {
         registry_key { '32:#{keypath}\\SubKeyToPurge': }
@@ -55,7 +55,7 @@ PHASE2
     phase3 = <<PHASE3
       registry_key { 'HKLM\\Software\\Vendor': ensure => present }
       Registry_key { ensure => absent }
-    
+
       # These have relationships because autorequire break things when
       # ensure is absent.  REVISIT: Make this not a requirement.
       # REVISIT: This appears to work with explicit relationships but not with ->
@@ -65,7 +65,7 @@ PHASE2
       registry_key { '#{keypath}':
         require => Registry_key['#{keypath}\\SubKeyToPurge', '#{keypath}\\SubKey1'],
       }
-    
+
       if $architecture == 'x64' {
         registry_key { '32:#{keypath}\\SubKey1': }
         registry_key { '32:#{keypath}\\SubKeyToPurge': }
@@ -90,15 +90,15 @@ PHASE3
 
     # A set of regular expression of values to be purged in phase 2.
     values_purged_native = [
-        /Registry_value\[hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value1\].ensure: removed/,
-        /Registry_value\[hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value2\].ensure: removed/,
-        /Registry_value\[hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value3\].ensure: removed/
+        /Registry_value\[Generated_hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value1_[\w-]+\].ensure: removed/,
+        /Registry_value\[Generated_hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value2_[\w-]+\].ensure: removed/,
+        /Registry_value\[Generated_hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value3_[\w-]+\].ensure: removed/
     ]
 
     values_purged_wow = [
-        /Registry_value\[32:hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value1\].ensure: removed/,
-        /Registry_value\[32:hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value2\].ensure: removed/,
-        /Registry_value\[32:hklm.Software.Vendor.PuppetLabsTest\w+.SubKeyToPurge.Value3\].ensure: removed/
+        /Registry_value\[Generated_32:hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value1_[\w-]+\].ensure: removed/,
+        /Registry_value\[Generated_32:hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value2_[\w-]+\].ensure: removed/,
+        /Registry_value\[Generated_32:hklm\\Software\\Vendor\\PuppetLabsTest\w+.SubKeyToPurge\\Value3_[\w-]+\].ensure: removed/,
     ]
 
     windows_agents.each do |agent|

@@ -41,6 +41,10 @@ module Registry
       filter_path[:root]
     end
 
+    def subkey
+      filter_path[:trailing_path]
+    end
+
     def ascend(&block)
       p = canonical
       while idx = p.rindex('\\')
@@ -58,20 +62,6 @@ module Registry
       result = {}
 
       path = @path
-
-      result[:valuename] = case path[-1, 1]
-      when '\\'
-        result[:is_default] = true
-        ''
-      else
-        result[:is_default] = false
-        idx = path.rindex('\\') || 0
-        if idx > 0
-          path[idx+1..-1]
-        else
-          ''
-        end
-      end
 
       # Strip off any trailing slash.
       path = path.gsub(/\\*$/, '')
@@ -124,47 +114,18 @@ module Registry
   end
 
   class RegistryKeyPath < RegistryPathBase
-    def subkey
-      filter_path[:trailing_path]
-    end
   end
 
   class RegistryValuePath < RegistryPathBase
-    def canonical
-      # This method gets called in the type and the provider.  We need to
-      # preserve the trailing backslash for the provider, otherwise it won't
-      # think this is a default value.
-      if default?
-        filter_path[:canonical] + "\\"
-      else
-        filter_path[:canonical]
-      end
-    end
-
-    def subkey
-      if default?
-        filter_path[:trailing_path]
-      else
-        filter_path[:trailing_path].gsub(/^(.*)\\.*$/, '\1')
-      end
-    end
-
-    def valuename
-      filter_path[:valuename]
-    end
-
-    def default?
-      !!filter_path[:is_default]
-    end
-
-    def filter_path
-      result = super
-
-      # It's possible to pass in a path of 'hklm' which can still be parsed, but is not valid registry key.  Only the default value 'hklm\'
-      # and named values 'hklm\something' are allowed
-      raise ArgumentError, "Invalid registry key: #{path}" if result[:trailing_path].empty? && result[:valuename].empty? && !result[:is_default]
-
-      result
+    # Will yield the path of this object, and then each immediate ancestor path e.g.
+    # For a path of HKLM\Software\foo\bar, it will yield (in this order):
+    #   HKLM\Software\foo\bar
+    #   HKLM\Software\foo
+    #   HKLM\Software
+    #   HKLM
+    def ascend_with_self(&block)
+      yield self.to_s
+      ascend(&block)
     end
   end
 end

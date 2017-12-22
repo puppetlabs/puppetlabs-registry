@@ -61,14 +61,14 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
     end
 
     it "should return false for a bogus hive/path" do
-      reg_value = type.new(:path => 'hklm\foobar5000', :catalog => catalog, :provider => described_class.name)
+      reg_value = type.new(:title => 'hklm\foobar5000', :catalog => catalog, :provider => described_class.name)
       reg_value.provider.exists?.should be false
     end
   end
 
   describe "#regvalue" do
     it "should return a valid string for a well known key" do
-      reg_value = type.new(:path => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRoot', :provider => described_class.name)
+      reg_value = type.new(:title => 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRoot', :provider => described_class.name)
       reg_value.provider.data.should eq [ENV['SystemRoot']]
       reg_value.provider.type.should eq :string
     end
@@ -90,7 +90,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
     let (:default_path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\" }
     let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
     def create_and_destroy(path, reg_type, data)
-      reg_value = type.new(:path => path,
+      reg_value = type.new(:title => path,
         :type => reg_type,
         :data => data,
         :provider => described_class.name)
@@ -141,14 +141,14 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
     let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
 
     after(:each) do
-      reg_value = type.new(:path => path, :provider => described_class.name)
+      reg_value = type.new(:title => path, :provider => described_class.name)
 
       reg_value.provider.destroy
       expect(reg_value.provider).to_not be_exists
     end
 
     def write_and_read_value(path, reg_type, value)
-      reg_value = type.new(:path => path,
+      reg_value = type.new(:title => path,
         :type => reg_type,
         :data => value,
         :provider => described_class.name)
@@ -190,8 +190,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       # character APIs, but passing wide strings to them (facepalm)
       # https://github.com/ruby/ruby/blob/v2_1_5/ext/win32/lib/win32/registry.rb#L323-L329
       # therefore, use our own code instead of hklm.delete_value
-
-      reg_value = type.new(:path => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}",
+      reg_value = type.new(:title => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}",
         :provider => described_class.name)
 
       reg_value.provider.destroy
@@ -210,7 +209,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       utf_8_bytes = ENDASH_UTF_8 + TM_UTF_8
       utf_8_str = utf_8_bytes.pack('c*').force_encoding(Encoding::UTF_8)
 
-      reg_value = type.new(:path => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}",
+      reg_value = type.new(:title => "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}",
         :type => :string,
         :data => utf_16_str,
         :provider => described_class.name)

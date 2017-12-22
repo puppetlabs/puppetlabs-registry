@@ -182,10 +182,6 @@ module ProviderBase
     path.subkey
   end
 
-  def valuename
-    path.valuename
-  end
-
   def type2name_map
     {
       Win32::Registry::REG_NONE      => :none,

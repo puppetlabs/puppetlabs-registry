@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-# The manifest used for testing, is located in spec/fixtures/mixed_default_settings/manifests/init.pp
+# The manifest used for testing, is located in spec/fixtures/test_registry/manifests/manifests/mixed_default_settings.pp
 
 # This test is to ensure that the way of setting default values (trailing slash) compiles correctly
 # when there is a similar looking path in the manifest. It mixes default and non-default value_names in the same manifest
@@ -17,7 +17,7 @@ require 'spec_helper'
 #                                    This is the 'hklm\Software\foo\\' resource
 #
 
-describe 'mixed_default_settings' do
+describe 'test_registry::mixed_default_settings' do
   it { is_expected.to compile }
 
   it { is_expected.to contain_registry_value('hklm\Software\foo\\') }

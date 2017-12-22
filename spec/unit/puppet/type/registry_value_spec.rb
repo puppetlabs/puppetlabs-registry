@@ -2,7 +2,14 @@
 require 'spec_helper'
 require 'puppet/type/registry_value'
 
+# Helper method used when display describe text blocks to distinguish
+# between empty strings and nils
+def display_nil_string(value)
+  value.nil? ? '(nil)' : value
+end
+
 describe Puppet::Type.type(:registry_value) do
+  let (:title) { 'TestRegistryValue' }
   let (:catalog) do Puppet::Resource::Catalog.new end
 
   [:ensure, :type, :data].each do |property|
@@ -15,54 +22,50 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
+  describe "value_name parameter" do
+    it "should have a value_name parameter" do
+      Puppet::Type.type(:registry_value).attrtype(:value_name).should == :param
+    end
+  end
+
   describe "path parameter" do
     it "should have a path parameter" do
       Puppet::Type.type(:registry_value).attrtype(:path).should == :param
     end
 
-    %w[hklm\propname hklm\software\propname].each do |path|
+    %w[hklm hklm\ hklm\propname hklm\software\propname].each do |path|
       it "should accept #{path}" do
-        described_class.new(:path => path, :catalog => catalog)
+        described_class.new(:title => title, :path => path, :catalog => catalog)
       end
     end
 
-    %w[hklm\\ hklm\software\\ hklm\software\vendor\\].each do |path|
-      it "should accept the unnamed (default) value: #{path}" do
-        described_class.new(:path => path, :catalog => catalog)
-      end
-    end
+    it "should strip trailling slashes from paths" do
+      value = described_class.new(:title => title, :path => 'hklm\\software\\\\', :catalog => catalog)
 
-    it "should strip trailling slashes from unnamed values" do
-      value = described_class.new(:path => 'hklm\\software\\\\', :catalog => catalog)
-
-      expect(value[:path]).to eq('hklm\\software\\')
+      expect(value[:path]).to eq('hklm\\software')
     end
 
     %w[HKEY_DYN_DATA\\ HKEY_PERFORMANCE_DATA\name].each do |path|
       it "should reject #{path} as unsupported" do
-        expect { described_class.new(:path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Unsupported/)
+        expect { described_class.new(:title => title, :path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Unsupported/)
       end
     end
 
-    %w[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
+    %w[unknown\\name unknown\\subkey\\name].each do |path|
       it "should reject #{path} as invalid" do
-        expect { described_class.new(:path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Invalid registry key/)
+        expect { described_class.new(:title => title, :path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Invalid registry key/)
       end
     end
 
     %w[HKLM\\name HKEY_LOCAL_MACHINE\\name hklm\\name].each do |root|
       it "should canonicalize root key #{root}" do
-        value = described_class.new(:path => root, :catalog => catalog)
+        value = described_class.new(:title => title, :path => root, :catalog => catalog)
         value[:path].should == 'hklm\name'
       end
     end
 
-    it 'should validate the length of the value name'
-    it 'should validate the length of the value data'
-    it 'should be case-preserving'
-    it 'should be case-insensitive'
-    it 'should support 32-bit values' do
-      value = described_class.new(:path => '32:hklm\software\foo', :catalog => catalog)
+    it 'should accept 32-bit values' do
+      described_class.new(:title => title, :path => '32:hklm\software\foo', :catalog => catalog)
     end
   end
 
@@ -111,7 +114,7 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe "type property" do
-    let (:value) { described_class.new(:path => 'hklm\software\foo', :catalog => catalog) }
+    let (:value) { described_class.new(:title => title, :path => 'hklm\software\foo', :catalog => catalog) }
 
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
       it "should support a #{type.to_s} type" do
@@ -125,8 +128,70 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
+  describe "title property" do
+    [ { :title => 'hklm\software\foo',
+        :expected_path       => 'hklm\software',
+        :expected_value_name => 'foo',
+      },
+      # Default values are specified with a trailing slash
+      { :title => 'hklm\software\foo\\',
+        :expected_path       => 'hklm\software\foo',
+        :expected_value_name => '',
+      },
+      # Default values are specified with an empty value_name
+      { :title => 'hklm\software\foo',
+        :value_name          => '',
+        :expected_path       => 'hklm\software',
+        :expected_value_name => '',
+      },
+      # Explicit paths should overried title
+      { :title => 'hklm\software\foo',
+        :path                => 'hklm\different\path',
+        :value_name          => 'value1',
+        :expected_path       => 'hklm\different\path',
+        :expected_value_name => 'value1',
+      },
+      # Explicit value names should overried title
+      { :title => 'hklm\software\foo',
+        :value_name          => 'value1',
+        :expected_path       => 'hklm\software\foo',
+        :expected_value_name => 'value1',
+      },
+      { :title => 'hklm\software\foo',
+        :value_name          => 'value\1',
+        :expected_path       => 'hklm\software\foo',
+        :expected_value_name => 'value\1',
+      },
+      { :title => 'hklm\software\foo',
+        :value_name          => 'value1\\',
+        :expected_path       => 'hklm\software\foo',
+        :expected_value_name => 'value1\\',
+      }].each do |testcase|
+
+      context "given a title of '#{testcase[:title]}', path of '#{display_nil_string(testcase[:path])}', and value_name of '#{display_nil_string(testcase[:value_name])}'" do
+        let (:value) {
+          params = {
+            :title => testcase[:title],
+            :catalog => catalog
+          }
+          params[:value_name] = testcase[:value_name] unless testcase[:value_name].nil?
+          params[:path] = testcase[:path] unless testcase[:path].nil?
+
+          described_class.new(params)
+        }
+
+        it "should use registry value name of '#{testcase[:expected_value_name]}'" do
+          expect(value[:value_name]).to eq(testcase[:expected_value_name])
+        end
+        it "should use registry path of '#{testcase[:expected_path]}'" do
+          expect(value[:path]).to eq(testcase[:expected_path])
+        end
+      end
+    end
+  end
+
   describe "data property" do
-    let (:value) { described_class.new(:path => 'hklm\software\foo', :catalog => catalog) }
+    let (:value) { described_class.new(:title => title, :path => 'hklm\software\foo', :catalog => catalog) }
 
     context "string data" do
       ['', 'foobar'].each do |data|
@@ -135,8 +200,6 @@ describe Puppet::Type.type(:registry_value) do
           value[:data] = data
         end
       end
-
-      pending "it should accept nil"
     end
 
     context "integer data" do

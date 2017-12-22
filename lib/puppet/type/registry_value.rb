@@ -17,9 +17,22 @@ Puppet::Type.newtype(:registry_value) do
     **Autorequires:** Any parent registry key managed by Puppet will be
     autorequired.
   EOT
-
   def self.title_patterns
-    [[/^(.*?)\Z/m, [[:path, lambda { |x| x }]]]]
+    [
+      [
+        /^(.+)\\(.*)$/,
+        [
+          [:path],
+          [:value_name],
+        ]
+      ],
+      [
+        /^([^\\]+)$/,
+        [
+          [:path],
+        ]
+      ]
+    ]
   end
 
   ensurable
@@ -36,18 +49,16 @@ Puppet::Type.newtype(:registry_value) do
     end
     munge do |path|
       reg_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path)
-      # Windows is case insensitive and case preserving.  We deal with this by
-      # aliasing resources to their downcase values.  This is inspired by the
-      # munge block in the alias metaparameter.
-      if @resource.catalog
-        reg_path.aliases.each do |alt_name|
-          @resource.catalog.alias(@resource, alt_name)
-        end
-      else
-        Puppet.debug "Resource has no associated catalog.  Aliases are not being set for #{@resource.to_s}"
-      end
       reg_path.canonical
     end
+  end
+
+  newparam(:value_name, :namevar => true) do
+    desc "The name of the registry value to manage.  For example:
+      'Value1' or 'Value\1'. This is typically specified
+      separately when the value name includes backslashes. A value of empty
+      string, for example '' denotes the default value of the registry key path
+      will be managed"
   end
 
   newproperty(:type) do
@@ -121,18 +132,25 @@ Puppet::Type.newtype(:registry_value) do
     end
   end
 
+  # Need to override the normal name method due to PUP-8620
+  # https://tickets.puppetlabs.com/browse/PUP-8260
+  # The registry_key eval_generate method creates regitry_value resources, however
+  # as this is a compound namevar resource it "breaks" (sends nil) the name which
+  # is used the eval_generate method to uniquely identify resources.  Instead we
+  # just return the title ourselves
+  def name
+    self.title
+  end
+
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
-    req = []
     # This is a value path and not a key path because it's based on the path of
     # the value resource.
     path = PuppetX::Puppetlabs::Registry::RegistryValuePath.new(value(:path))
     # It is important to match against the downcase value of the path because
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
-    if found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
-      req << found.to_s.downcase
-    end
-    req
+    found = path.enum_for(:ascend_with_self).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
+    found.nil? ? [] : [found.to_s.downcase]
   end
 end
