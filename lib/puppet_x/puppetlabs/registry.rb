@@ -41,6 +41,10 @@ module Registry
       filter_path[:root]
     end
 
+    def subkey
+      filter_path[:trailing_path]
+    end
+
     def ascend(&block)
       p = canonical
       while idx = p.rindex('\\')
@@ -58,21 +62,6 @@ module Registry
       result = {}
 
       path = @path
-
-      result[:valuename] = case path[-1, 1]
-      when '\\'
-        result[:is_default] = true
-        ''
-      else
-        result[:is_default] = false
-        idx = path.rindex('\\') || 0
-        if idx > 0
-          path[idx+1..-1]
-        else
-          ''
-        end
-      end
-
       # Strip off any trailing slash.
       path = path.gsub(/\\*$/, '')
 
@@ -124,37 +113,41 @@ module Registry
   end
 
   class RegistryKeyPath < RegistryPathBase
-    def subkey
-      filter_path[:trailing_path]
-    end
   end
 
   class RegistryValuePath < RegistryPathBase
+    attr_reader :valuename
+
+    # Extract the valuename from the path and then munge the actual path
+    def initialize(path)
+      @valuename = case path[-1, 1]
+      when '\\'
+        @is_default = true
+        ''
+      else
+        @is_default = false
+        idx = path.rindex('\\') || 0
+        if idx > 0
+          val = path[idx+1..-1]
+          # Strip the valuename from the path
+          path = path[0..idx-1]
+          val
+        else
+          ''
+        end
+      end
+
+      super(path)
+    end
+
     def canonical
-      # This method gets called in the type and the provider.  We need to
-      # preserve the trailing backslash for the provider, otherwise it won't
-      # think this is a default value.
-      if default?
-        filter_path[:canonical] + "\\"
-      else
-        filter_path[:canonical]
-      end
-    end
-
-    def subkey
-      if default?
-        filter_path[:trailing_path]
-      else
-        filter_path[:trailing_path].gsub(/^(.*)\\.*$/, '\1')
-      end
-    end
-
-    def valuename
-      filter_path[:valuename]
+      # Because we extracted the valuename in the initializer we
+      # need to add it back in when canical is called
+      filter_path[:canonical] + '\\' + valuename
     end
 
     def default?
-      !!filter_path[:is_default]
+      @is_default
     end
 
     def filter_path
@@ -162,7 +155,7 @@ module Registry
 
       # It's possible to pass in a path of 'hklm' which can still be parsed, but is not valid registry key.  Only the default value 'hklm\'
       # and named values 'hklm\something' are allowed
-      raise ArgumentError, "Invalid registry key: #{path}" if result[:trailing_path].empty? && result[:valuename].empty? && !result[:is_default]
+      raise ArgumentError, "Invalid registry key: #{path}" if result[:trailing_path].empty? && valuename.empty? && !default?
 
       result
     end
