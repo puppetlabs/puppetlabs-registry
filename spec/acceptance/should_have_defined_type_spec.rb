@@ -11,7 +11,7 @@ describe 'registry::value defined type' do
 
   manifest = <<HERE
     registry_key { '#{vendor_path}': ensure => present }
-  
+
     registry::value { 'Setting1':
       key   => '#{keypath}',
       value => 'Setting1',
@@ -37,17 +37,17 @@ HERE
     # A set of keys we expect Puppet to create
     phase1_resources_created = [
         /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\\].ensure: created/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting1\].ensure: created/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting2\].ensure: created/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting3\].ensure: created/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\\].ensure: created/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting1\].ensure: created/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting2\].ensure: created/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting3\].ensure: created/,
     ]
 
     phase2_resources_changed = [
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting1\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting2\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
-        /Registry_value\[HKLM.Software.Vendor.PuppetLabsTest\w+\\Setting3\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting1\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting2\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
+        /Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting3\].data: data changed 'fact_phase=1' to 'fact_phase=2'/,
     ]
     windows_agents.each do |agent|
       it 'Phase 1.a - Create some values' do

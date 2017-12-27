@@ -9,9 +9,8 @@
     * [Beginning with registry](#beginning-with-registry)
 4. [Usage - Configuration options and additional functionality](#usage)
 5. [Reference](#reference)
-    * [Public Defines](#public-defines)
-    * [Public Types](#public-types)
-    * [Parameters](#parameters)
+    * [Defined types](#defined-types)
+    * [Types/Providers](#typesproviders)
 6. [Limitations](#limitations)
 7. [Development - Guide for contributing to registry](#development)
 
@@ -51,13 +50,24 @@ registry_value { 'HKLM\System\CurrentControlSet\Services\Puppet\Description':
 }
 ```
 
+### Manage a single Registry value with a complex name
+
+``` puppet
+registry_value { 'ComplexValue':
+  path       => 'HKLM\System\CurrentControlSet\Services\Puppet\\\ValueWithA\Backslash',
+  ensure     => present,
+  type       => string,
+  data       => "The Puppet Agent service periodically manages your configuration",
+}
+```
+
 ### Manage a Registry value and its parent key in one declaration
 
 ``` puppet
 class myapp {
   registry::value { 'puppetmaster':
-  key  => 'HKLM\Software\Vendor\PuppetLabs',
-  data => 'puppet.puppet.com',
+    key  => 'HKLM\Software\Vendor\PuppetLabs',
+    data => 'puppet.puppet.com',
   }
 }
 ```
@@ -139,17 +149,13 @@ registry::service { puppet:
 
 ## Reference
 
-### Public Defines
-* `registry::value`: Manages the parent key for a particular value. If the parent key doesn't exist, Puppet automatically creates it.
-* `registry::service`: Manages entries in the Microsoft service control framework by manipulating values in the key `HKLM\System\CurrentControlSet\Services\$name\`.
+### Defined types
 
-### Public Types
-* `registry_key`: Manages individual Registry keys.
-* `registry_value`: Manages individual Registry values.
+#### `registry::value`
 
-### Parameters
+Manages the parent key for a particular value. If the parent key doesn't exist, Puppet automatically creates it.
 
-#### `registry::value`:
+**Parameters**
 
 All parameters are required unless otherwise stated.
 
@@ -169,45 +175,13 @@ Provides the contents of the specified value. Valid options: a string by default
 
 *Optional.* Determines what Registry value(s) to manage within the specified key. To set a Registry value as the default value for its parent key, name the value '(default)'. Valid options: a string. Default value: the title of your declared resource.
 
-#### `registry_key`
-
-##### `ensure`
-
-Tells Puppet whether the key should or shouldn't exist. Valid options: 'present' and 'absent'. Default value: 'present'.
-
-##### `path`
-
-Specifies a Registry key for Puppet to manage. If any of the parent keys in the path don't exist, Puppet creates them automatically. Valid options: a string containing a Registry path. For example: `HKLM\Software` or `HKEY_LOCAL_MACHINE\Software\Vendor`.
-
-If Puppet is running on a 64-bit system, the 32-bit Registry key can be explicitly managed using a prefix. For example: `32:HKLM\Software`.
-
-##### `purge_values`
-
-*Optional.* Specifies whether to delete any values in the specified key that are not managed by Puppet. Valid options: `true` and `false`. Default value: `false`.
-
-For more on this parameter, see the [Purge existing values section](#purge-existing-values) under Usage.
-
-#### `registry_value`
-
-##### `path`
-
-*Optional.* Specifies a Registry value for Puppet to manage. Valid options: a string containing a Registry path. If any of the parent keys in the path don't exist, Puppet creates them automatically. For example: `HKLM\Software` or `HKEY_LOCAL_MACHINE\Software\Vendor`. Default value: the title of your declared resource.
-
-If Puppet is running on a 64-bit system, the 32-bit Registry key can be explicitly managed using a prefix. For example: `32:HKLM\Software\Value3`.
-
-##### `ensure`
-
-Tells Puppet whether the value should or shouldn't exist. Valid options: 'present' and 'absent'. Default value: 'present'.
-
-##### `type`
-
-*Optional.* Sets the data type of the specified value. Valid options: 'string', 'array', 'dword', 'qword', 'binary' and 'expand'. Default value: 'string'.
-
-##### `data`
-
-Provides the contents of the specified value. Valid options: a string by default; an array if specified through the `type` parameter.
-
 #### `registry::service`
+
+Manages entries in the Microsoft service control framework by manipulating values in the key `HKLM\System\CurrentControlSet\Services\$name\`.
+
+**Parameters**
+
+All parameters are required unless otherwise stated.
 
 ##### `ensure`
 
@@ -230,6 +204,95 @@ Specifies the command to execute when starting the service. Valid options: a str
 Specifies the starting mode of the service. Valid options: 'automatic', 'manual' and 'disabled'.
 
 Puppet's [native service resource](http://docs.puppet.com/references/latest/type.html#service) can also be used to manage this setting.
+
+
+### Types/Providers
+
+#### `registry_key`
+
+Manages individual Registry keys.
+
+**Parameters**
+
+All parameters are required unless otherwise stated.
+
+##### `ensure`
+
+Tells Puppet whether the key should or shouldn't exist. Valid options: 'present' and 'absent'. Default value: 'present'.
+
+##### `path`
+
+Specifies a Registry key for Puppet to manage. If any of the parent keys in the path don't exist, Puppet creates them automatically. Valid options: a string containing a Registry path. For example: `HKLM\Software` or `HKEY_LOCAL_MACHINE\Software\Vendor`.
+
+If Puppet is running on a 64-bit system, manage the 32-bit Registry key using a prefix, for example: `32:HKLM\Software`.
+
+##### `purge_values`
+
+*Optional.* Specifies whether to delete any values in the specified key that are not managed by Puppet. Valid options: `true` and `false`. Default value: `false`.
+
+For more on this parameter, see the [Purge existing values section](#purge-existing-values) under Usage.
+
+
+#### `registry_value`
+
+Manages individual Registry values.
+
+The title of the resource determines the path and value name that will be managed, for example:
+
+The manifest below manages the value called 'foo' in the key 'HKLM\Software'
+
+``` puppet
+registry_value { 'HKLM\Software\foo':
+  ...
+}
+```
+
+You can also manage the default value of a key by adding a backslash at the end of the path.  The manifest below manages the default value in the key 'HKLM\Software\Vendor'
+
+``` puppet
+registry_value { 'HKLM\Software\Vendor\\':
+  ...
+}
+```
+
+Use a double backslash between the registry path and value name when managing a value with a back slash in the name.  For example the manifest below
+manages a value called 'A\Backslash' in the registry path 'HKLM\Software\Vendor'
+
+``` puppet
+registry_value { 'HKLM\Software\Vendor\\\A\Backslash':
+  ...
+}
+```
+
+Note that the resource title has a triple backslash instead of the suggested double.  Unfortunately the backslash character can also be an escape
+sequence character in the text string.  In the example above '\\\' will actually be interpreted by Puppet as '\\'
+
+See the [single quoted strings documention](https://puppet.com/docs/puppet/latest/lang_data_string.html#single-quoted-strings) for more information.
+
+
+**Parameters**
+
+All parameters are required unless otherwise stated.
+
+##### `path`
+
+The path to the registry value to manage.  For example:
+'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'. If Puppet is running on a 64-bit system, the 32-bit registry key can
+be explicitly managed using a prefix.  For example: '32:HKLM\Software\Value3'. Use a double backslash between the value name
+and path when managing a value with a backslash in the name.
+
+##### `ensure`
+
+Tells Puppet whether the value should or shouldn't exist. Valid options: 'present' and 'absent'. Default value: 'present'.
+
+##### `type`
+
+*Optional.* Sets the data type of the specified value. Valid options: 'string', 'array', 'dword', 'qword', 'binary' and 'expand'. Default value: 'string'.
+
+##### `data`
+
+Provides the contents of the specified value. Valid options: a string by default; an array if specified through the `type` parameter.
+
 
 ## Limitations
 

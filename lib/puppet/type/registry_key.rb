@@ -112,7 +112,8 @@ EOT
     # create absent registry_value resources for the complement
     resources = []
     (is_values - should_values).each do |name|
-      resources << Puppet::Type.type(:registry_value).new(:path => "#{self[:path]}\\#{name}", :ensure => :absent, :catalog => catalog)
+      resource_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.combine_path_and_value(self[:path], name)
+      resources << Puppet::Type.type(:registry_value).new(:path => resource_path, :ensure => :absent, :catalog => catalog)
     end
     resources
   end
