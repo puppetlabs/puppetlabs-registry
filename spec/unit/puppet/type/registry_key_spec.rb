@@ -125,15 +125,13 @@ describe Puppet::Type.type(:registry_key) do
       end
 
       it "should purge existing values that are not being managed and case insensitive)" do
-        pending("eval_generate is currently not case insensitive, but should be")
         key.provider.expects(:values).returns(['VAL1', 'VaL\3', 'Val99'])
         resources = key.eval_generate
         resources.count.must == 1
         res = resources.first
 
         res[:ensure].must == :absent
-        res[:path].must == key[:path]
-        res[:value_name].must == 'Val99'
+        res[:path].must == "#{key[:path]}\\Val99"
       end
 
       it "should return an empty array if all existing values are being managed" do
