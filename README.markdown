@@ -50,11 +50,21 @@ registry_value { 'HKLM\System\CurrentControlSet\Services\Puppet\Description':
 }
 ```
 
-### Manage a single Registry value with a complex name
+### Manage a single Registry value with a backslash in the value name
 
 ``` puppet
-registry_value { 'ComplexValue':
-  path       => 'HKLM\System\CurrentControlSet\Services\Puppet\\\ValueWithA\Backslash',
+registry_value { 'HKLM\System\CurrentControlSet\Services\Puppet\\\ValueWithA\Backslash':
+  ensure     => present,
+  type       => string,
+  data       => "The Puppet Agent service periodically manages your configuration",
+}
+```
+
+### Manage a single Registry value with a different resource title
+
+``` puppet
+registry_value { 'PuppetDescription':
+  path       => 'HKLM\System\CurrentControlSet\Services\Puppet\Description',
   ensure     => present,
   type       => string,
   data       => "The Puppet Agent service periodically manages your configuration",
@@ -73,10 +83,6 @@ class myapp {
 ```
 
 Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it contains a value named 'puppetmaster' containing the string 'puppet.puppet.com'.
-
-**Note:** the `registry::value` define only manages keys and values in the system-native architecture. In other words, 32-bit keys applied in a 64-bit OS aren't managed by this define; instead, you must use the types, [`registry_key`](#type-registry_key) and [`registry_value`](#type-registry_value) individually.
-
-Within this define, you can specify multiple Registry values for one Registry key and manage them all at once.
 
 ### Set the default value for a key
 
@@ -138,7 +144,7 @@ The `registry::service` define manages entries in the Microsoft service control 
 
 This is an alternative approach to using INSTSRV.EXE [1](http://support.microsoft.com/kb/137890).
 
-``` powershell
+``` puppet
 registry::service { puppet:
   ensure       => present,
   display_name => "Puppet Agent",
@@ -161,7 +167,11 @@ All parameters are required unless otherwise stated.
 
 ##### `key`
 
-Specifies a Registry key for Puppet to manage. Note that if any of the parent keys in the path do not exist, the resource raises an error. Use the `registry_key` to create the parent key prior to setting a registry value. Valid options: a string containing a Registry path.
+Specifies a Registry key for Puppet to manage. If any of the parent keys in the path don't exist, Puppet creates them automatically.
+
+If Puppet is running on a 64-bit system, manage the 32-bit Registry key using a prefix, for example: `32:HKLM\Software`.
+
+Valid options: a string containing a Registry path.
 
 ##### `data`
 
