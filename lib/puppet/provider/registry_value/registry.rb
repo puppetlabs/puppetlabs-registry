@@ -1,22 +1,32 @@
 require 'puppet/type'
 begin
   require "puppet_x/puppetlabs/registry"
-  require "puppet_x/puppetlabs/registry/provider_base"
 rescue LoadError => detail
   require "pathname" # JJM WORK_AROUND #14073 and #7788
   module_base = Pathname.new(__FILE__).dirname + "../../../"
   require module_base + "puppet_x/puppetlabs/registry"
-  require module_base + "puppet_x/puppetlabs/registry/provider_base"
 end
 
 Puppet::Type.type(:registry_value).provide(:registry) do
-  include PuppetX::Puppetlabs::Registry::ProviderBase
+  include Puppet::Util::Windows::Registry if Puppet.features.microsoft_windows?
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
 
   def self.instances
     []
+  end
+
+  def hive
+    PuppetX::Puppetlabs::Registry.hkeys[path.root]
+  end
+
+  def access
+    path.access
+  end
+
+  def subkey
+    path.subkey
   end
 
   def exists?
@@ -118,7 +128,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
         pdata.first
       end
 
-    return [name2type(ptype), ndata]
+    return [PuppetX::Puppetlabs::Registry.name2type(ptype), ndata]
   end
 
   # convert from native type and data to puppet
@@ -126,7 +136,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     ntype, ndata = ary
 
     pdata =
-      case type2name(ntype)
+      case PuppetX::Puppetlabs::Registry.type2name(ntype)
       when :binary
         ndata.bytes.map{ |byte| "%02x" % byte }.join(' ')
       when :array
@@ -140,7 +150,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # always give an array to Puppet.  This is why we have the ternary operator
     # I'm not calling .to_a because Ruby issues a warning about the default
     # implementation of to_a going away in the future.
-    return [type2name(ntype), pdata.kind_of?(Array) ? pdata : [pdata]]
+    return [PuppetX::Puppetlabs::Registry.type2name(ntype), pdata.kind_of?(Array) ? pdata : [pdata]]
   end
 
   private
@@ -202,6 +212,23 @@ Puppet::Type.type(:registry_value).provide(:registry) do
         end
       end
     end
+  end
+
+  if Puppet.features.microsoft_windows?
+    require 'ffi'
+    extend FFI::Library
+    # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724923(v=vs.85).aspx
+    # LONG WINAPI RegSetValueEx(
+    #   _In_             HKEY    hKey,
+    #   _In_opt_         LPCTSTR lpValueName,
+    #   _Reserved_       DWORD   Reserved,
+    #   _In_             DWORD   dwType,
+    #   _In_       const BYTE    *lpData,
+    #   _In_             DWORD   cbData
+    # );
+    ffi_lib :advapi32
+    attach_function :RegSetValueExW,
+      [:handle, :pointer, :dword, :dword, :pointer, :dword], :win32_long
   end
 
   def valuename
