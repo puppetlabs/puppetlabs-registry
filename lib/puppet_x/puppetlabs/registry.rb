@@ -172,14 +172,9 @@ module Registry
 
       # valuename appears after the the first double backslash
       path, @valuename = path.split('\\\\', 2)
-      # found \\ so nearly done parsing
-      if !@valuename.nil?
-        @is_default = @valuename.empty?
-      # no \\ but there is at least a single \
-      else
-        path, _, @valuename = path.rpartition('\\')
-        @is_default = @valuename.empty?
-      end
+      # no \\ but there is at least a single \ to split on
+      path, _, @valuename = path.rpartition('\\') if @valuename.nil?
+      @is_default = @valuename.empty?
 
       super(path)
     end
