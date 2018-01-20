@@ -168,19 +168,17 @@ module Registry
 
     # Extract the valuename from the path and then munge the actual path
     def initialize(path)
+      raise ArgumentError, "Invalid registry key: #{path}" if !path.include?('\\')
+
       # valuename appears after the the first double backslash
       path, @valuename = path.split('\\\\', 2)
       # found \\ so nearly done parsing
       if !@valuename.nil?
         @is_default = @valuename.empty?
       # no \\ but there is at least a single \
-      elsif path.include?('\\')
+      else
         path, _, @valuename = path.rpartition('\\')
         @is_default = @valuename.empty?
-      # a hive name that contains no \
-      else
-        @valuename = ''
-        @is_default = false
       end
 
       super(path)
