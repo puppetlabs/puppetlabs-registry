@@ -6,42 +6,38 @@ module Registry
   # For 64-bit OS, use 32-bit view. Ignored on 32-bit OS
   KEY_WOW64_32KEY = 0x200 unless defined? KEY_WOW64_32KEY
 
-  # Helper methods used in the registry providers
-  # Guarded to only load on Windows due to Win32 constants
-  if Puppet.features.microsoft_windows?
-    def self.hkeys
-      {
-        :hkcr => Win32::Registry::HKEY_CLASSES_ROOT,
-        :hklm => Win32::Registry::HKEY_LOCAL_MACHINE,
-        :hku  => Win32::Registry::HKEY_USERS,
-      }
-    end
+  def self.hkeys
+    {
+      :hkcr => Win32::Registry::HKEY_CLASSES_ROOT,
+      :hklm => Win32::Registry::HKEY_LOCAL_MACHINE,
+      :hku  => Win32::Registry::HKEY_USERS,
+    }
+  end
 
-    def self.hive
-      hkeys[root]
-    end
+  def self.hive
+    hkeys[root]
+  end
 
-    def self.type2name_map
-      {
-        Win32::Registry::REG_NONE      => :none,
-        Win32::Registry::REG_SZ        => :string,
-        Win32::Registry::REG_EXPAND_SZ => :expand,
-        Win32::Registry::REG_BINARY    => :binary,
-        Win32::Registry::REG_DWORD     => :dword,
-        Win32::Registry::REG_QWORD     => :qword,
-        Win32::Registry::REG_MULTI_SZ  => :array
-      }
-    end
+  def self.type2name_map
+    {
+      Win32::Registry::REG_NONE      => :none,
+      Win32::Registry::REG_SZ        => :string,
+      Win32::Registry::REG_EXPAND_SZ => :expand,
+      Win32::Registry::REG_BINARY    => :binary,
+      Win32::Registry::REG_DWORD     => :dword,
+      Win32::Registry::REG_QWORD     => :qword,
+      Win32::Registry::REG_MULTI_SZ  => :array
+    }
+  end
 
-    def self.type2name(type)
-      type2name_map[type]
-    end
+  def self.type2name(type)
+    type2name_map[type]
+  end
 
-    def self.name2type(name)
-      name2type = {}
-      type2name_map.each_pair {|k,v| name2type[v] = k}
-      name2type[name]
-    end
+  def self.name2type(name)
+    name2type = {}
+    type2name_map.each_pair {|k,v| name2type[v] = k}
+    name2type[name]
   end
 
   # This is the base class for Path manipulation.  This class is meant to be
@@ -172,34 +168,13 @@ module Registry
 
     # Extract the valuename from the path and then munge the actual path
     def initialize(path)
-      # Try finding the valuename via the double backslash method first
-      # and then revert to the old single backslash way
-      dbl_slash_idx = path.index('\\\\') || 0
-      if dbl_slash_idx > 0
-        # If the user specified a double backslash, split the string there
-        # Strip the valuename from the path
-        @valuename = path[dbl_slash_idx+2..-1]
-        @is_default = @valuename.empty?
-        path = path[0..dbl_slash_idx-1]
-      else
-        # This older method splits the string at the last single backslash
-        @valuename = case path[-1, 1]
-        when '\\'
-          @is_default = true
-          ''
-        else
-          @is_default = false
-          idx = path.rindex('\\') || 0
-          if idx > 0
-            val = path[idx+1..-1]
-            # Strip the valuename from the path
-            path = path[0..idx-1]
-            val
-          else
-            ''
-          end
-        end
-      end
+      raise ArgumentError, "Invalid registry key: #{path}" if !path.include?('\\')
+
+      # valuename appears after the the first double backslash
+      path, @valuename = path.split('\\\\', 2)
+      # no \\ but there is at least a single \ to split on
+      path, _, @valuename = path.rpartition('\\') if @valuename.nil?
+      @is_default = @valuename.empty?
 
       super(path)
     end
