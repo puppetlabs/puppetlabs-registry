@@ -265,8 +265,7 @@ registry_value { 'HKLM\Software\Vendor\\':
 }
 ```
 
-Use a double backslash between the registry path and value name when managing a value with a back slash in the name.  For example the manifest below
-manages a value called 'A\Backslash' in the registry path 'HKLM\Software\Vendor'
+Use a double backslash between the Registry path and value name when managing a value with a backslash in the name.  For example the manifest below manages a value called 'A\Backslash' in the Registry path 'HKLM\Software\Vendor'
 
 ``` puppet
 registry_value { 'HKLM\Software\Vendor\\\A\Backslash':
@@ -274,8 +273,7 @@ registry_value { 'HKLM\Software\Vendor\\\A\Backslash':
 }
 ```
 
-Note that the resource title has a triple backslash instead of the suggested double.  Unfortunately the backslash character can also be an escape
-sequence character in the text string.  In the example above '\\\' will actually be interpreted by Puppet as '\\'
+Note that the resource title has a triple backslash instead of the suggested double.  Unfortunately, the backslash character can also be an escape sequence character in the text string.  In the example above '\\\' will actually be interpreted by Puppet as '\\'
 
 See the [single quoted strings documention](https://puppet.com/docs/puppet/latest/lang_data_string.html#single-quoted-strings) for more information.
 
@@ -287,8 +285,7 @@ All parameters are required unless otherwise stated.
 ##### `path`
 
 The path to the registry value to manage.  For example:
-'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'. If Puppet is running on a 64-bit system, the 32-bit registry key can
-be explicitly managed using a prefix.  For example: '32:HKLM\Software\Value3'. Use a double backslash between the value name
+'HKLM\Software\Value1', 'HKEY_LOCAL_MACHINE\Software\Vendor\Value2'. If Puppet is running on a 64-bit system, the 32-bit registry key can be explicitly managed using a prefix.  For example: '32:HKLM\Software\Value3'. Use a double backslash between the value name
 and path when managing a value with a backslash in the name.
 
 ##### `ensure`
