@@ -43,7 +43,11 @@ define registry::value (
   Pattern[/^\w+/]           $key,
   Optional[String]          $value = undef,
   Optional[Pattern[/^\w+/]] $type = 'string',
-  Optional[String]          $data  = undef,
+  Optional[Variant[
+    String,
+    Numeric,
+    Array[Variant[String]
+  ]]]                       $data  = undef,
 ) {
 
   # ensure windows os

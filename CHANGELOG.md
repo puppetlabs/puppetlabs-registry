@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## Unreleased
 
+#### Fixed
+- Fix the restrictive typing introduced for the registry::value defined type to once again allow numeric values to be specified for DWORD, QWORD and arrays for REG_MULTI_SZ values ([MODULES-6528](https://tickets.puppetlabs.com/browse/MODULES-6528))
+
 ## [2.0.0] - 2018-01-26
 ### Added
 - Add support for Puppet 5 ([MODULES-5144](https://tickets.puppetlabs.com/browse/MODULES-5144))
