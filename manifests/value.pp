@@ -46,8 +46,8 @@ define registry::value (
   Optional[Variant[
     String,
     Numeric,
-    Array[Variant[String]
-  ]]]                       $data  = undef,
+    Array[String]
+  ]]                       $data  = undef,
 ) {
 
   # ensure windows os
