@@ -8,7 +8,7 @@ rescue LoadError => detail
 end
 
 Puppet::Type.type(:registry_value).provide(:registry) do
-  include Puppet::Util::Windows::Registry if Puppet.features.microsoft_windows?
+  include Puppet::Util::Windows::Registry if Puppet::Util::Platform.windows?
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows
@@ -214,7 +214,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     end
   end
 
-  if Puppet.features.microsoft_windows?
+  if Puppet::Util::Platform.windows?
     require 'ffi'
     extend FFI::Library
     # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724923(v=vs.85).aspx

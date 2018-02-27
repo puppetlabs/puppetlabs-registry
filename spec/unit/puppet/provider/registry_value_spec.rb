@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'puppet/type/registry_value'
 
-describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet::Util::Platform.windows? do
   let (:catalog) do Puppet::Resource::Catalog.new end
   let (:type) { Puppet::Type.type(:registry_value) }
 
@@ -275,7 +275,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
 
     # proof that there is no conversion to local encodings like IBM437
     it "will return a UTF-8 string from a REG_SZ registry value (written as UTF-16LE)",
-      :if => Puppet.features.microsoft_windows? && RUBY_VERSION >= '2.1' do
+      :if => Puppet::Util::Platform.windows? && RUBY_VERSION >= '2.1' do
 
       # create a UTF-16LE byte array representing "–™"
       utf_16_bytes = ENDASH_UTF_16 + TM_UTF_16
