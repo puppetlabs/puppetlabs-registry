@@ -10,7 +10,7 @@ rescue LoadError => detail
 end
 
 Puppet::Type.type(:registry_key).provide(:registry) do
-  include Puppet::Util::Windows::Registry if Puppet.features.microsoft_windows?
+  include Puppet::Util::Windows::Registry if Puppet::Util::Platform.windows?
 
   defaultfor :operatingsystem => :windows
   confine    :operatingsystem => :windows

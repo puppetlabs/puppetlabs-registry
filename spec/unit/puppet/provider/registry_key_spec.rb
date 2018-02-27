@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'puppet/type/registry_key'
 
-describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet::Util::Platform.windows? do
   let (:catalog) do Puppet::Resource::Catalog.new end
   let (:type) { Puppet::Type.type(:registry_key) }
 
@@ -47,7 +47,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
     end
   end
 
-  describe "#purge_values", :if => Puppet.features.microsoft_windows? do
+  describe "#purge_values", :if => Puppet::Util::Platform.windows? do
     let (:guid) { SecureRandom.uuid }
     let (:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
 
@@ -84,7 +84,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       end
     end
 
-    context "with unicode", :if => Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./ do
+    context "with unicode", :if => Puppet::Util::Platform.windows? && RUBY_VERSION =~ /^2\./ do
       before(:each) do
         # create temp registry key with Unicode values
         Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
