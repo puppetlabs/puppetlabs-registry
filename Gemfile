@@ -58,7 +58,9 @@ group :system_tests do
   gem "beaker-pe",                                                               :require => false
   gem "beaker-rspec", *location_for(ENV['BEAKER_RSPEC_VERSION'])                
   gem "beaker-hostgenerator", *location_for(ENV['BEAKER_HOSTGENERATOR_VERSION'])
-  gem "beaker-abs", *location_for(ENV['BEAKER_ABS_VERSION'] || '~> 0.1')        
+  gem "beaker-abs", *location_for(ENV['BEAKER_ABS_VERSION'] || '~> 0.1')
+  gem "beaker-testmode_switcher", '~> 0.4',                                      :require => false
+  gem 'master_manipulator',                                                      :require => false        
   gem "puppet-blacksmith", '~> 3.4',                                             :require => false
 end
 
