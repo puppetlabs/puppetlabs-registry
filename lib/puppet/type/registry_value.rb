@@ -19,7 +19,7 @@ Puppet::Type.newtype(:registry_value) do
   EOT
 
   def self.title_patterns
-    [[/^(.*?)\Z/m, [[:path, lambda { |x| x }]]]]
+    [[/^(.*?)\Z/m, [[:path]]]]
   end
 
   ensurable
