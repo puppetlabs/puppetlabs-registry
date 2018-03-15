@@ -1,6 +1,12 @@
 ---
 Rakefile:
   unmanaged: true
+Gemfile:
+  optional:
+    ':system_tests':
+      - gem: beaker-testmode_switcher
+        version: '~> 0.4'
+      - gem: master_manipulator
 spec/spec_helper.rb:
   unmanaged: true
 appveyor.yml:

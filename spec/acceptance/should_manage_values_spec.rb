@@ -269,7 +269,7 @@ P1
 
 
       it 'Registry Values - Phase 1.a - Create some values' do
-        apply_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
+        execute_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
           assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
           phase1_resources_created.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -278,7 +278,7 @@ P1
       end
 
       it 'Registry Values - Phase 1.b - Make sure Puppet is idempotent' do
-        apply_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
+        execute_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
           phase1_resources_created.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -287,7 +287,7 @@ P1
       end
 
       it 'Registry Values - Phase 2.a - Change some values' do
-        apply_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
+        execute_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
           assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
           phase2_resources_changed.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -296,7 +296,7 @@ P1
       end
 
       it 'Registry Values - Phase 2.b - Make sure Puppet is idempotent' do
-        apply_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
+        execute_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
           phase2_resources_changed.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -321,4 +321,3 @@ P1
     end
   end
 end
-

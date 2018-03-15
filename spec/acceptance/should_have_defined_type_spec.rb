@@ -51,7 +51,7 @@ HERE
     ]
     windows_agents.each do |agent|
       it 'Phase 1.a - Create some values' do
-        apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do
+        execute_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do
           phase1_resources_created.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -60,7 +60,7 @@ HERE
       end
 
       it 'Phase 1.b - Make sure Puppet is idempotent' do
-        apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do
+        execute_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do
           phase1_resources_created.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output not to contain #{val_re.inspect}.")
           end
@@ -69,7 +69,7 @@ HERE
       end
 
       it 'Phase 2.a - Change some values' do
-        apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}) do
+        execute_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}) do
           phase2_resources_changed.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -78,7 +78,7 @@ HERE
       end
 
       it 'Phase 2.b - Make sure Puppet is idempotent' do
-        apply_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}) do
+        execute_manifest_on agent, manifest, get_apply_opts({'FACTER_FACT_PHASE' => '2'}) do
           (phase1_resources_created + phase2_resources_changed).each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output not to contain #{val_re.inspect}.")
           end
@@ -88,4 +88,3 @@ HERE
     end
   end
 end
-

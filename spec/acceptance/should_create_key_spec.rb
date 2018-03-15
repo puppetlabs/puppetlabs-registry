@@ -102,11 +102,12 @@ PHASE3
     ]
 
     windows_agents.each do |agent|
-      keys_created = keys_created_native + (is_x64(agent) ? keys_created_wow : [])
-      values_purged = values_purged_native + (is_x64(agent) ? values_purged_wow : [])
+      agent_is_x64 = is_x64(agent)
+      keys_created = keys_created_native + (agent_is_x64 ? keys_created_wow : [])
+      values_purged = values_purged_native + (agent_is_x64 ? values_purged_wow : [])
 
       it 'Registry - Phase 1.a - Create some keys' do
-        apply_manifest_on(agent, phase1, get_apply_opts) do
+        execute_manifest_on(agent, phase1, get_apply_opts) do
           keys_created.each do |key_re|
             assert_match(key_re, @result.stdout, "Expected #{key_re.inspect} to match the output. (First Run)")
           end
@@ -116,7 +117,7 @@ PHASE3
 
       it 'Registry - Phase 1.b - Make sure Puppet is idempotent' do
         # Do a second run and make sure the key isn't created a second time.
-         apply_manifest_on(agent, phase1, get_apply_opts) do
+         execute_manifest_on(agent, phase1, get_apply_opts) do
           keys_created.each do |key_re|
             assert_no_match(key_re, @result.stdout,
                             "Expected #{key_re.inspect} NOT to match the output. (First Run)")
@@ -126,7 +127,7 @@ PHASE3
       end
 
       it 'Registry - Phase 2 - Make sure purge_values works' do
-        apply_manifest_on(agent, phase2, get_apply_opts({'FACTER_FACT_PHASE' => '2'})) do
+        execute_manifest_on(agent, phase2, get_apply_opts({'FACTER_FACT_PHASE' => '2'})) do
           values_purged.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -135,11 +136,10 @@ PHASE3
       end
 
       it 'Registry - Phase 3 - Should clean up' do
-        apply_manifest_on(agent, phase3, get_apply_opts({'FACTER_FACT_PHASE' => '3'})) do
+        execute_manifest_on(agent, phase3, get_apply_opts({'FACTER_FACT_PHASE' => '3'})) do
           assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
         end
       end
     end
   end
 end
-

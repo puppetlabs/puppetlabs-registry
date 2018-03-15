@@ -144,7 +144,7 @@ HERE
       end
 
       it "Registry Tolerate Mixed Case Values - Phase 1.a - Create some values" do
-        apply_manifest_on agent, phase1, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do |result|
+        execute_manifest_on agent, phase1, get_apply_opts({'FACTER_FACT_PHASE' => '1'}) do |result|
           phase1_resources_created.each do |val_re|
             assert_match(val_re, result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
