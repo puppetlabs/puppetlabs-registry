@@ -8,18 +8,14 @@ run_puppet_install_helper
 
 install_module_dependencies_on(hosts)
 
-test_name "Installing Puppet Modules" do
-  proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-  hosts.each do |host|
-    if host['platform'] =~ /windows/
-      on host, "mkdir -p #{host['distmoduledir']}/registry"
-      target = (on host, "echo #{host['distmoduledir']}/registry").raw_output.chomp
+proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+staging = { module_name: 'puppetlabs-registry' }
+local = { module_name: 'registry', source: proj_root }
 
-      %w(lib manifests metadata.json).each do |file|
-        scp_to host, "#{proj_root}/#{file}", target
-      end
-    end
-  end
+hosts.each do |host|
+  # Install Registry Module
+  # in CI allow install from staging forge, otherwise from local
+  install_dev_puppet_module_on(host, options[:forge_host] ? staging : local)
 end
 
 def is_x64(agent)
