@@ -94,7 +94,7 @@ describe Puppet::Type.type(:registry_key) do
         key[:purge_values] = true
         catalog.add_resource(key)
         catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val1", :catalog => catalog))
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\val2", :catalog => catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\vAl2", :catalog => catalog))
         catalog.add_resource(Puppet::Type.type(:registry_value).new(:path => "#{key[:path]}\\\\val\\3", :catalog => catalog))
       end
 
