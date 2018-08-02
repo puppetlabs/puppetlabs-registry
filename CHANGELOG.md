@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## Unreleased
 
+## [2.0.2] - 2018-08-08
+### Added
+- Add Windows Server 2016 and Windows 10 as supported Operating Systems ([MODULES-4271](https://tickets.puppetlabs.com/browse/MODULES-4271))
+
+### Changed
+- Convert tests to use testmode switcher ([MODULES-6744](https://tickets.puppetlabs.com/browse/MODULES-6744))
+
+### Fixed
+- Fix types to no longer use unsupported proc title patterns ([MODULES-6818](https://tickets.puppetlabs.com/browse/MODULES-6818))
+- Fix acceptance tests in master-agent scenarios ([FM-6934](https://tickets.puppetlabs.com/browse/FM-6934))
+- Use case insensitive search when purging ([MODULES-7534](https://tickets.puppetlabs.com/browse/MODULES-7534))
+
+### Removed
+
 ## [2.0.1] - 2018-01-25
 ### Fixed
 - Fix the restrictive typing introduced for the registry::value defined type to once again allow numeric values to be specified for DWORD, QWORD and arrays for REG_MULTI_SZ values ([MODULES-6528](https://tickets.puppetlabs.com/browse/MODULES-6528))
