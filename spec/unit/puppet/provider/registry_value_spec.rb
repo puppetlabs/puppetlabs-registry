@@ -219,7 +219,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
       reg_value = type.new(:path => path, :provider => described_class.name)
 
       reg_value.provider.destroy
-      expect(reg_value.provider).to_not be_exists
     end
 
     def write_and_read_value(path, reg_type, value)

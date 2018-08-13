@@ -7,6 +7,9 @@
   "source": "git://github.com/puppetlabs/puppetlabs-registry.git",
   "project_page": "http://links.puppet.com/registry-module",
   "issues_url": "https://github.com/puppetlabs/puppetlabs-registry/issues",
+  "dependencies": [
+
+  ],
   "operatingsystem_support": [
     {
       "operatingsystem": "Windows",
@@ -29,6 +32,7 @@
     }
   ],
   "description": "This module provides a native type and provider to manage keys and values in the Windows Registry",
-  "dependencies": [
-  ]
+  "pdk-version": "1.6.0",
+  "template-url": "file://C:/Program Files/Puppet Labs/DevelopmentKit/share/cache/pdk-templates.git",
+  "template-ref": "1.6.0-0-gf5564c0"
 }
