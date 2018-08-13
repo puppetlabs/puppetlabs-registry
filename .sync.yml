@@ -1,25 +1,63 @@
 ---
-Rakefile:
-  unmanaged: true
 Gemfile:
-  optional:
+  required:
     ':system_tests':
+      - gem: 'puppet-module-posix-system-r#{minor_version}'
+        platforms: ruby
+      - gem: 'puppet-module-win-system-r#{minor_version}'
+        platforms:
+          - mswin
+          - mingw
+          - x64_mingw
+      - gem: beaker
+        version: '~> 3.13'
+        from_env: BEAKER_VERSION
+      - gem: beaker-abs
+        version: '~> 0.1'
+        from_env: BEAKER_ABS_VERSION
+      - gem: beaker-pe
+      - gem: beaker-hostgenerator
+        version: '>= 0.0'
+        from_env: BEAKER_HOSTGENERATOR_VERSION
+      - gem: beaker-rspec
+        version: '>= 0.0'
+        from_env: BEAKER_RSPEC_VERSION
       - gem: beaker-testmode_switcher
         version: '~> 0.4'
       - gem: master_manipulator
-spec/spec_helper.rb:
+      - gem: puppet-blacksmith
+        version: '~> 3.4'
+
+# For the moment don't do any rubocop checks.
+.rubocop.yml:
+  include_todos: true
+  selected_profile: off
+
+spec/default_facts.yml:
   unmanaged: true
+
+# The registry module doesn't support parallel_spec
 appveyor.yml:
-  matrix_extras:
-    - PUPPET_GEM_VERSION: 4.2.3
-      RUBY_VER: 21-x64
-  test_script:
-    - 'bundle exec rspec spec/unit -fd -b'
-MAINTAINERS.md:
-  maintainers:
-    - "Puppet Windows Team `windows |at| puppet |dot| com`"
-NOTICE:
-  copyright_holders:
-    - name: 'Puppet, Inc.'
-      begin: 2012
-      end: 'latest'
+  matrix:
+    - RUBY_VERSION: 24-x64
+      CHECK: "syntax lint metadata_lint check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop"
+    - PUPPET_GEM_VERSION: ~> 4.0
+      RUBY_VERSION: 21
+      CHECK: spec
+    - PUPPET_GEM_VERSION: ~> 4.0
+      RUBY_VERSION: 21-x64
+      CHECK: spec
+    - PUPPET_GEM_VERSION: ~> 5.0
+      RUBY_VERSION: 24
+      CHECK: spec
+    - PUPPET_GEM_VERSION: ~> 5.0
+      RUBY_VERSION: 24-x64
+      CHECK: spec
+
+# appveyor.yml:
+#   unmanaged: true
+.gitlab-ci.yml:
+  delete: true
+
+Rakefile:
+  unmanaged: true
