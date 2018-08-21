@@ -54,8 +54,6 @@ appveyor.yml:
       RUBY_VERSION: 24-x64
       CHECK: spec
 
-# appveyor.yml:
-#   unmanaged: true
 .gitlab-ci.yml:
   delete: true
 
