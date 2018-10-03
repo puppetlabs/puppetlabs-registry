@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'puppet/type/registry_key'
+require 'puppet/type/registry_value'
 
 RSpec.describe 'registry::value', :type => :define do
   let(:title) { 'RegistryTest' }
