@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## Unreleased
 
+## [2.1.0] - 2018-10-10
+### Added
+- Updated module for Puppet 6 ([MODULES-7832](https://tickets.puppetlabs.com/browse/MODULES-7832))
+
+### Changed
+- Update module for PDK ([MODULES-7404](https://tickets.puppetlabs.com/browse/MODULES-7404))
+
 ## [2.0.2] - 2018-08-08
 ### Added
 - Add Windows Server 2016 and Windows 10 as supported Operating Systems ([MODULES-4271](https://tickets.puppetlabs.com/browse/MODULES-4271))
