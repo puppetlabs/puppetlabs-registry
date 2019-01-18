@@ -219,6 +219,18 @@ describe Puppet::Type.type(:registry_value) do
         value[:type] = :array
         value[:data] = ['foo', 'bar', 'baz']
       end
+
+      it "should support an empty array" do
+        value[:type] = :array
+        value[:data] = []
+      end
+
+      [ [''], nil, ['', 'foo', 'bar'], ['foo', '', 'bar'], ['foo', 'bar', ''] ].each do |data|
+        it "should reject '#{data}'" do
+          value[:type] = :array
+          expect { value[:data] = data }.to raise_error(Puppet::Error)
+        end
+      end
     end
   end
 end

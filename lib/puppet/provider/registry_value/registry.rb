@@ -100,6 +100,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
           if Puppet::Util::Windows::Registry.RegQueryValueExW(reg.hkey, valuename_ptr,
             FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL,
             FFI::MemoryPointer::NULL, FFI::MemoryPointer::NULL) == 0
+            # Note - This actually calls read from Win32::Registry not Puppet::Util::Windows::Registry
             @regvalue[:type], @regvalue[:data] = from_native(reg.read(valuename))
           end
         end
