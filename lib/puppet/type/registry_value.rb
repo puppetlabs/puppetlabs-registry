@@ -74,6 +74,15 @@ Puppet::Type.newtype(:registry_value) do
 
     defaultto ''
 
+    validate do |value|
+      case resource[:type]
+      when :array
+        fail("An array registry value can not contain empty values") if value.empty?
+      else
+        true
+      end
+    end
+
     munge do |value|
       case resource[:type]
       when :dword
