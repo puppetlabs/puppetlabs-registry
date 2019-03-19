@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'puppet/type/registry_key'
 
-describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:registry_key).provider(:registry) do
   let (:catalog) do Puppet::Resource::Catalog.new end
   let (:type) { Puppet::Type.type(:registry_key) }
 
@@ -11,6 +11,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
   subkey_name ="PuppetRegProviderTest"
 
   before(:each) do
+    skip('Not on Windows platform') unless Puppet.features.microsoft_windows?
     # problematic Ruby codepath triggers a conversion of UTF-16LE to
     # a local codepage which can totally break when that codepage has no
     # conversion from the given UTF-16LE characters to local codepage
@@ -47,12 +48,16 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
     end
   end
 
-  describe "#purge_values", :if => Puppet.features.microsoft_windows? do
+  describe "#purge_values" do
     let (:guid) { SecureRandom.uuid }
     let (:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
 
     def bytes_to_utf8(bytes)
       bytes.pack('c*').force_encoding(Encoding::UTF_8)
+    end
+
+    before(:each) do
+      skip('Not on Windows platform') unless Puppet.features.microsoft_windows?
     end
 
     after(:each) do
@@ -84,8 +89,9 @@ describe Puppet::Type.type(:registry_key).provider(:registry), :if => Puppet.fea
       end
     end
 
-    context "with unicode", :if => Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./ do
+    context "with unicode" do
       before(:each) do
+        skip('Not on Windows platform with Ruby version 2.x') unless Puppet.features.microsoft_windows? && RUBY_VERSION =~ /^2\./
         # create temp registry key with Unicode values
         Win32::Registry::HKEY_LOCAL_MACHINE.create(reg_path,
           Win32::Registry::KEY_ALL_ACCESS |

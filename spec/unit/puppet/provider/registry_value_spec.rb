@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'puppet/type/registry_value'
 
-describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.features.microsoft_windows? do
+describe Puppet::Type.type(:registry_value).provider(:registry) do
   let (:catalog) do Puppet::Resource::Catalog.new end
   let (:type) { Puppet::Type.type(:registry_value) }
 
@@ -11,12 +11,15 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
   subkey_name ="PuppetRegProviderTest"
 
   before(:all) do
-    Win32::Registry::HKEY_LOCAL_MACHINE.create("#{puppet_key}\\#{subkey_name}",
-      Win32::Registry::KEY_ALL_ACCESS |
-      PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY)
+    if Puppet.features.microsoft_windows?
+      Win32::Registry::HKEY_LOCAL_MACHINE.create("#{puppet_key}\\#{subkey_name}",
+        Win32::Registry::KEY_ALL_ACCESS |
+        PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY)
+    end
   end
 
   before(:each) do
+    skip('Not on Windows platform') unless Puppet.features.microsoft_windows?
     # problematic Ruby codepath triggers a conversion of UTF-16LE to
     # a local codepage which can totally break when that codepage has no
     # conversion from the given UTF-16LE characters to local codepage
@@ -37,16 +40,18 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
   end
 
   after(:all) do
-    # Ruby 2.1.5 has bugs with deleting registry keys due to using ANSI
-    # character APIs, but passing wide strings to them (facepalm)
-    # https://github.com/ruby/ruby/blob/v2_1_5/ext/win32/lib/win32/registry.rb#L323-L329
-    # therefore, use our own code instead of hklm.delete_value
+    if Puppet.features.microsoft_windows?
+      # Ruby 2.1.5 has bugs with deleting registry keys due to using ANSI
+      # character APIs, but passing wide strings to them (facepalm)
+      # https://github.com/ruby/ruby/blob/v2_1_5/ext/win32/lib/win32/registry.rb#L323-L329
+      # therefore, use our own code instead of hklm.delete_value
 
-    # NOTE: registry_value tests unfortunately depend on registry_key type
-    # otherwise, there would be a bit of Win32 API code here
-    reg_key = Puppet::Type.type(:registry_key).new(:path => "hklm\\#{puppet_key}\\#{subkey_name}",
-      :provider => :registry)
-    reg_key.provider.destroy
+      # NOTE: registry_value tests unfortunately depend on registry_key type
+      # otherwise, there would be a bit of Win32 API code here
+      reg_key = Puppet::Type.type(:registry_key).new(:path => "hklm\\#{puppet_key}\\#{subkey_name}",
+        :provider => :registry)
+      reg_key.provider.destroy
+    end
   end
 
   describe "#exists?" do
@@ -273,8 +278,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry), :if => Puppet.f
     end
 
     # proof that there is no conversion to local encodings like IBM437
-    it "will return a UTF-8 string from a REG_SZ registry value (written as UTF-16LE)",
-      :if => Puppet.features.microsoft_windows? && RUBY_VERSION >= '2.1' do
+    it "will return a UTF-8 string from a REG_SZ registry value (written as UTF-16LE)" do
+      skip('Not on Windows platform with Ruby version greater than or equal to 2.1') unless Puppet.features.microsoft_windows? && RUBY_VERSION >= '2.1'
 
       # create a UTF-16LE byte array representing "–™"
       utf_16_bytes = ENDASH_UTF_16 + TM_UTF_16
