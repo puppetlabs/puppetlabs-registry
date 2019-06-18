@@ -99,6 +99,15 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       type, data = reg.from_native([3, "\x1"])
       data.should eq ['01']
     end
+
+    xit "should gracefully handle corrupt registry values" do
+      reg = described_class.new 
+      broken_encoding = [0xd800].pack('U')
+      type, data = reg.from_native([3, broken_encoding])  
+      data.should eql ['']
+    end
+
+
   end
 
   describe "#destroy" do
