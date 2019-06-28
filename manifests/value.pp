@@ -1,37 +1,34 @@
-# = Define: registry::value
+# @summary High level abstraction on top of registry_key and registry_value resources
 #
-# This defined resource type provides a higher level of abstraction on top of
-# the registry_key and registry_value resources.  Using this defined resource
-# type, you do not need to explicitly manage the parent key for a particular
-# value.  Puppet will automatically manage the parent key for you.
+# @note
+#   This defined resource type provides a higher level of abstraction on top of
+#   the registry_key and registry_value resources.  Using this defined resource
+#   type, you do not need to explicitly manage the parent key for a particular
+#   value.  Puppet will automatically manage the parent key for you.
 #
-# == Parameters:
+# @param key
+#   The path of key the value will placed inside.
+# @param value
+#   The name of the registry value to manage.  This will be copied from
+#   the resource title if not specified.  The special value of
+#   '(default)' may be used to manage the default value of the key.
+# @param type
+#   The type the registry value.  Defaults to 'string'.  See the output of
+#   `puppet describe registry_value` for a list of supported types in the
+#   "type" parameter.
+# @param data
+#   The data to place inside the registry value.
 #
-# key:: The path of key the value will placed inside.
-#
-# value:: The name of the registry value to manage.  This will be copied from
-#         the resource title if not specified.  The special value of
-#         '(default)' may be used to manage the default value of the key.
-#
-# type:: The type the registry value.  Defaults to 'string'.  See the output of
-#        `puppet describe registry_value` for a list of supported types in the
-#        "type" parameter.
-#
-# data:: The data to place inside the registry value.
-#
-# == Actions:
+# Actions:
 #   - Manage the parent key if not already managed.
 #   - Manage the value
 #
-# == Requires:
+# Requires:
 #   - Registry Module
 #   - Stdlib Module
 #
-# == Sample Usage:
 #
-# This example will automatically manage the key.  It will also create a value
-# named 'puppetmaster' inside this key.
-#
+# @example This example will automatically manage the key.  It will also create a value named 'puppetmaster' inside this key.
 #   class myapp {
 #     registry::value { 'puppetmaster':
 #       key => 'HKLM\Software\Vendor\PuppetLabs',

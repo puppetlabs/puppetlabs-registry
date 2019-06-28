@@ -1,5 +1,5 @@
-# Define: registry::service
-#
+# @summary Defined resource type that manages service entries
+# @note
 #   This defined resource type manages service entries in the Microsoft service
 #   control framework by managing the appropriate registry keys and values.
 #
@@ -7,31 +7,23 @@
 #
 #   [1] http://support.microsoft.com/kb/137890
 #
-# Parameters:
-#
-#   ensure: [ present, absent ]
-#
-#   display_name: The Display Name of the service.  Defaults to the title of
+# @param ensure[ present, absent ]
+# @param display_name
+#   The Display Name of the service.  Defaults to the title of
 #   the resource.
-#
-#   description: A description of the service
-#
-#   command: The command to execute
-#
-#   start: The starting mode of the service.  (Note, the native service
+# @param description
+#   A description of the service
+# @param command
+#   The command to execute
+# @param start
+#   The starting mode of the service.  (Note, the native service
 #   resource can also be used to manage this setting.)
 #   [ automatic, manual, disabled ]
 #
-# Actions:
 #
-#   Manages the values in the key HKLM\System\CurrentControlSet\Services\$name\
+# Manages the values in the key HKLM\System\CurrentControlSet\Services\$name\
 #
-# Requires:
-#
-#   Module puppetlabs-registry
-#
-# Sample Usage:
-#
+# @example Sample Usage:
 #   registry::service { puppet:
 #     ensure       => present,
 #     display_name => 'Puppet Agent',
