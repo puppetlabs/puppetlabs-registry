@@ -15,51 +15,51 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
-  describe "path parameter" do
-    it "should have a path parameter" do
+  describe 'path parameter' do
+    it 'has a path parameter' do
       Puppet::Type.type(:registry_value).attrtype(:path).should == :param
     end
 
-    %w[hklm\propname hklm\software\propname].each do |path|
+    ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
       it "should accept #{path}" do
-        described_class.new(:path => path, :catalog => catalog)
+        described_class.new(path: path, catalog: catalog)
       end
     end
 
-    %w[hklm\\ hklm\software\\ hklm\software\vendor\\].each do |path|
+    ['hklm\\', 'hklm\\software\\', 'hklm\\software\\vendor\\'].each do |path|
       it "should accept the unnamed (default) value: #{path}" do
-        described_class.new(:path => path, :catalog => catalog)
+        described_class.new(path: path, catalog: catalog)
       end
     end
 
-    it "should strip trailling slashes from unnamed values" do
-      value = described_class.new(:path => 'hklm\\software\\\\', :catalog => catalog)
+    it 'strips trailling slashes from unnamed values' do
+      value = described_class.new(path: 'hklm\\software\\\\', catalog: catalog)
 
       expect(value[:path]).to eq('hklm\\software\\')
     end
 
-    %w[HKEY_DYN_DATA\\ HKEY_PERFORMANCE_DATA\name].each do |path|
+    ['HKEY_DYN_DATA\\', 'HKEY_PERFORMANCE_DATA\\name'].each do |path|
       it "should reject #{path} as unsupported" do
-        expect { described_class.new(:path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Unsupported/)
+        expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Unsupported})
       end
     end
 
-    %w[hklm hkcr unknown\\name unknown\\subkey\\name].each do |path|
+    ['hklm', 'hkcr', 'unknown\\name', 'unknown\\subkey\\name'].each do |path|
       it "should reject #{path} as invalid" do
-        expect { described_class.new(:path => path, :catalog => catalog) }.to raise_error(Puppet::Error, /Invalid registry key/)
+        expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Invalid registry key})
       end
     end
 
-    %w[HKLM\\name HKEY_LOCAL_MACHINE\\name hklm\\name].each do |root|
+    ['HKLM\\name', 'HKEY_LOCAL_MACHINE\\name', 'hklm\\name'].each do |root|
       it "should canonicalize root key #{root}" do
-        value = described_class.new(:path => root, :catalog => catalog)
+        value = described_class.new(path: root, catalog: catalog)
         value[:path].should == 'hklm\name'
       end
     end
 
-    %w[HKLM\Software\\\\nam\\e HKEY_LOCAL_MACHINE\Software\\\\nam\\e hklm\Software\\\\nam\\e].each do |root|
+    ['HKLM\\Software\\\\nam\\e', 'HKEY_LOCAL_MACHINE\\Software\\\\nam\\e', 'hklm\\Software\\\\nam\\e'].each do |root|
       it "should use a double backslash when canonicalizing value names with a backslash #{root}" do
-        value = described_class.new(:path => root, :catalog => catalog)
+        value = described_class.new(path: root, catalog: catalog)
         value[:path].should == 'hklm\Software\\\\nam\e'
       end
     end
@@ -71,7 +71,7 @@ describe Puppet::Type.type(:registry_value) do
       'HKLM\\Software\\\\\\'                 => 'hklm\\Software\\\\\\', # A value name of backslash
     }.each do |testcase, expected_value|
       it "should use a double backslash as a delimeter between path and value for title #{testcase}" do
-        value = described_class.new(:path => testcase, :catalog => catalog)
+        value = described_class.new(path: testcase, catalog: catalog)
         value[:path].should == expected_value
       end
     end
@@ -80,46 +80,47 @@ describe Puppet::Type.type(:registry_value) do
     it 'should validate the length of the value data'
     it 'should be case-preserving'
     it 'should be case-insensitive'
-    it 'should support 32-bit values' do
-      value = described_class.new(:path => '32:hklm\software\foo', :catalog => catalog)
+    it 'supports 32-bit values' do
+      value = described_class.new(path: '32:hklm\software\foo', catalog: catalog)
     end
   end
 
   describe '#autorequire' do
-    let(:subject) { described_class.new(:title => subject_title, :catalog => catalog) }
+    let(:subject) { described_class.new(title: subject_title, catalog: catalog) }
+
     [
       {
-        :context                => 'with a non-default value_name',
-        :reg_value_title        => 'hklm\software\foo\bar',
-        :expected_reg_key_title => 'hklm\Software\foo',
+        context: 'with a non-default value_name',
+        reg_value_title: 'hklm\software\foo\bar',
+        expected_reg_key_title: 'hklm\Software\foo',
       },
       {
-        :context                => 'with a mixed case path and value_name',
-        :reg_value_title        => 'hkLm\soFtwarE\fOo\Bar',
-        :expected_reg_key_title => 'hklm\Software\foo',
+        context: 'with a mixed case path and value_name',
+        reg_value_title: 'hkLm\soFtwarE\fOo\Bar',
+        expected_reg_key_title: 'hklm\Software\foo',
       },
       {
-        :context                => 'with a default value_name',
-        :reg_value_title        => 'hklm\software\foo\bar\\',
-        :expected_reg_key_title => 'hklm\Software\foo\bar',
+        context: 'with a default value_name',
+        reg_value_title: 'hklm\software\foo\bar\\',
+        expected_reg_key_title: 'hklm\Software\foo\bar',
       },
       {
-        :context                => 'with a value whose parent key is not managed but does have an ancestor key in the catalog',
-        :reg_value_title        => 'hklm\software\foo\bar\baz\alice',
-        :expected_reg_key_title => 'hklm\Software\foo\bar',
-      }
+        context: 'with a value whose parent key is not managed but does have an ancestor key in the catalog',
+        reg_value_title: 'hklm\software\foo\bar\baz\alice',
+        expected_reg_key_title: 'hklm\Software\foo\bar',
+      },
     ].each do |testcase|
       context testcase[:context] do
-        let(:subject) { described_class.new(:title => testcase[:reg_value_title], :catalog => catalog) }
+        let(:subject) { described_class.new(title: testcase[:reg_value_title], catalog: catalog) }
 
-        it 'should not autorequire ancestor keys if none exist' do
+        it 'does not autorequire ancestor keys if none exist' do
           expect(subject.autorequire).to eq([])
         end
 
-        it 'should only autorequire the nearest ancestor registry_key resource' do
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software', :catalog => catalog))
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software\foo', :catalog => catalog))
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(:path => 'hklm\Software\foo\bar', :catalog => catalog))
+        it 'onlies autorequire the nearest ancestor registry_key resource' do
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software', catalog: catalog))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo', catalog: catalog))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo\bar', catalog: catalog))
 
           autorequire_array = subject.autorequire
           expect(autorequire_array.count).to eq(1)
@@ -129,25 +130,25 @@ describe Puppet::Type.type(:registry_value) do
     end
   end
 
-  describe "type property" do
-    let (:value) { described_class.new(:path => 'hklm\software\foo', :catalog => catalog) }
+  describe 'type property' do
+    let (:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
-      it "should support a #{type.to_s} type" do
+      it "should support a #{type} type" do
         value[:type] = type
         value[:type].should == type
       end
     end
 
-    it "should reject other types" do
+    it 'rejects other types' do
       expect { value[:type] = 'REG_SZ' }.to raise_error(Puppet::Error)
     end
   end
 
-  describe "data property" do
-    let (:value) { described_class.new(:path => 'hklm\software\foo', :catalog => catalog) }
+  describe 'data property' do
+    let (:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
-    context "string data" do
+    context 'string data' do
       ['', 'foobar'].each do |data|
         it "should accept '#{data}'" do
           value[:type] = :string
@@ -155,10 +156,10 @@ describe Puppet::Type.type(:registry_value) do
         end
       end
 
-      pending "it should accept nil"
+      pending 'it should accept nil'
     end
 
-    context "integer data" do
+    context 'integer data' do
       [:dword, :qword].each do |type|
         context "for #{type}" do
           [0, 0xFFFFFFFF, -1, 42].each do |data|
@@ -168,7 +169,7 @@ describe Puppet::Type.type(:registry_value) do
             end
           end
 
-          %w['foobar' :true].each do |data|
+          ['foobar', ':true'].each do |data|
             it "should reject #{data}" do
               value[:type] = type
               expect { value[:data] = data }.to raise_error(Puppet::Error)
@@ -177,29 +178,29 @@ describe Puppet::Type.type(:registry_value) do
         end
       end
 
-      context "for 64-bit integers" do
+      context 'for 64-bit integers' do
         let :data do 0xFFFFFFFFFFFFFFFF end
 
-        it "should accept qwords" do
+        it 'accepts qwords' do
           value[:type] = :qword
           value[:data] = data
         end
 
-        it "should reject dwords" do
+        it 'rejects dwords' do
           value[:type] = :dword
           expect { value[:data] = data }.to raise_error(Puppet::Error)
         end
       end
     end
 
-    context "binary data" do
+    context 'binary data' do
       ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
         it "should accept '#{data}'" do
           value[:type] = :binary
           value[:data] = data
         end
       end
-      [9,'1','A'].each do |data|
+      [9, '1', 'A'].each do |data|
         it "should accept '#{data}' and have a leading zero" do
           value[:type] = :binary
           value[:data] = data
@@ -214,18 +215,18 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context "array data" do
-      it "should support array data" do
+    context 'array data' do
+      it 'supports array data' do
         value[:type] = :array
         value[:data] = ['foo', 'bar', 'baz']
       end
 
-      it "should support an empty array" do
+      it 'supports an empty array' do
         value[:type] = :array
         value[:data] = []
       end
 
-      [ [''], nil, ['', 'foo', 'bar'], ['foo', '', 'bar'], ['foo', 'bar', ''] ].each do |data|
+      [[''], nil, ['', 'foo', 'bar'], ['foo', '', 'bar'], ['foo', 'bar', '']].each do |data|
         it "should reject '#{data}'" do
           value[:type] = :array
           expect { value[:data] = data }.to raise_error(Puppet::Error)

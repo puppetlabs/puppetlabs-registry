@@ -32,22 +32,22 @@ end
 def random_string(length)
   chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a
   str = ''
-  1.upto(length) { |i| str << chars[rand(chars.size-1)] }
-  return str
+  1.upto(length) { |_i| str << chars[rand(chars.size - 1)] }
+  str
 end
 
 def get_apply_opts(environment_hash = nil)
   opts = {
-      :catch_failures => true,
-      :acceptable_exit_codes => [0, 2],
+    catch_failures: true,
+    acceptable_exit_codes: [0, 2],
   }
-  opts.merge!(:environment => environment_hash) if environment_hash
+  opts[:environment] = environment_hash if environment_hash
   opts
 end
 
 def native_sysdir(agent)
   if is_x64(agent)
-    if on(agent, 'ls /cygdrive/c/windows/sysnative', :acceptable_exit_codes => (0..255)).exit_code == 0
+    if on(agent, 'ls /cygdrive/c/windows/sysnative', acceptable_exit_codes: (0..255)).exit_code == 0
       '`cygpath -W`/sysnative'
     else
       nil

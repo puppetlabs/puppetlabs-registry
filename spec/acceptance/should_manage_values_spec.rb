@@ -2,10 +2,9 @@ require 'pathname'
 require 'spec_helper_acceptance'
 
 describe 'Registry Value Management' do
-
-# Generate a unique key name
+  # Generate a unique key name
   keyname = "PuppetLabsTest_Value_#{random_string(8)}"
-# This is the keypath we'll use for this entire test.  We will actually create this key and delete it.
+  # This is the keypath we'll use for this entire test.  We will actually create this key and delete it.
   vendor_path = 'HKLM\\Software\\Vendor'
   keypath = "#{vendor_path}\\#{keyname}"
 
@@ -25,7 +24,7 @@ describe 'Registry Value Management' do
         registry_key { '32:#{keypath}\\SubKey1': }
         registry_key { '32:#{keypath}\\SubKey2': }
       }
-    
+
       # The Default Value
       registry_value { '#{keypath}\\SubKey1\\\\':
         data => "Default Data phase=#{phase}",
@@ -34,7 +33,7 @@ describe 'Registry Value Management' do
         type => array,
         data => [ "Default Data L1 phase=#{phase}", "Default Data L2 phase=#{phase}" ],
       }
-    
+
       # String Values
       registry_value { '#{keypath}\\SubKey1\\ValueString1':
         data => "Should be a string phase=#{phase}",
@@ -53,7 +52,7 @@ describe 'Registry Value Management' do
         type   => string,
         ensure => present,
       }
-    
+
       if $architecture == 'x64' {
         # String Values
         registry_value { '32:#{keypath}\\SubKey1\\ValueString1':
@@ -74,7 +73,7 @@ describe 'Registry Value Management' do
           ensure => present,
         }
       }
-    
+
       # Array Values
       registry_value { '#{keypath}\\SubKey1\\ValueArray1':
         type => array,
@@ -128,7 +127,7 @@ describe 'Registry Value Management' do
           ensure => present,
         }
       }
-    
+
       # Expand Values
       registry_value { '#{keypath}\\SubKey1\\ValueExpand1':
         type => expand,
@@ -150,7 +149,7 @@ describe 'Registry Value Management' do
           ensure => present,
         }
       }
-    
+
       # DWORD Values
       registry_value { '#{keypath}\\SubKey1\\ValueDword1':
         type => dword,
@@ -162,7 +161,7 @@ describe 'Registry Value Management' do
           data => #{phase},
         }
       }
-    
+
       # QWORD Values
       registry_value { '#{keypath}\\SubKey1\\ValueQword1':
         type => qword,
@@ -174,7 +173,7 @@ describe 'Registry Value Management' do
           data => #{phase},
         }
       }
-    
+
       # Binary Values
       registry_value { '#{keypath}\\SubKey1\\ValueBinary1':
         type => binary,
@@ -197,26 +196,25 @@ describe 'Registry Value Management' do
 P1
   end
 
-  context "Start testing should_manage_values" do
+  context 'Start testing should_manage_values' do
     windows_agents.each do |agent|
-
       # A set of keys we expect Puppet to create
       phase1_resources_created = [
-          /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
-          /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created/,
-          /Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey2\].ensure: created/,
+        %r{Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created},
+        %r{Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created},
+        %r{Registry_key\[HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey2\].ensure: created},
       ]
 
       if is_x64(agent)
         phase1_resources_created += [
-            /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created/,
-            /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created/,
-            /Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey2\].ensure: created/,
+          %r{Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\].ensure: created},
+          %r{Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\].ensure: created},
+          %r{Registry_key\[32:HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey2\].ensure: created},
         ]
       end
 
       # A set of values we expect Puppet to change in Phase 2
-      phase2_resources_changed = Array.new
+      phase2_resources_changed = []
 
       prefixes = ['']
       prefixes << '32:' if is_x64(agent)
@@ -225,52 +223,51 @@ P1
       prefixes.each do |prefix|
         # We should have created 4 REG_SZ values
         1.upto(4).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueString#{idx}\].ensure: created/
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueString#{idx}\].data: data changed 'Should be a string phase=1' to 'Should be a string phase=2'/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueString#{idx}\].ensure: created}
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueString#{idx}\].data: data changed 'Should be a string phase=1' to 'Should be a string phase=2'}
         end
         # We should have created 5 REG_MULTI_SZ values
         1.upto(5).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].ensure: created/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].ensure: created}
         end
 
         # The first two array items are an exception
         1.upto(2).each do |idx|
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].data: data changed 'Should be an array L1 phase=1' to 'Should be an array L1 phase=2'/
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].data: data changed 'Should be an array L1 phase=1' to 'Should be an array L1 phase=2'}
         end
 
         # The rest of the array items are OK and have 2 "lines" each.
         3.upto(5).each do |idx|
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].data: data changed 'Should be an array L1 phase=1,Should be an array L2 phase=1' to 'Should be an array L1 phase=2,Should be an array L2 phase=2'/
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueArray#{idx}\].data: data changed 'Should be an array L1 phase=1,Should be an array L2 phase=1' to 'Should be an array L1 phase=2,Should be an array L2 phase=2'}
         end
 
         # We should have created 2 REG_EXPAND_SZ values
         1.upto(2).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueExpand#{idx}\].ensure: created/
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueExpand#{idx}\].data: data changed '%SystemRoot% - Should be a REG_EXPAND_SZ phase=1' to '%SystemRoot% - Should be a REG_EXPAND_SZ phase=2'/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueExpand#{idx}\].ensure: created}
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueExpand#{idx}\].data: data changed '%SystemRoot% - Should be a REG_EXPAND_SZ phase=1' to '%SystemRoot% - Should be a REG_EXPAND_SZ phase=2'}
         end
         # We should have created 1 qword
         1.upto(1).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueQword#{idx}\].ensure: created/
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueQword#{idx}\].data: data changed '1' to '2'/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueQword#{idx}\].ensure: created}
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueQword#{idx}\].data: data changed '1' to '2'}
         end
         # We should have created 1 dword
         1.upto(1).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueDword#{idx}\].ensure: created/
-          phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueDword#{idx}\].data: data changed '1' to '2'/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueDword#{idx}\].ensure: created}
+          phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueDword#{idx}\].data: data changed '1' to '2'}
         end
         # We should have created 2 binary values
         1.upto(2).each do |idx|
-          phase1_resources_created << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary#{idx}\].ensure: created/
+          phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary#{idx}\].ensure: created}
         end
         # We have different data for the binary values
-        phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary1\].data: data changed '01' to '02'/
-        phase2_resources_changed << /Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary2\].data: data changed 'de ad be ef ca f1' to 'de ad be ef ca f2'/
+        phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary1\].data: data changed '01' to '02'}
+        phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary2\].data: data changed 'de ad be ef ca f1' to 'de ad be ef ca f2'}
       end
-
 
       it 'Registry Values - Phase 1.a - Create some values' do
         execute_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
-          assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
+          assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
           phase1_resources_created.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -282,13 +279,13 @@ P1
           phase1_resources_created.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
-          assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
+          assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
         end
       end
 
       it 'Registry Values - Phase 2.a - Change some values' do
         execute_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
-          assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
+          assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
           phase2_resources_changed.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -300,7 +297,7 @@ P1
           phase2_resources_changed.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
-          assert_no_match(/err:/, @result.stdout, 'Expected no error messages.')
+          assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
         end
       end
 
@@ -309,11 +306,11 @@ P1
         # default value of a registry key.  It should contain the string shown in
         # val_re.
         dir = native_sysdir(agent)
-        if not dir
+        if !dir
           puts('Cannot query 64-bit view of registry from 32-bit process, skipping')
         else
           on agent, "#{dir}/reg.exe query '#{keypath}\\Subkey1'" do
-            val_re = /\(Default\)    REG_SZ    Default Data phase=2/i
+            val_re = %r{\(Default\)    REG_SZ    Default Data phase=2}i
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
         end
