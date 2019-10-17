@@ -100,6 +100,7 @@ PHASE3
     ]
 
     windows_agents.each do |agent|
+      # rubocop:disable RSpec/InstanceVariable
       agent_is_x64 = is_x64(agent)
       keys_created = keys_created_native + (agent_is_x64 ? keys_created_wow : [])
       values_purged = values_purged_native + (agent_is_x64 ? values_purged_wow : [])
@@ -138,6 +139,7 @@ PHASE3
           assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
         end
       end
+      # rubocop:enable RSpec/InstanceVariable
     end
   end
 end

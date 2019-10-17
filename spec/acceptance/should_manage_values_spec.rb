@@ -8,7 +8,7 @@ describe 'Registry Value Management' do
   vendor_path = 'HKLM\\Software\\Vendor'
   keypath = "#{vendor_path}\\#{keyname}"
 
-  def getManifest(keypath, vendor_path, phase)
+  def get_manifest(keypath, vendor_path, phase)
     <<P1
       notify { fact_phase: message => "fact_phase: #{phase}" }
       registry_key { '#{vendor_path}': ensure => present }
@@ -221,6 +221,8 @@ P1
 
       # This is just to save a whole bunch of copy / paste
       prefixes.each do |prefix|
+        # rubocop:disable Metrics/LineLength
+
         # We should have created 4 REG_SZ values
         1.upto(4).each do |idx|
           phase1_resources_created << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueString#{idx}\].ensure: created}
@@ -263,10 +265,12 @@ P1
         # We have different data for the binary values
         phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary1\].data: data changed '01' to '02'}
         phase2_resources_changed << %r{Registry_value\[#{prefix}HKLM.Software.Vendor.PuppetLabsTest\w+\\SubKey1\\ValueBinary2\].data: data changed 'de ad be ef ca f1' to 'de ad be ef ca f2'}
+        # rubocop:enable Metrics/LineLength
       end
 
+      # rubocop:disable RSpec/InstanceVariable
       it 'Registry Values - Phase 1.a - Create some values' do
-        execute_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
+        execute_manifest_on agent, get_manifest(keypath, vendor_path, '1'), get_apply_opts do
           assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
           phase1_resources_created.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -275,7 +279,7 @@ P1
       end
 
       it 'Registry Values - Phase 1.b - Make sure Puppet is idempotent' do
-        execute_manifest_on agent, getManifest(keypath, vendor_path, '1'), get_apply_opts do
+        execute_manifest_on agent, get_manifest(keypath, vendor_path, '1'), get_apply_opts do
           phase1_resources_created.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -284,7 +288,7 @@ P1
       end
 
       it 'Registry Values - Phase 2.a - Change some values' do
-        execute_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
+        execute_manifest_on agent, get_manifest(keypath, vendor_path, '2'), get_apply_opts do
           assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
           phase2_resources_changed.each do |val_re|
             assert_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
@@ -293,7 +297,7 @@ P1
       end
 
       it 'Registry Values - Phase 2.b - Make sure Puppet is idempotent' do
-        execute_manifest_on agent, getManifest(keypath, vendor_path, '2'), get_apply_opts do
+        execute_manifest_on agent, get_manifest(keypath, vendor_path, '2'), get_apply_opts do
           phase2_resources_changed.each do |val_re|
             assert_no_match(val_re, @result.stdout, "Expected output to contain #{val_re.inspect}.")
           end
@@ -315,6 +319,7 @@ P1
           end
         end
       end
+      # rubocop:enable RSpec/InstanceVariable
     end
   end
 end

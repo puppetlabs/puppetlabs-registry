@@ -49,6 +49,7 @@ HERE
       %r{Registry_value\[HKLM\\Software\\Vendor\\PuppetLabsTest\w+\\\\Setting3\].data: data changed 'fact_phase=1' to 'fact_phase=2'},
     ]
     windows_agents.each do |agent|
+      # rubocop:disable RSpec/InstanceVariable
       it 'Phase 1.a - Create some values' do
         execute_manifest_on agent, manifest, get_apply_opts('FACTER_FACT_PHASE' => '1') do
           phase1_resources_created.each do |val_re|
@@ -84,6 +85,7 @@ HERE
           assert_no_match(%r{err:}, @result.stdout, 'Expected no error messages.')
         end
       end
+      # rubocop:enable RSpec/InstanceVariable
     end
   end
 end

@@ -44,7 +44,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
   def exists?
     Puppet.debug("Checking existence of registry key #{self}")
     begin
-      !!hive.open(subkey, Win32::Registry::KEY_READ | access) { |_reg| true }
+      !!hive.open(subkey, Win32::Registry::KEY_READ | access) { |_reg| true } # rubocop:disable Style/DoubleNegation
     rescue
       false
     end

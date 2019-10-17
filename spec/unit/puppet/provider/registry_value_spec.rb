@@ -1,16 +1,15 @@
-#! /usr/bin/env ruby
-
 require 'spec_helper'
 require 'puppet/type/registry_value'
 
 describe Puppet::Type.type(:registry_value).provider(:registry) do
-  let (:catalog) do Puppet::Resource::Catalog.new end
-  let (:type) { Puppet::Type.type(:registry_value) }
+  let(:catalog) { Puppet::Resource::Catalog.new }
+  let(:type) { Puppet::Type.type(:registry_value) }
+  let(:instance) { instance_double(Win32::Registry) }
 
   puppet_key = 'SOFTWARE\\Puppet Labs'
   subkey_name = 'PuppetRegProviderTest'
 
-  before(:all) do
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
     if Puppet.features.microsoft_windows?
       Win32::Registry::HKEY_LOCAL_MACHINE.create("#{puppet_key}\\#{subkey_name}",
                                                  Win32::Registry::KEY_ALL_ACCESS |
@@ -24,22 +23,26 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # a local codepage which can totally break when that codepage has no
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
-    expect_any_instance_of(Win32::Registry).to receive(:export_string).never
 
-    expect_any_instance_of(Win32::Registry).to receive(:delete_value).never
-    expect_any_instance_of(Win32::Registry).to receive(:delete_key).never
+    # rubocop:disable RSpec/ExpectInHook
+    expect(instance).to receive(:export_string).never
+
+    expect(instance).to receive(:delete_value).never
+    expect(instance).to receive(:delete_key).never
 
     if RUBY_VERSION >= '2.1'
       # also, expect that we're not using Rubys each_key / each_value which exhibit bad behavior
-      expect_any_instance_of(Win32::Registry).to receive(:each_key).never
-      expect_any_instance_of(Win32::Registry).to receive(:each_value).never
+      expect(instance).to receive(:each_key).never
+      expect(instance).to receive(:each_value).never
 
       # this covers []= write_s write_i and write_bin
-      expect_any_instance_of(Win32::Registry).to receive(:write).never
+      expect(instance).to receive(:write).never
     end
+
+    # rubocop:enable RSpec/ExpectInHook
   end
 
-  after(:all) do
+  after(:all) do # rubocop:disable RSpec/BeforeAfterAll
     if Puppet.features.microsoft_windows?
       # Ruby 2.1.5 has bugs with deleting registry keys due to using ANSI
       # character APIs, but passing wide strings to them (facepalm)
@@ -90,21 +93,21 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
 
     it 'returns a string of lowercased hex encoded bytes' do
       reg = described_class.new
-      type, data = reg.from_native([3, "\u07AD"])
+      _type, data = reg.from_native([3, "\u07AD"])
       data.should eq ['de ad']
     end
 
     it 'left pads binary strings' do
       reg = described_class.new
-      type, data = reg.from_native([3, "\x1"])
+      _type, data = reg.from_native([3, "\x1"])
       data.should eq ['01']
     end
   end
 
   describe '#destroy' do
-    let (:default_path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\" }
-    let (:valuename) { SecureRandom.uuid }
-    let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
+    let(:default_path) { _path = "hklm\\#{puppet_key}\\#{subkey_name}\\" }
+    let(:valuename) { SecureRandom.uuid }
+    let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
 
     def create_and_destroy(path, reg_type, data)
       reg_value = type.new(path: path,
@@ -125,8 +128,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a middle double backslash' do
-      let (:valuename) { SecureRandom.uuid.insert(5, '\\\\') }
-      let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
+      let(:valuename) { SecureRandom.uuid.insert(5, '\\\\') }
+      let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
         create_and_destroy(path, :string, SecureRandom.uuid)
@@ -134,8 +137,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a leading double backslash' do
-      let (:valuename) { '\\\\' + SecureRandom.uuid }
-      let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
+      let(:valuename) { '\\\\' + SecureRandom.uuid }
+      let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
         create_and_destroy(path, :string, SecureRandom.uuid)
@@ -143,8 +146,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a trailing double backslash' do
-      let (:valuename) { SecureRandom.uuid + '\\\\' }
-      let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
+      let(:valuename) { SecureRandom.uuid + '\\\\' }
+      let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
         create_and_destroy(path, :string, SecureRandom.uuid)
@@ -152,8 +155,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename of a backslash' do
-      let (:valuename) { '\\' }
-      let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
+      let(:valuename) { '\\' }
+      let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
         create_and_destroy(path, :string, SecureRandom.uuid)
@@ -161,8 +164,8 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a backslash' do
-      let (:valuename) { SecureRandom.uuid.insert(5, '\\') }
-      let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
+      let(:valuename) { SecureRandom.uuid.insert(5, '\\') }
+      let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
         create_and_destroy(path, :string, SecureRandom.uuid)
@@ -219,7 +222,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
   end
 
   context 'when writing numeric values' do
-    let (:path) { path = "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
+    let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
 
     after(:each) do
       reg_value = type.new(path: path, provider: described_class.name)
@@ -243,14 +246,14 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
 
     # values chosen at 1 bit past previous byte boundary
     [0xFF + 1, 0xFFFF + 1, 0xFFFFFF + 1, 0xFFFFFFFF].each do |value|
-      it 'properly round-trips written values by converting endianness properly' do
+      it 'properly round-trips written values by converting endianness properly - 1' do
         write_and_read_value(path, :dword, value)
         write_and_read_value(path, :qword, value)
       end
     end
 
     [0xFFFFFFFFFF + 1, 0xFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFFFF].each do |value|
-      it 'properly round-trips written values by converting endianness properly' do
+      it 'properly round-trips written values by converting endianness properly - 2' do
         write_and_read_value(path, :qword, value)
       end
     end
@@ -262,7 +265,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     TM_UTF_8 = [0xE2, 0x84, 0xA2].freeze
     TM_UTF_16 = [0x2122].freeze
 
-    let (:guid) { SecureRandom.uuid }
+    let(:guid) { SecureRandom.uuid }
 
     after(:each) do
       # Ruby 2.1.5 has bugs with deleting registry keys due to using ANSI

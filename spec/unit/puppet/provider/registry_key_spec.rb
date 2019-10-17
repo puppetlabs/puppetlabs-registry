@@ -1,11 +1,10 @@
-#! /usr/bin/env ruby
-
 require 'spec_helper'
 require 'puppet/type/registry_key'
 
 describe Puppet::Type.type(:registry_key).provider(:registry) do
-  let (:catalog) do Puppet::Resource::Catalog.new end
-  let (:type) { Puppet::Type.type(:registry_key) }
+  let(:catalog) { Puppet::Resource::Catalog.new }
+  let(:type) { Puppet::Type.type(:registry_key) }
+  let(:instance) { instance_double(Win32::Registry) }
 
   puppet_key = 'SOFTWARE\\Puppet Labs'
   subkey_name = 'PuppetRegProviderTest'
@@ -16,10 +15,13 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
     # a local codepage which can totally break when that codepage has no
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
-    expect_any_instance_of(Win32::Registry).to receive(:export_string).never
 
-    expect_any_instance_of(Win32::Registry).to receive(:delete_value).never
-    expect_any_instance_of(Win32::Registry).to receive(:delete_key).never
+    # rubocop:disable RSpec/ExpectInHook
+    expect(instance).to receive(:export_string).never
+
+    expect(instance).to receive(:delete_value).never
+    expect(instance).to receive(:delete_key).never
+    # rubocop:enable RSpec/ExpectInHook
   end
 
   describe '#destroy' do
@@ -42,8 +44,8 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
   end
 
   describe '#purge_values' do
-    let (:guid) { SecureRandom.uuid }
-    let (:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
+    let(:guid) { SecureRandom.uuid }
+    let(:reg_path) { "#{puppet_key}\\#{subkey_name}\\Unicode-#{guid}" }
 
     def bytes_to_utf8(bytes)
       bytes.pack('c*').force_encoding(Encoding::UTF_8)
