@@ -1,9 +1,11 @@
 # @api private
+# rubocop:disable Style/ClassAndModuleChildren
 module PuppetX
   # @api private
   module Puppetlabs
     # @api private
     module Registry
+      # rubocop:enable Style/ClassAndModuleChildren
       # For 64-bit OS, use 64-bit view. Ignored on 32-bit OS
       KEY_WOW64_64KEY = 0x100
       # For 64-bit OS, use 32-bit view. Ignored on 32-bit OS
@@ -86,7 +88,7 @@ module PuppetX
 
         def ascend
           p = canonical
-          while idx = p.rindex('\\')
+          while idx = p.rindex('\\') # rubocop:disable Lint/AssignmentInCondition
             p = p[0, idx]
             yield p
           end

@@ -14,7 +14,6 @@ AllCops:
   - "**/Rakefile"
   - pkg/**/*
   - spec/fixtures/**/*
-  - spec/**/*
   - vendor/**/*
   - "**/Puppetfile"
   - "**/Vagrantfile"
@@ -28,7 +27,6 @@ GetText/DecorateString:
   Description: We don't want to decorate test output.
   Exclude:
   - spec/**/*
-Lint/AssignmentInCondition:
   Enabled: false
 RSpec/BeforeAfterAll:
   Description: Beware of using after(:all) as it may cause state to leak between tests.
@@ -43,9 +41,8 @@ Style/BlockDelimiters:
     be consistent then.
   EnforcedStyle: braces_for_chaining
 Style/ClassAndModuleChildren:
-  Enabled: false
-Style/DoubleNegation:
-  Enabled: false
+  Description: Compact style reduces the required amount of indentation.
+  EnforcedStyle: compact
 Style/EmptyElse:
   Description: Enforce against empty else clauses, but allow `nil` for clarity.
   EnforcedStyle: empty
@@ -92,6 +89,12 @@ Style/MethodCalledOnDoEndBlock:
   Enabled: true
 Style/StringMethods:
   Enabled: true
+GetText/DecorateFunctionMessage:
+  Enabled: false
+GetText/DecorateStringFormattingUsingInterpolation:
+  Enabled: false
+GetText/DecorateStringFormattingUsingPercent:
+  Enabled: false
 Layout/EndOfLine:
   Enabled: false
 Layout/IndentHeredoc:

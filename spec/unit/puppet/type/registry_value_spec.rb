@@ -1,9 +1,8 @@
-#!/usr/bin/env ruby -S rspec
 require 'spec_helper'
 require 'puppet/type/registry_value'
 
 describe Puppet::Type.type(:registry_value) do
-  let (:catalog) do Puppet::Resource::Catalog.new end
+  let(:catalog) { Puppet::Resource::Catalog.new }
 
   [:ensure, :type, :data].each do |property|
     it "should have a #{property} property" do
@@ -19,7 +18,7 @@ describe Puppet::Type.type(:registry_value) do
     it 'has a path parameter' do
       Puppet::Type.type(:registry_value).attrtype(:path).should == :param
     end
-
+    # rubocop:disable RSpec/RepeatedExample
     ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
       it "should accept #{path}" do
         described_class.new(path: path, catalog: catalog)
@@ -31,6 +30,7 @@ describe Puppet::Type.type(:registry_value) do
         described_class.new(path: path, catalog: catalog)
       end
     end
+    # rubocop:enable RSpec/RepeatedExample
 
     it 'strips trailling slashes from unnamed values' do
       value = described_class.new(path: 'hklm\\software\\\\', catalog: catalog)
@@ -81,12 +81,12 @@ describe Puppet::Type.type(:registry_value) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'supports 32-bit values' do
-      value = described_class.new(path: '32:hklm\software\foo', catalog: catalog)
+      _value = described_class.new(path: '32:hklm\software\foo', catalog: catalog)
     end
   end
 
   describe '#autorequire' do
-    let(:subject) { described_class.new(title: subject_title, catalog: catalog) }
+    let(:instance) { described_class.new(title: subject_title, catalog: catalog) }
 
     [
       {
@@ -111,10 +111,10 @@ describe Puppet::Type.type(:registry_value) do
       },
     ].each do |testcase|
       context testcase[:context] do
-        let(:subject) { described_class.new(title: testcase[:reg_value_title], catalog: catalog) }
+        let(:instance) { described_class.new(title: testcase[:reg_value_title], catalog: catalog) }
 
         it 'does not autorequire ancestor keys if none exist' do
-          expect(subject.autorequire).to eq([])
+          expect(instance.autorequire).to eq([])
         end
 
         it 'onlies autorequire the nearest ancestor registry_key resource' do
@@ -122,7 +122,7 @@ describe Puppet::Type.type(:registry_value) do
           catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo', catalog: catalog))
           catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo\bar', catalog: catalog))
 
-          autorequire_array = subject.autorequire
+          autorequire_array = instance.autorequire
           expect(autorequire_array.count).to eq(1)
           expect(autorequire_array[0].to_s).to eq("Registry_key[#{testcase[:expected_reg_key_title]}] => Registry_value[#{testcase[:reg_value_title]}]")
         end
@@ -131,7 +131,7 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe 'type property' do
-    let (:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
+    let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
       it "should support a #{type} type" do
@@ -146,7 +146,7 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe 'data property' do
-    let (:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
+    let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
     context 'string data' do
       ['', 'foobar'].each do |data|
@@ -179,7 +179,7 @@ describe Puppet::Type.type(:registry_value) do
       end
 
       context 'for 64-bit integers' do
-        let :data do 0xFFFFFFFFFFFFFFFF end
+        let(:data) { 0xFFFFFFFFFFFFFFFF }
 
         it 'accepts qwords' do
           value[:type] = :qword
@@ -194,6 +194,7 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     context 'binary data' do
+      # rubocop:disable RSpec/RepeatedExample
       ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
         it "should accept '#{data}'" do
           value[:type] = :binary
@@ -206,6 +207,7 @@ describe Puppet::Type.type(:registry_value) do
           value[:data] = data
         end
       end
+      # rubocop:enable RSpec/RepeatedExample
 
       ["\040\040", 'foobar', :true].each do |data|
         it "should reject '#{data}'" do

@@ -11,7 +11,7 @@ def growl(message)
             (Regexp.last_match(1).to_i == 0) ? '~/.watchr_images/passed.png' : '~/.watchr_images/failed.png'
           else
             '~/.watchr_images/unknown.png'
-  end
+          end
   options = "-w -n Watchr --image '#{File.expand_path(image)}' -m '#{message}' '#{title}'"
   system %(#{growlnotify} #{options} &)
 end
@@ -70,8 +70,8 @@ Signal.trap 'INT' do
 end
 
 def file2spec(file)
-  result = file.sub('lib/puppet/', 'spec/unit/puppet/').gsub(%r{\.rb$}, '_spec.rb')
-  result = file.sub('lib/facter/', 'spec/unit/facter/').gsub(%r{\.rb$}, '_spec.rb')
+  _result = file.sub('lib/puppet/', 'spec/unit/puppet/').gsub(%r{\.rb$}, '_spec.rb')
+  _result = file.sub('lib/facter/', 'spec/unit/facter/').gsub(%r{\.rb$}, '_spec.rb')
 end
 
 watch('spec/.*_spec\.rb') do |_md|

@@ -1,20 +1,17 @@
-#!/usr/bin/env ruby -S rspec
 require 'spec_helper'
 require 'puppet/resource'
 require 'puppet/resource/catalog'
 require 'puppet/type/registry_key'
 
 describe Puppet::Type.type(:registry_key) do
-  let (:catalog) do Puppet::Resource::Catalog.new end
+  let(:catalog) { Puppet::Resource::Catalog.new }
 
   # This is overridden here so we get a consistent association with the key
   # and a catalog using memoized let methods.
-  let (:key) do
-    Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog)
-  end
+  let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog) }
   let(:provider) { Puppet::Provider.new(key) }
 
-  before :each do
+  before(:each) do
     key.provider = provider
   end
 
@@ -33,6 +30,7 @@ describe Puppet::Type.type(:registry_key) do
       Puppet::Type.type(:registry_key).attrtype(:path).must == :param
     end
 
+    # rubocop:disable RSpec/RepeatedExample
     ['hklm', 'hklm\\software', 'hklm\\software\\vendor'].each do |path|
       it "should accept #{path}" do
         key[:path] = path
@@ -44,6 +42,7 @@ describe Puppet::Type.type(:registry_key) do
         key[:path] = path
       end
     end
+    # rubocop:enable RSpec/RepeatedExample
 
     ['HKEY_DYN_DATA', 'HKEY_PERFORMANCE_DATA'].each do |path|
       it "should reject #{path} as unsupported case insensitively" do
@@ -81,13 +80,11 @@ describe Puppet::Type.type(:registry_key) do
     end
 
     context 'purging' do
-      let (:catalog) do Puppet::Resource::Catalog.new end
+      let(:catalog) { Puppet::Resource::Catalog.new }
 
       # This is overridden here so we get a consistent association with the key
       # and a catalog using memoized let methods.
-      let (:key) do
-        Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog)
-      end
+      let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog) }
 
       before :each do
         key[:purge_values] = true
@@ -102,6 +99,7 @@ describe Puppet::Type.type(:registry_key) do
         key.eval_generate.must be_empty
       end
 
+      # rubocop:disable Lint/Void
       it 'purges existing values that are not being managed (without backslash)' do
         expect(key.provider).to receive(:values).and_return(['val1', 'val\3', 'val99'])
         resources = key.eval_generate
@@ -132,6 +130,7 @@ describe Puppet::Type.type(:registry_key) do
         res[:ensure].must == :absent
         res[:path].must == "#{key[:path]}\\Val99"
       end
+      # rubocop:enable Lint/Void
 
       it 'returns an empty array if all existing values are being managed' do
         expect(key.provider).to receive(:values).and_return(['val1', 'val2', 'val\3'])
