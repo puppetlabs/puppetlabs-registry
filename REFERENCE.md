@@ -89,11 +89,6 @@ Default value: 'UNSET'
 
 ### registry::value
 
-This defined resource type provides a higher level of abstraction on top of
-the registry_key and registry_value resources.  Using this defined resource
-type, you do not need to explicitly manage the parent key for a particular
-value.  Puppet will automatically manage the parent key for you.
-
 Actions:
   - Manage the parent key if not already managed.
   - Manage the value
@@ -101,6 +96,11 @@ Actions:
 Requires:
   - Registry Module
   - Stdlib Module
+
+* **Note** This defined resource type provides a higher level of abstraction on top of
+the registry_key and registry_value resources.  Using this defined resource
+type, you do not need to explicitly manage the parent key for a particular
+value.  Puppet will automatically manage the parent key for you.
 
 #### Examples
 
