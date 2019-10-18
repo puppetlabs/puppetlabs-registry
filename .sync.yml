@@ -1,19 +1,5 @@
 ---
 Gemfile:
-  required:
-    ':system_tests':
-      - gem: 'puppet-module-posix-system-r#{minor_version}'
-        platforms: ruby
-      - gem: 'puppet-module-win-system-r#{minor_version}'
-        platforms:
-          - mswin
-          - mingw
-          - x64_mingw
-      - gem: beaker-testmode_switcher
-        version: '~> 0.4'
-      - gem: master_manipulator
-      - gem: puppet-blacksmith
-        version: '~> 3.4'
   optional:
     ':development':
       - gem: 'github_changelog_generator'
@@ -21,47 +7,14 @@ Gemfile:
         ref: '20ee04ba1234e9e83eb2ffb5056e23d641c7a018'
         condition: "Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')"
 
-
-.gitignore:
-  required:
-    - ---.project
-
-spec/default_facts.yml:
-  unmanaged: true
-
 .travis.yml:
   simplecov: true
 
-# The registry module doesn't support parallel_spec
 appveyor.yml:
   simplecov: true
-  matrix:
-    - RUBY_VERSION: 24-x64
-      CHECK: "syntax lint metadata_lint check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop"
-    - PUPPET_GEM_VERSION: ~> 4.0
-      RUBY_VERSION: 21
-      CHECK: spec
-    - PUPPET_GEM_VERSION: ~> 4.0
-      RUBY_VERSION: 21-x64
-      CHECK: spec
-    - PUPPET_GEM_VERSION: ~> 5.0
-      RUBY_VERSION: 24
-      CHECK: spec
-    - PUPPET_GEM_VERSION: ~> 5.0
-      RUBY_VERSION: 24-x64
-      CHECK: spec
-    - PUPPET_GEM_VERSION: ~> 6.0
-      RUBY_VERSION: 25
-      CHECK: spec
-    - PUPPET_GEM_VERSION: ~> 6.0
-      RUBY_VERSION: 25-x64
-      CHECK: spec
 
 .gitlab-ci.yml:
   delete: true
-
-Rakefile:
-  unmanaged: true
 
 spec/spec_helper.rb:
   mock_with: ':rspec'
