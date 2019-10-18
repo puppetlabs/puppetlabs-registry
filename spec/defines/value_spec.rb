@@ -3,114 +3,152 @@ require 'puppet/type/registry_key'
 require 'puppet/type/registry_value'
 
 RSpec.describe 'registry::value', type: :define do
-  let(:title) { 'RegistryTest' }
-  let(:facts) do
-    {
-      'operatingsystem' => 'windows',
-    }
-  end
+  let(:title) { 'value_name' }
 
-  context 'Given a minimal resource' do
-    let(:params) do
-      {
-        key: 'HKLM\Software\Vendor',
-      }
-    end
-
-    it { is_expected.to compile }
-
-    context 'On a non-windows platform' do
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
       let(:facts) do
-        {
-          'operatingsystem' => 'Debian',
-        }
+        facts
       end
 
-      it { is_expected.to compile.and_raise_error(%r{Unsupported OS}) }
-    end
-  end
+      context 'with an empty key' do
+        let(:params) { { key: '' } }
 
-  context 'Given an empty key' do
-    let(:params) do
-      {
-        key: '',
-      }
-    end
-
-    it { is_expected.to compile.and_raise_error(%r{parameter 'key'}) }
-  end
-
-  context 'Given an empty type' do
-    let(:params) do
-      {
-        key: 'HKLM\Software\Vendor',
-        type: '',
-      }
-    end
-
-    it { is_expected.to compile.and_raise_error(%r{parameter 'type'}) }
-  end
-
-  context 'Given a resource with string data' do
-    let(:params) do
-      {
-        key: 'HKLM\Software\Vendor',
-        data: 'KingKongBundy',
-      }
-    end
-
-    it { is_expected.to compile }
-  end
-
-  ['dword', 'qword'].each do |type|
-    context "Given a resource with #{type} numeric data" do
-      let(:params) do
-        {
-          key: 'HKLM\Software\Vendor',
-          type: type,
-          data: 42,
-        }
+        it { is_expected.to compile.and_raise_error(%r{parameter 'key'}) }
       end
 
-      it { is_expected.to compile }
-    end
-  end
+      context 'with a key specified' do
+        let(:params) { { key: 'HKLM\Software\Vendor' } }
 
-  context 'Given a resource with binary data' do
-    let(:params) do
-      {
-        key: 'HKLM\Software\Vendor',
-        type: 'binary',
-        data: '1',
-      }
-    end
-
-    it { is_expected.to compile }
-  end
-
-  ['string', 'expand'].each do |type|
-    context "Given a resource with string data typed as '#{type}'" do
-      let(:params) do
-        {
-          key: 'HKLM\Software\Vendor',
-          data: 'RavishingRickRude',
-          type: type,
+        it { is_expected.to compile }
+        it {
+          is_expected.to contain_registry_key('HKLM\Software\Vendor')
+            .with_ensure('present')
         }
-      end
+        it {
+          is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+            .with(
+              ensure: 'present',
+              type: 'string',
+              data: nil,
+            )
+        }
 
-      it { is_expected.to compile }
+        context 'with an empty type' do
+          let(:params) { super().merge(type: '') }
+
+          it { is_expected.to compile.and_raise_error(%r{parameter 'type'}) }
+        end
+
+        context 'with untyped string data' do
+          let(:params) { super().merge(data: 'some string data') }
+
+          it { is_expected.to compile }
+          it {
+            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+              .with(
+                ensure: 'present',
+                type: 'string',
+                data: 'some string data',
+              )
+          }
+        end
+
+        ['dword', 'qword'].each do |type|
+          context "with #{type} numeric data" do
+            let(:params) { super().merge(type: type, data: 42) }
+
+            it { is_expected.to compile }
+            it {
+              is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+                .with(
+                  ensure: 'present',
+                  type: type,
+                  data: 42,
+                )
+            }
+          end
+        end
+
+        context 'with binary data' do
+          let(:params) { super().merge(type: 'binary', data: '1') }
+
+          it { is_expected.to compile }
+          it {
+            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+              .with(
+                ensure: 'present',
+                type: 'binary',
+                data: '1',
+              )
+          }
+        end
+
+        ['string', 'expand'].each do |type|
+          context "with string data typed as '#{type}'" do
+            let(:params) { super().merge(type: type, data: 'some typed string data') }
+
+            it { is_expected.to compile }
+            it {
+              is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+                .with(
+                  ensure: 'present',
+                  type: type,
+                  data: 'some typed string data',
+                )
+            }
+          end
+        end
+
+        context 'with array data' do
+          let(:params) { super().merge(type: 'array', data: ['JakeTheSnake', 'AndreTheGiant']) }
+
+          it { is_expected.to compile }
+          it {
+            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+              .with(
+                ensure: 'present',
+                type: 'array',
+                data: ['JakeTheSnake', 'AndreTheGiant'],
+              )
+          }
+        end
+
+        context 'with an empty value name' do
+          let(:params) { super().merge(value: '(default)') }
+
+          it { is_expected.to compile }
+          it {
+            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\')
+              .with_ensure('present')
+          }
+        end
+
+        context 'with a value name override' do
+          let(:params) { super().merge(value: 'other_name') }
+
+          it { is_expected.to compile }
+          it {
+            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\other_name')
+              .with_ensure('present')
+          }
+        end
+      end
     end
   end
 
-  context 'Given a resource with array data' do
+  context 'On a non-windows platform' do
     let(:params) do
       {
-        key: 'HKLM\Software\Vendor',
-        data: ['JakeTheSnake', 'AndreTheGiant'],
-        type: 'array',
+        key: 'foo',
+      }
+    end
+    let(:facts) do
+      {
+        'operatingsystem' => 'bar',
       }
     end
 
-    it { is_expected.to compile }
+    it { is_expected.to compile.and_raise_error(%r{Unsupported OS bar}) }
   end
 end
