@@ -29,8 +29,12 @@ Gemfile:
 spec/default_facts.yml:
   unmanaged: true
 
+.travis.yml:
+  simplecov: true
+
 # The registry module doesn't support parallel_spec
 appveyor.yml:
+  simplecov: true
   matrix:
     - RUBY_VERSION: 24-x64
       CHECK: "syntax lint metadata_lint check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop"
