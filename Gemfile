@@ -1,4 +1,5 @@
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
+gem 'pdk', git: 'https://github.com/puppetlabs/pdk.git', branch: 'master'
 
 def location_for(place_or_version, fake_version = nil)
   git_url_regex = %r{\A(?<url>(https?|git)[:@][^#]*)(#(?<branch>.*))?}
@@ -29,8 +30,6 @@ group :development do
   gem "puppet-module-win-default-r#{minor_version}", '~> 0.3',   require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "puppet-module-win-dev-r#{minor_version}", '~> 0.3',       require: false, platforms: [:mswin, :mingw, :x64_mingw]
   gem "github_changelog_generator",                              require: false, git: 'https://github.com/skywinder/github-changelog-generator', ref: '20ee04ba1234e9e83eb2ffb5056e23d641c7a018' if Gem::Version.new(RUBY_VERSION.dup) >= Gem::Version.new('2.2.2')
-  # override the 'pdk' gem to master for now to workaround PDK-1525
-  gem 'pdk', git: 'git://github.com/puppetlabs/pdk.git'
 end
 
 puppet_version = ENV['PUPPET_GEM_VERSION']
