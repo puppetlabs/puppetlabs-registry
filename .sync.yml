@@ -11,7 +11,7 @@ Gemfile:
   simplecov: true
 
 appveyor.yml:
-  simplecov: true
+  unmanaged: true
 
 .gitlab-ci.yml:
   delete: true
