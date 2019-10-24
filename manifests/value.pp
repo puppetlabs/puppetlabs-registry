@@ -48,7 +48,7 @@ define registry::value (
 ) {
 
   # ensure windows os
-  if $::operatingsystem != 'windows'{
+  if $::operatingsystem != 'windows' {
     fail("Unsupported OS ${::operatingsystem}")
   }
 
@@ -73,4 +73,3 @@ define registry::value (
     data => $data,
   }
 }
-
