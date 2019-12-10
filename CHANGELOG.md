@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.1.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v3.1.0) (2019-12-10)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v3.0.0...v3.1.0)
+
+### Added
+
+- \(FM-8190\) convert module to litmus [\#190](https://github.com/puppetlabs/puppetlabs-registry/pull/190) ([DavidS](https://github.com/DavidS))
+
 ## [v3.0.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v3.0.0) (2019-10-17)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/2.1.0...v3.0.0)
