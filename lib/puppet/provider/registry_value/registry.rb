@@ -178,16 +178,30 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     raise error
   end
 
+  def wide_string_to_bytes(data)
+    bytes = Puppet::Util::Windows::String.wide_string(data).bytes.to_a
+    # versions prior to 7 embedded a wide null in the string content to work
+    # around ruby bugs, see PUP-3970
+    if Puppet::PUPPETVERSION[0].to_i >= 7
+      bytes << 0 << 0
+    else
+      bytes
+    end
+  end
+
+  # This method must include wide null terminators in the returned
+  # byte array for string-based registry values like REG_SZ. In
+  # addition REG_MULTI_SZ must append another wide null character
+  # to signify there are no more entries in the array.
   def data_to_bytes(type, data)
     bytes = []
 
     case type
     when Win32::Registry::REG_SZ, Win32::Registry::REG_EXPAND_SZ
-      bytes = Puppet::Util::Windows::String.wide_string(data).bytes.to_a
+      bytes = wide_string_to_bytes(data)
     when Win32::Registry::REG_MULTI_SZ
-      # each wide string is already NULL terminated
-      bytes = data.map { |s| Puppet::Util::Windows::String.wide_string(s).bytes.to_a }.flat_map { |a| a }
-      # requires an additional NULL terminator to terminate properly
+      bytes = data.map { |s| wide_string_to_bytes(s) }.flat_map { |a| a }
+      # requires an additional wide NULL terminator
       bytes << 0 << 0
     when Win32::Registry::REG_BINARY
       bytes = data.bytes.to_a
@@ -209,6 +223,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       bytes = data_to_bytes(type, data)
       FFI::MemoryPointer.new(:uchar, bytes.length) do |data_ptr|
         data_ptr.write_array_of_uchar(bytes)
+        # From https://docs.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regsetvalueexw
+        # "cbData must include the size of the terminating null character or characters"
         if RegSetValueExW(reg.hkey, name_ptr, 0,
                           type, data_ptr, data_ptr.size) != 0
           raise Puppet::Util::Windows::Error, 'Failed to write registry value'
