@@ -33,7 +33,7 @@
     }
   ],
   "description": "This module provides a native type and provider to manage keys and values in the Windows Registry",
-  "pdk-version": "1.17.0",
+  "pdk-version": "1.18.1",
   "template-url": "https://github.com/puppetlabs/pdk-templates#master",
-  "template-ref": "heads/master-0-g095317c"
+  "template-ref": "remotes/origin/master-0-ga58fd92"
 }
