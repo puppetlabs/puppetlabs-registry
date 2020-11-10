@@ -104,7 +104,7 @@ jobs:
       with:
         timeout_minutes: 30
         max_attempts: 5
-        retry_wait_seconds: 60
+        retry_wait_seconds: 90
         command: bundle exec rake 'litmus:install_agent[${{ matrix.collection }}]'
 
     # The agent installer on windows does not finish in time for this to work. To
