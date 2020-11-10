@@ -40,7 +40,7 @@ jobs:
       stage: spec
 branches:
   only:
-    - main
+    - master
     - /^v\d/
 notifications:
   email: false
