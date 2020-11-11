@@ -28,7 +28,7 @@
 #     ensure       => present,
 #     display_name => 'Puppet Agent',
 #     description  => 'Periodically fetches and applies
-#                   configurations from a Puppet master server.',
+#                   configurations from a Puppet Server.',
 #     command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 #   }
 #

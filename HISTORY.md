@@ -14,7 +14,7 @@
 
 ### Fixed
 - Fix types to no longer use unsupported proc title patterns ([MODULES-6818](https://tickets.puppetlabs.com/browse/MODULES-6818))
-- Fix acceptance tests in master-agent scenarios ([FM-6934](https://tickets.puppetlabs.com/browse/FM-6934))
+- Fix acceptance tests in server-agent scenarios ([FM-6934](https://tickets.puppetlabs.com/browse/FM-6934))
 - Use case insensitive search when purging ([MODULES-7534](https://tickets.puppetlabs.com/browse/MODULES-7534))
 
 ### Removed

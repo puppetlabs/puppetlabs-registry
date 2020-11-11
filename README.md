@@ -1,5 +1,5 @@
 # registry
-[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-registry.png?branch=master)](https://travis-ci.org/puppetlabs/puppetlabs-registry)
+[![Build Status](https://travis-ci.org/puppetlabs/puppetlabs-registry.png?branch=main)](https://travis-ci.org/puppetlabs/puppetlabs-registry)
 
 #### Table of Contents
 
@@ -22,7 +22,7 @@ The Registry is a hierarchical database built into Microsoft Windows. It stores 
 
 ## Setup
 
-This module must be installed on your Puppet master. We've tested it with Puppet agents running on Windows Server 2008 R2, 2012, and 2012 R2.
+This module must be installed on your Puppet server. We've tested it with Puppet agents running on Windows Server 2008 R2, 2012, and 2012 R2.
 
 ### Beginning with registry
 
@@ -73,14 +73,14 @@ registry_value { 'PuppetDescription':
 
 ``` puppet
 class myapp {
-  registry::value { 'puppetmaster':
+  registry::value { 'puppetserver':
     key  => 'HKLM\Software\Vendor\PuppetLabs',
     data => 'puppet.puppet.com',
   }
 }
 ```
 
-Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it contains a value named 'puppetmaster' containing the string 'puppet.puppet.com'.
+Puppet looks up the key 'HKLM\Software\Vendor\PuppetLabs' and makes sure it contains a value named 'puppetserver' containing the string 'puppet.puppet.com'.
 
 ### Set the default value for a key
 
@@ -146,13 +146,13 @@ This is an alternative approach to using INSTSRV.EXE [1](http://support.microsof
 registry::service { puppet:
   ensure       => present,
   display_name => "Puppet Agent",
-  description  => "Periodically fetches and applies configurations from a Puppet master server.",
+  description  => "Periodically fetches and applies configurations from a Puppet Server.",
   command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 }
 ```
 
 ## Reference
-For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-registry/blob/master/REFERENCE.md)
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-registry/blob/main/REFERENCE.md)
 
 ## Limitations
 
@@ -167,7 +167,7 @@ Puppet Inc modules on the Puppet Forge are open projects, and community contribu
 
 We want to keep it as easy as possible to contribute changes so that our modules work in your environment. There are a few guidelines that we need contributors to follow so that we can have a chance of keeping on top of things.
 
-If you would like to contribute to this module, please follow the rules in the [CONTRIBUTING.md](https://github.com/puppetlabs/puppetlabs-registry/blob/master/CONTRIBUTING.md). For more information, see our [module contribution guide.](https://puppet.com/docs/puppet/latest/contributing.html)
+If you would like to contribute to this module, please follow the rules in the [CONTRIBUTING.md](https://github.com/puppetlabs/puppetlabs-registry/blob/main/CONTRIBUTING.md). For more information, see our [module contribution guide.](https://puppet.com/docs/puppet/latest/contributing.html)
 
 ### Contributors
 

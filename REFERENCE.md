@@ -36,7 +36,7 @@ registry::service { puppet:
   ensure       => present,
   display_name => 'Puppet Agent',
   description  => 'Periodically fetches and applies
-                configurations from a Puppet master server.',
+                configurations from a Puppet Server.',
   command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 }
 ```
@@ -105,11 +105,11 @@ value.  Puppet will automatically manage the parent key for you.
 
 #### Examples
 
-##### This example will automatically manage the key. It will also create a value named 'puppetmaster' inside this key.
+##### This example will automatically manage the key. It will also create a value named 'puppetserver' inside this key.
 
 ```puppet
 class myapp {
-  registry::value { 'puppetmaster':
+  registry::value { 'puppetserver':
     key => 'HKLM\Software\Vendor\PuppetLabs',
     data => 'puppet.puppetlabs.com',
   }
