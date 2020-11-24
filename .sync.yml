@@ -42,3 +42,7 @@ Gemfile:
 spec/spec_helper.rb:
   mock_with: ":rspec"
   coverage_report: true
+.github/workflows/nightly.yml:
+  unmanaged: false
+.github/workflows/pr_test.yml:
+  unmanaged: false
