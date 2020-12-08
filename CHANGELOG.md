@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.2.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v3.2.0) (2020-12-08)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v3.1.1...v3.2.0)
+
+### Added
+
+- pdksync - \(feat\) Add support for Puppet 7 [\#231](https://github.com/puppetlabs/puppetlabs-registry/pull/231) ([daianamezdrea](https://github.com/daianamezdrea))
+- pdksync - \(IAC-973\) - Update travis/appveyor to run on new default branch `main` [\#217](https://github.com/puppetlabs/puppetlabs-registry/pull/217) ([david22swan](https://github.com/david22swan))
+
 ## [v3.1.1](https://github.com/puppetlabs/puppetlabs-registry/tree/v3.1.1) (2020-08-12)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v3.1.0...v3.1.1)
