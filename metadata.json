@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-registry",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "author": "puppetlabs",
   "summary": "This module provides a native type and provider to manage keys and values in the Windows Registry",
   "license": "Apache-2.0",
@@ -29,11 +29,11 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 5.5.10 < 7.0.0"
+      "version_requirement": ">= 5.5.10 < 8.0.0"
     }
   ],
   "description": "This module provides a native type and provider to manage keys and values in the Windows Registry",
   "pdk-version": "1.18.1",
   "template-url": "https://github.com/puppetlabs/pdk-templates#main",
-  "template-ref": "heads/main-0-g874030e"
+  "template-ref": "heads/main-0-g5afcd3d"
 }
