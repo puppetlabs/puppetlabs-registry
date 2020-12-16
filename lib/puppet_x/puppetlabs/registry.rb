@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @api private
 # rubocop:disable Style/ClassAndModuleChildren
 module PuppetX

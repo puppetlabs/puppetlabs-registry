@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # The manifest used for testing, is located in spec/fixtures/mixed_default_settings/manifests/init.pp

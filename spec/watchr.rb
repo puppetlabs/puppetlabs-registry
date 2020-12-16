@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ENV['AUTOTEST'] = 'true'
 ENV['WATCHR']   = '1'
 
