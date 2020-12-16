@@ -26,7 +26,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
-    # rubocop:disable RSpec/ExpectInHook
     expect(instance).to receive(:export_string).never
 
     expect(instance).to receive(:delete_value).never

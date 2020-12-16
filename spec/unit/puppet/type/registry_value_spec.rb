@@ -7,11 +7,11 @@ describe Puppet::Type.type(:registry_value) do
   let(:catalog) { Puppet::Resource::Catalog.new }
 
   [:ensure, :type, :data].each do |property|
-    it "should have a #{property} property" do
+    it "has a #{property} property" do
       described_class.attrclass(property).ancestors.should be_include(Puppet::Property)
     end
 
-    it "should have documentation for its #{property} property" do
+    it "has documentation for its #{property} property" do
       described_class.attrclass(property).doc.should be_instance_of(String)
     end
   end
@@ -22,13 +22,13 @@ describe Puppet::Type.type(:registry_value) do
     end
     # rubocop:disable RSpec/RepeatedExample
     ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
-      it "should accept #{path}" do
+      it "accepts #{path}" do
         described_class.new(path: path, catalog: catalog)
       end
     end
 
     ['hklm\\', 'hklm\\software\\', 'hklm\\software\\vendor\\'].each do |path|
-      it "should accept the unnamed (default) value: #{path}" do
+      it "accepts the unnamed (default) value: #{path}" do
         described_class.new(path: path, catalog: catalog)
       end
     end
@@ -41,26 +41,26 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     ['HKEY_DYN_DATA\\', 'HKEY_PERFORMANCE_DATA\\name'].each do |path|
-      it "should reject #{path} as unsupported" do
+      it "rejects #{path} as unsupported" do
         expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Unsupported})
       end
     end
 
     ['hklm', 'hkcr', 'unknown\\name', 'unknown\\subkey\\name'].each do |path|
-      it "should reject #{path} as invalid" do
+      it "rejects #{path} as invalid" do
         expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Invalid registry key})
       end
     end
 
     ['HKLM\\name', 'HKEY_LOCAL_MACHINE\\name', 'hklm\\name'].each do |root|
-      it "should canonicalize root key #{root}" do
+      it "canonicalizes root key #{root}" do
         value = described_class.new(path: root, catalog: catalog)
         value[:path].should == 'hklm\name'
       end
     end
 
     ['HKLM\\Software\\\\nam\\e', 'HKEY_LOCAL_MACHINE\\Software\\\\nam\\e', 'hklm\\Software\\\\nam\\e'].each do |root|
-      it "should use a double backslash when canonicalizing value names with a backslash #{root}" do
+      it "uses a double backslash when canonicalizing value names with a backslash #{root}" do
         value = described_class.new(path: root, catalog: catalog)
         value[:path].should == 'hklm\Software\\\\nam\e'
       end
@@ -72,7 +72,7 @@ describe Puppet::Type.type(:registry_value) do
       'HKLM\\Software\\\\TrailingSlashes\\'  => 'hklm\\Software\\\\TrailingSlashes\\',
       'HKLM\\Software\\\\\\'                 => 'hklm\\Software\\\\\\', # A value name of backslash
     }.each do |testcase, expected_value|
-      it "should use a double backslash as a delimeter between path and value for title #{testcase}" do
+      it "uses a double backslash as a delimeter between path and value for title #{testcase}" do
         value = described_class.new(path: testcase, catalog: catalog)
         value[:path].should == expected_value
       end
@@ -136,7 +136,7 @@ describe Puppet::Type.type(:registry_value) do
     let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
-      it "should support a #{type} type" do
+      it "supports a #{type} type" do
         value[:type] = type
         value[:type].should == type
       end
@@ -152,7 +152,7 @@ describe Puppet::Type.type(:registry_value) do
 
     context 'string data' do
       ['', 'foobar'].each do |data|
-        it "should accept '#{data}'" do
+        it "accepts '#{data}'" do
           value[:type] = :string
           value[:data] = data
         end
@@ -165,14 +165,14 @@ describe Puppet::Type.type(:registry_value) do
       [:dword, :qword].each do |type|
         context "for #{type}" do
           [0, 0xFFFFFFFF, -1, 42].each do |data|
-            it "should accept #{data}" do
+            it "accepts #{data}" do
               value[:type] = type
               value[:data] = data
             end
           end
 
           ['foobar', ':true'].each do |data|
-            it "should reject #{data}" do
+            it "rejects #{data}" do
               value[:type] = type
               expect { value[:data] = data }.to raise_error(Puppet::Error)
             end
@@ -198,13 +198,13 @@ describe Puppet::Type.type(:registry_value) do
     context 'binary data' do
       # rubocop:disable RSpec/RepeatedExample
       ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
-        it "should accept '#{data}'" do
+        it "accepts '#{data}'" do
           value[:type] = :binary
           value[:data] = data
         end
       end
       [9, '1', 'A'].each do |data|
-        it "should accept '#{data}' and have a leading zero" do
+        it "accepts '#{data}' and have a leading zero" do
           value[:type] = :binary
           value[:data] = data
         end
@@ -212,7 +212,7 @@ describe Puppet::Type.type(:registry_value) do
       # rubocop:enable RSpec/RepeatedExample
 
       ["\040\040", 'foobar', :true].each do |data|
-        it "should reject '#{data}'" do
+        it "rejects '#{data}'" do
           value[:type] = :binary
           expect { value[:data] = data }.to raise_error(Puppet::Error)
         end
@@ -231,7 +231,7 @@ describe Puppet::Type.type(:registry_value) do
       end
 
       [[''], nil, ['', 'foo', 'bar'], ['foo', '', 'bar'], ['foo', 'bar', '']].each do |data|
-        it "should reject '#{data}'" do
+        it "rejects '#{data}'" do
           value[:type] = :array
           expect { value[:data] = data }.to raise_error(Puppet::Error)
         end
