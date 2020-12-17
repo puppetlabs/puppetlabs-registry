@@ -32,7 +32,7 @@ describe Puppet::Type.type(:registry_key) do
       Puppet::Type.type(:registry_key).attrtype(:path).must == :param
     end
 
-    # rubocop:disable RSpec/RepeatedExample
+    # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
     ['hklm', 'hklm\\software', 'hklm\\software\\vendor'].each do |path|
       it "accepts #{path}" do
         key[:path] = path
@@ -44,7 +44,7 @@ describe Puppet::Type.type(:registry_key) do
         key[:path] = path
       end
     end
-    # rubocop:enable RSpec/RepeatedExample
+    # rubocop:enable RSpec/RepeatedExample,RSpec/RepeatedDescription
 
     ['HKEY_DYN_DATA', 'HKEY_PERFORMANCE_DATA'].each do |path|
       it "rejects #{path} as unsupported case insensitively" do
