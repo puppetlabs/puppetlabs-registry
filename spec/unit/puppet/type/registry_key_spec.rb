@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'puppet/resource'
 require 'puppet/resource/catalog'
@@ -16,11 +18,11 @@ describe Puppet::Type.type(:registry_key) do
   end
 
   [:ensure].each do |property|
-    it "should have a #{property} property" do
+    it "has a #{property} property" do
       described_class.attrclass(property).ancestors.should be_include(Puppet::Property)
     end
 
-    it "should have documentation for its #{property} property" do
+    it "has documentation for its #{property} property" do
       described_class.attrclass(property).doc.should be_instance_of(String)
     end
   end
@@ -30,35 +32,35 @@ describe Puppet::Type.type(:registry_key) do
       Puppet::Type.type(:registry_key).attrtype(:path).must == :param
     end
 
-    # rubocop:disable RSpec/RepeatedExample
+    # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
     ['hklm', 'hklm\\software', 'hklm\\software\\vendor'].each do |path|
-      it "should accept #{path}" do
+      it "accepts #{path}" do
         key[:path] = path
       end
     end
 
     ['hku', 'hku\\.DEFAULT', 'hku\\.DEFAULT\\software', 'hku\\.DEFAULT\\software\\vendor'].each do |path|
-      it "should accept #{path}" do
+      it "accepts #{path}" do
         key[:path] = path
       end
     end
-    # rubocop:enable RSpec/RepeatedExample
+    # rubocop:enable RSpec/RepeatedExample,RSpec/RepeatedDescription
 
     ['HKEY_DYN_DATA', 'HKEY_PERFORMANCE_DATA'].each do |path|
-      it "should reject #{path} as unsupported case insensitively" do
+      it "rejects #{path} as unsupported case insensitively" do
         expect { key[:path] = path }.to raise_error(Puppet::Error, %r{Unsupported})
       end
     end
 
     ['hklm\\', 'hklm\\foo\\', 'unknown', 'unknown\\subkey', '\\:hkey'].each do |path|
-      it "should reject #{path} as invalid" do
+      it "rejects #{path} as invalid" do
         path = 'hklm\\' + 'a' * 256
         expect { key[:path] = path }.to raise_error(Puppet::Error, %r{Invalid registry key})
       end
     end
 
     ['HKLM', 'HKEY_LOCAL_MACHINE', 'hklm'].each do |root|
-      it "should canonicalize the root key #{root}" do
+      it "canonicalizes the root key #{root}" do
         key[:path] = root
         key[:path].must == 'hklm'
       end

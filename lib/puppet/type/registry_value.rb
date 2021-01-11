@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'puppet/type'
 begin
   require 'puppet_x/puppetlabs/registry'

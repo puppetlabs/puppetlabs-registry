@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # REMIND: need to support recursive delete of subkeys & values
 begin
   # We expect this to work once Puppet supports Rubygems in #7788
