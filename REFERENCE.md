@@ -16,7 +16,7 @@
 
 ## Defined types
 
-### `registry::service`
+### <a name="registryservice"></a>`registry::service`
 
 Manages the values in the key HKLM\System\CurrentControlSet\Services\$name\
 
@@ -43,9 +43,15 @@ registry::service { puppet:
 
 #### Parameters
 
-The following parameters are available in the `registry::service` defined type.
+The following parameters are available in the `registry::service` defined type:
 
-##### `ensure`
+* [`ensure`](#ensure)
+* [`display_name`](#display_name)
+* [`description`](#description)
+* [`command`](#command)
+* [`start`](#start)
+
+##### <a name="ensure"></a>`ensure`
 
 Data type: `present, absent`
 
@@ -53,7 +59,7 @@ Data type: `present, absent`
 
 Default value: `'UNSET'`
 
-##### `display_name`
+##### <a name="display_name"></a>`display_name`
 
 Data type: `Any`
 
@@ -62,7 +68,7 @@ the resource.
 
 Default value: `'UNSET'`
 
-##### `description`
+##### <a name="description"></a>`description`
 
 Data type: `Any`
 
@@ -70,7 +76,7 @@ A description of the service
 
 Default value: `'UNSET'`
 
-##### `command`
+##### <a name="command"></a>`command`
 
 Data type: `Any`
 
@@ -78,7 +84,7 @@ The command to execute
 
 Default value: `'UNSET'`
 
-##### `start`
+##### <a name="start"></a>`start`
 
 Data type: `Any`
 
@@ -88,7 +94,7 @@ resource can also be used to manage this setting.)
 
 Default value: `'UNSET'`
 
-### `registry::value`
+### <a name="registryvalue"></a>`registry::value`
 
 Actions:
   - Manage the parent key if not already managed.
@@ -118,15 +124,20 @@ class myapp {
 
 #### Parameters
 
-The following parameters are available in the `registry::value` defined type.
+The following parameters are available in the `registry::value` defined type:
 
-##### `key`
+* [`key`](#key)
+* [`value`](#value)
+* [`type`](#type)
+* [`data`](#data)
+
+##### <a name="key"></a>`key`
 
 Data type: `Pattern[/^\w+/]`
 
 The path of key the value will placed inside.
 
-##### `value`
+##### <a name="value"></a>`value`
 
 Data type: `Optional[String]`
 
@@ -136,7 +147,7 @@ the resource title if not specified.  The special value of
 
 Default value: ``undef``
 
-##### `type`
+##### <a name="type"></a>`type`
 
 Data type: `Optional[Pattern[/^\w+/]]`
 
@@ -146,7 +157,7 @@ The type the registry value.  Defaults to 'string'.  See the output of
 
 Default value: `'string'`
 
-##### `data`
+##### <a name="data"></a>`data`
 
 Data type: `Optional[Variant[
     String,
@@ -160,7 +171,7 @@ Default value: ``undef``
 
 ## Resource types
 
-### `registry_key`
+### <a name="registry_key"></a>`registry_key`
 
 Manages registry keys on Windows
 
@@ -180,16 +191,20 @@ Default value: `present`
 
 The following parameters are available in the `registry_key` type.
 
-##### `path`
+* [`path`](#path)
+* [`provider`](#provider)
+* [`purge_values`](#purge_values)
+
+##### <a name="path"></a>`path`
 
 The path to the registry key to manage
 
-##### `provider`
+##### <a name="provider"></a>`provider`
 
 The specific backend to use for this `registry_key` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### `purge_values`
+##### <a name="purge_values"></a>`purge_values`
 
 Valid values: ``true``, ``false``
 
@@ -197,7 +212,7 @@ Common boolean for munging and validation.
 
 Default value: ``false``
 
-### `registry_value`
+### <a name="registry_value"></a>`registry_value`
 
 Manages registry values on Windows systems.
 
@@ -231,11 +246,14 @@ Default value: `string`
 
 The following parameters are available in the `registry_value` type.
 
-##### `path`
+* [`path`](#path)
+* [`provider`](#provider)
+
+##### <a name="path"></a>`path`
 
 The path to the registry value to manage.
 
-##### `provider`
+##### <a name="provider"></a>`provider`
 
 The specific backend to use for this `registry_value` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
