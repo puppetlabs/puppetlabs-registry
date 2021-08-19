@@ -100,41 +100,49 @@ Puppet::Type.newtype(:registry_value) do
       case resource[:type]
       when :array
         raise('An array registry value can not contain empty values') if value.empty?
-      else
+      when :dword
+        munged = munge(value)
+        unless munged && (munged.abs >> 32) <= 0
+          raise("The data must be a valid DWORD: received '#{value}'")
+        end
+      when :qword
+        munged = munge(value)
+        unless munged && (munged.abs >> 64) <= 0
+          raise("The data must be a valid QWORD: received '#{value}'")
+        end
+      when :binary
+        munged = munge(value)
+        unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
+          raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'")
+        end
+      else #:string, :expand, :array
         true
       end
     end
 
     munge do |value|
       case resource[:type]
-      when :dword
-        val = begin
-                Integer(value)
-              rescue
-                nil
-              end
-        raise("The data must be a valid DWORD: #{value}") unless val && (val.abs >> 32) <= 0
-        val
-      when :qword
-        val = begin
-                Integer(value)
-              rescue
-                nil
-              end
-        raise("The data must be a valid QWORD: #{value}") unless val && (val.abs >> 64) <= 0
-        val
+      when :dword, :qword
+        begin
+          Integer(value)
+        rescue
+          nil
+        end
       when :binary
-        if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
-          value = "0#{value}"
-        end
-        unless value =~ %r{^([a-f\d]{2} ?)*$}i
-          raise("The data must be a hex encoded string of the form: '00 01 02 ...'")
-        end
+        munged = if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
+                   "0#{value}"
+                 else
+                   value
+                 end
+
         # First, strip out all spaces from the string in the manfest.  Next,
         # put a space after each pair of hex digits.  Strip off the rightmost
         # space if it's present.  Finally, downcase the whole thing.  The final
         # result should be: "CaFE BEEF" => "ca fe be ef"
-        value.gsub(%r{\s+}, '').gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }.rstrip.downcase
+        munged.gsub(%r{\s+}, '')
+              .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
+              .rstrip
+              .downcase
       else #:string, :expand, :array
         value
       end
