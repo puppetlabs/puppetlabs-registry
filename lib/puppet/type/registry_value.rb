@@ -94,7 +94,13 @@ Puppet::Type.newtype(:registry_value) do
     @doc = <<-EOT
       The data stored in the registry value.
     EOT
-    defaultto ''
+
+    # We probably shouldn't set default values for this property at all. For
+    # dword and qword specifically, the legacy default value will not pass
+    # validation. As such, no default value will be set for those types. At
+    # least for now, other types will still have the legacy empty-string
+    # default value.
+    defaultto { [:dword, :qword].include?(resource[:type]) ? nil : '' }
 
     validate do |value|
       case resource[:type]
