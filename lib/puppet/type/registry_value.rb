@@ -175,6 +175,15 @@ Puppet::Type.newtype(:registry_value) do
     end
   end
 
+  validate do
+    # To ensure consistent behavior, always require a value for the data
+    # property. This validation can be removed if we remove the default value
+    # for the data property, for all data types.
+    if property(:data).nil?
+      raise ArgumentError, "No value supplied for required property 'data'"
+    end
+  end
+
   # Autorequire the nearest ancestor registry_key found in the catalog.
   autorequire(:registry_key) do
     req = []
