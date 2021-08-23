@@ -94,47 +94,61 @@ Puppet::Type.newtype(:registry_value) do
     @doc = <<-EOT
       The data stored in the registry value.
     EOT
-    defaultto ''
+
+    # We probably shouldn't set default values for this property at all. For
+    # dword and qword specifically, the legacy default value will not pass
+    # validation. As such, no default value will be set for those types. At
+    # least for now, other types will still have the legacy empty-string
+    # default value.
+    defaultto { [:dword, :qword].include?(resource[:type]) ? nil : '' }
 
     validate do |value|
       case resource[:type]
       when :array
         raise('An array registry value can not contain empty values') if value.empty?
-      else
+      when :dword
+        munged = munge(value)
+        unless munged && (munged.abs >> 32) <= 0
+          raise("The data must be a valid DWORD: received '#{value}'")
+        end
+      when :qword
+        munged = munge(value)
+        unless munged && (munged.abs >> 64) <= 0
+          raise("The data must be a valid QWORD: received '#{value}'")
+        end
+      when :binary
+        munged = munge(value)
+        unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
+          raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'")
+        end
+      else #:string, :expand, :array
         true
       end
     end
 
     munge do |value|
       case resource[:type]
-      when :dword
-        val = begin
-                Integer(value)
-              rescue
-                nil
-              end
-        raise("The data must be a valid DWORD: #{value}") unless val && (val.abs >> 32) <= 0
-        val
-      when :qword
-        val = begin
-                Integer(value)
-              rescue
-                nil
-              end
-        raise("The data must be a valid QWORD: #{value}") unless val && (val.abs >> 64) <= 0
-        val
+      when :dword, :qword
+        begin
+          Integer(value)
+        rescue
+          nil
+        end
       when :binary
-        if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
-          value = "0#{value}"
-        end
-        unless value =~ %r{^([a-f\d]{2} ?)*$}i
-          raise("The data must be a hex encoded string of the form: '00 01 02 ...'")
-        end
+        munged = if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
+                   "0#{value}"
+                 else
+                   value
+                 end
+
         # First, strip out all spaces from the string in the manfest.  Next,
         # put a space after each pair of hex digits.  Strip off the rightmost
         # space if it's present.  Finally, downcase the whole thing.  The final
         # result should be: "CaFE BEEF" => "ca fe be ef"
-        value.gsub(%r{\s+}, '').gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }.rstrip.downcase
+        munged.gsub(%r{\s+}, '')
+              .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
+              .rstrip
+              .downcase
       else #:string, :expand, :array
         value
       end
@@ -158,6 +172,15 @@ Puppet::Type.newtype(:registry_value) do
         newvalue = newvalue.join(',')
       end
       super(currentvalue, newvalue)
+    end
+  end
+
+  validate do
+    # To ensure consistent behavior, always require a value for the data
+    # property. This validation can be removed if we remove the default value
+    # for the data property, for all data types.
+    if property(:data).nil?
+      raise ArgumentError, "No value supplied for required property 'data'"
     end
   end
 
