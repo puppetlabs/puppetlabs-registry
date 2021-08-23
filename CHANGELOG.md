@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.0.1](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.0.1) (2021-08-23)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.0.0...v4.0.1)
+
+### Fixed
+
+- Add possibility to produce a detailed error message  [\#254](https://github.com/puppetlabs/puppetlabs-registry/pull/254) ([reidmv](https://github.com/reidmv))
+
 ## [v4.0.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.0.0) (2021-02-27)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v3.2.0...v4.0.0)
