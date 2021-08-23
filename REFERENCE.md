@@ -224,8 +224,6 @@ The following properties are available in the `registry_value` type.
 
 The data stored in the registry value.
 
-Default value: `''`
-
 ##### `ensure`
 
 Valid values: `present`, `absent`
