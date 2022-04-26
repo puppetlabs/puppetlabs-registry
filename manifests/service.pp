@@ -32,14 +32,13 @@
 #     command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 #   }
 #
-define registry::service(
+define registry::service (
   $ensure       = 'UNSET',
   $display_name = 'UNSET',
   $description  = 'UNSET',
   $command      = 'UNSET',
   $start        = 'UNSET'
 ) {
-
   $ensure_real = $ensure ? {
     'UNSET'  => present,
     undef   => present,
