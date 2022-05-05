@@ -20,16 +20,14 @@ class { 'registry': }
 # Define a new service named "Puppet Test" that is disabled.
 registry::service { 'PuppetExample1':
   display_name => 'Puppet Example 1',
-  description  =>
-  'This is a simple example managing the
+  description  => 'This is a simple example managing the
     registry entries for a Windows Service',
   command      => 'C:\PuppetExample1.bat',
   start        => 'disabled',
 }
 registry::service { 'PuppetExample2':
   display_name => 'Puppet Example 2',
-  description  =>
-  'This is a simple example
+  description  => 'This is a simple example
     managing the registry entries for a Windows Service',
   command      => 'C:\PuppetExample2.bat',
   start        => 'disabled',

@@ -73,7 +73,7 @@ case $::purge_example_mode {
     registry_value { "${key_path}\\Value4":
       ensure => present,
       type   => array,
-      data   => [ 'one', 'two', 'three' ],
+      data   => ['one', 'two', 'three'],
     }
     registry_value { "${key_path}\\Value5":
       ensure => present,

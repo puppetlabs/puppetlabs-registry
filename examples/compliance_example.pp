@@ -28,7 +28,7 @@ case $::registry_compliance_example_mode {
     notify { 'compliance_example_mode_info':
       message => 'Switch to audit mode using
       \$env:FACTER_REGISTRY_COMPLIANCE_EXAMPLE_MODE = \'audit\'',
-      before  => Notify['compliance_example_mode']
+      before  => Notify['compliance_example_mode'],
     }
   }
 }
@@ -41,7 +41,7 @@ notify { 'compliance_example_mode':
 Registry_key {
   ensure => $mode ? {
     setup   => present,
-    default => undef
+    default => undef,
   },
   purge_values => $mode ? {
     setup   => true,

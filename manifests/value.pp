@@ -37,16 +37,15 @@
 #   }
 #
 define registry::value (
-  Pattern[/^\w+/]           $key,
-  Optional[String]          $value = undef,
-  Optional[Pattern[/^\w+/]] $type = 'string',
+  Pattern[/^\w+/] $key,
+  Optional[String] $value   = undef,
+  Pattern[/^\w+/] $type     = 'string',
   Optional[Variant[
-    String,
-    Numeric,
-    Array[String]
-  ]]                       $data  = undef,
+      String,
+      Numeric,
+      Array[String]
+  ]] $data                  = undef,
 ) {
-
   # ensure windows os
   if $::operatingsystem != 'windows' {
     fail("Unsupported OS ${::operatingsystem}")
