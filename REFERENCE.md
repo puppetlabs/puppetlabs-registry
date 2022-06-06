@@ -149,7 +149,7 @@ Default value: ``undef``
 
 ##### <a name="type"></a>`type`
 
-Data type: `Optional[Pattern[/^\w+/]]`
+Data type: `Pattern[/^\w+/]`
 
 The type the registry value.  Defaults to 'string'.  See the output of
 `puppet describe registry_value` for a list of supported types in the
@@ -160,9 +160,9 @@ Default value: `'string'`
 ##### <a name="data"></a>`data`
 
 Data type: `Optional[Variant[
-    String,
-    Numeric,
-    Array[String]
+      String,
+      Numeric,
+      Array[String]
   ]]`
 
 The data to place inside the registry value.
