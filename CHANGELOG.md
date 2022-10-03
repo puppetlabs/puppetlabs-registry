@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.1.1](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.1) (2022-10-03)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.1.0...v4.1.1)
+
+### Fixed
+
+- \(MAINT\) Dropped support for Windows\(7,8, 2008 Server and 2008 R2 Server\) [\#267](https://github.com/puppetlabs/puppetlabs-registry/pull/267) ([jordanbreen28](https://github.com/jordanbreen28))
+
 ## [v4.1.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.0) (2022-06-06)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.0.1...v4.1.0)
