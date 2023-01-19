@@ -67,9 +67,9 @@ define registry::service (
 
   # Map descriptive names to flags.
   $start_real = $start ? {
-    automatic => 2,
-    manual    => 3,
-    disabled  => 4,
+    'automatic' => 2,
+    'manual'    => 3,
+    'disabled'  => 4,
   }
 
   # Variable to hold the base key path.
