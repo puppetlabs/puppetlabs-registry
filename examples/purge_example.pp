@@ -31,12 +31,12 @@
 #   include registry::purge_example
 #
 # (MARKUP: http://links.puppetlabs.com/puppet_manifest_documentation)
-class { '::registry': }
+class { 'registry': }
 
 $key_path = 'HKLM\Software\Vendor\Puppet Labs\Examples\KeyPurge'
 
-case $::purge_example_mode {
-  setup: {
+case $purge_example_mode {
+  'setup': {
     registry_key { $key_path:
       ensure       => present,
       purge_values => false,
@@ -86,7 +86,7 @@ case $::purge_example_mode {
       data   => '01AB CDEF',
     }
   }
-  purge: {
+  'purge': {
     registry_key { $key_path:
       ensure       => present,
       purge_values => true,

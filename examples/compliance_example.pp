@@ -15,12 +15,12 @@
 #   include registry::compliance_example
 #
 # (MARKUP: http://links.puppetlabs.com/puppet_manifest_documentation)
-class { '::registry': }
+class { 'registry': }
 
 $key_path = 'HKLM\Software\Vendor\Puppet Labs\Examples\Compliance'
 
-case $::registry_compliance_example_mode {
-  audit: {
+case $registry_compliance_example_mode {
+  'audit': {
     $mode = 'audit'
   }
   default: {
