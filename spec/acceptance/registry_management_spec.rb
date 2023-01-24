@@ -16,7 +16,7 @@ describe 'Registry Management' do
       # use a different case here, to exercise the case-conversion codepaths
       registry_key { 'HKLM\\Software\\VENDOR': ensure => present }
 
-      registry_key { '#{keypath}': ensure => present }
+      registry_key { '#{keypath}': ensure => 'present' }
       registry_key { '#{keypath}\\SubKey1': ensure => present }
 
       registry_key   { '#{keypath}\\SubKeyToPurge': ensure => present }

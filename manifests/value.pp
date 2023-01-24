@@ -47,8 +47,8 @@ define registry::value (
   ]] $data                  = undef,
 ) {
   # ensure windows os
-  if $::operatingsystem != 'windows' {
-    fail("Unsupported OS ${::operatingsystem}")
+  if $facts['os']['name'] != 'windows' {
+    fail("Unsupported OS ${facts['os']['name']}")
   }
 
   $value_real = $value ? {

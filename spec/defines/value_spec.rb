@@ -147,7 +147,7 @@ RSpec.describe 'registry::value', type: :define do
     end
     let(:facts) do
       {
-        'operatingsystem' => 'bar',
+        os: { name: 'bar' },
       }
     end
 

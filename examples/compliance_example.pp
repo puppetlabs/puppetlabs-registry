@@ -15,12 +15,12 @@
 #   include registry::compliance_example
 #
 # (MARKUP: http://links.puppetlabs.com/puppet_manifest_documentation)
-class { '::registry': }
+class { 'registry': }
 
 $key_path = 'HKLM\Software\Vendor\Puppet Labs\Examples\Compliance'
 
-case $::registry_compliance_example_mode {
-  audit: {
+case $registry_compliance_example_mode {
+  'audit': {
     $mode = 'audit'
   }
   default: {
@@ -40,29 +40,29 @@ notify { 'compliance_example_mode':
 # Resource Defaults
 Registry_key {
   ensure => $mode ? {
-    setup   => present,
+    'setup'   => present,
     default => undef,
   },
   purge_values => $mode ? {
-    setup   => true,
+    'setup'   => true,
     default => false,
   },
 }
 Registry_value {
   ensure => $mode ? {
-    setup   => present,
+    'setup'   => present,
     default => undef,
   },
   type   => $mode ? {
-    setup   => string,
+    'setup'   => string,
     default => undef,
   },
   data   => $mode ? {
-    setup   => 'Puppet Default Data',
+    'setup'   => 'Puppet Default Data',
     default => undef,
   },
   audit  => $mode ? {
-    setup   => undef,
+    'setup'   => undef,
     default => all,
   },
 }
