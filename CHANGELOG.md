@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.1.2](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.2) (2023-03-23)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.1.1...v4.1.2)
+
+### Fixed
+
+- \(CONT-362\) Syntax update [\#273](https://github.com/puppetlabs/puppetlabs-registry/pull/273) ([LukasAud](https://github.com/LukasAud))
+
 ## [v4.1.1](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.1) (2022-10-03)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.1.0...v4.1.1)
