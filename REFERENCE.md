@@ -6,8 +6,8 @@
 
 ### Defined types
 
-* [`registry::service`](#registryservice): Defined resource type that manages service entries
-* [`registry::value`](#registryvalue): High level abstraction on top of registry_key and registry_value resources
+* [`registry::service`](#registry--service): Defined resource type that manages service entries
+* [`registry::value`](#registry--value): High level abstraction on top of registry_key and registry_value resources
 
 ### Resource types
 
@@ -16,7 +16,7 @@
 
 ## Defined types
 
-### <a name="registryservice"></a>`registry::service`
+### <a name="registry--service"></a>`registry::service`
 
 Manages the values in the key HKLM\System\CurrentControlSet\Services\$name\
 
@@ -36,7 +36,7 @@ registry::service { puppet:
   ensure       => present,
   display_name => 'Puppet Agent',
   description  => 'Periodically fetches and applies
-                configurations from a Puppet Server.',
+                   configurations from a Puppet Server.',
   command      => 'C:\PuppetLabs\Puppet\service\daemon.bat',
 }
 ```
@@ -45,56 +45,55 @@ registry::service { puppet:
 
 The following parameters are available in the `registry::service` defined type:
 
-* [`ensure`](#ensure)
-* [`display_name`](#display_name)
-* [`description`](#description)
-* [`command`](#command)
-* [`start`](#start)
+* [`ensure`](#-registry--service--ensure)
+* [`display_name`](#-registry--service--display_name)
+* [`description`](#-registry--service--description)
+* [`command`](#-registry--service--command)
+* [`start`](#-registry--service--start)
 
-##### <a name="ensure"></a>`ensure`
+##### <a name="-registry--service--ensure"></a>`ensure`
 
-Data type: `present, absent`
+Data type: `Enum['present', 'absent', 'UNSET']`
 
-
-
-Default value: `'UNSET'`
-
-##### <a name="display_name"></a>`display_name`
-
-Data type: `Any`
-
-The Display Name of the service.  Defaults to the title of
-the resource.
+Ensures the presence or absence of a registry key. Valid values: 'present', 'absent', 'UNSET'.
 
 Default value: `'UNSET'`
 
-##### <a name="description"></a>`description`
+##### <a name="-registry--service--display_name"></a>`display_name`
 
-Data type: `Any`
+Data type: `String[1]`
 
-A description of the service
-
-Default value: `'UNSET'`
-
-##### <a name="command"></a>`command`
-
-Data type: `Any`
-
-The command to execute
+The Display Name of the service.  Defaults to the title of the resource.
 
 Default value: `'UNSET'`
 
-##### <a name="start"></a>`start`
+##### <a name="-registry--service--description"></a>`description`
 
-Data type: `Any`
+Data type: `String[1]`
+
+A description of the service. String value set to 'UNSET' by default.
+
+Default value: `'UNSET'`
+
+##### <a name="-registry--service--command"></a>`command`
+
+Data type: `String[1]`
+
+The command to execute. Set to 'UNSET' by default.
+
+Default value: `'UNSET'`
+
+##### <a name="-registry--service--start"></a>`start`
+
+Data type: `Enum['automatic', 'manual', 'disabled', 'UNSET']`
 
 The starting mode of the service.  (Note, the native service
 resource can also be used to manage this setting.)
-[ automatic, manual, disabled ]
+Valid values: 'automatic', 'manual', 'disabled'
 
 Default value: `'UNSET'`
 
-### <a name="registryvalue"></a>`registry::value`
+### <a name="registry--value"></a>`registry::value`
 
 Actions:
   - Manage the parent key if not already managed.
@@ -126,18 +125,18 @@ class myapp {
 
 The following parameters are available in the `registry::value` defined type:
 
-* [`key`](#key)
-* [`value`](#value)
-* [`type`](#type)
-* [`data`](#data)
+* [`key`](#-registry--value--key)
+* [`value`](#-registry--value--value)
+* [`type`](#-registry--value--type)
+* [`data`](#-registry--value--data)
 
-##### <a name="key"></a>`key`
+##### <a name="-registry--value--key"></a>`key`
 
 Data type: `Pattern[/^\w+/]`
 
 The path of key the value will placed inside.
 
-##### <a name="value"></a>`value`
+##### <a name="-registry--value--value"></a>`value`
 
 Data type: `Optional[String]`
 
@@ -145,9 +144,9 @@ The name of the registry value to manage.  This will be copied from
 the resource title if not specified.  The special value of
 '(default)' may be used to manage the default value of the key.
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="type"></a>`type`
+##### <a name="-registry--value--type"></a>`type`
 
 Data type: `Pattern[/^\w+/]`
 
@@ -157,17 +156,21 @@ The type the registry value.  Defaults to 'string'.  See the output of
 
 Default value: `'string'`
 
-##### <a name="data"></a>`data`
+##### <a name="-registry--value--data"></a>`data`
 
-Data type: `Optional[Variant[
+Data type:
+
+```puppet
+Optional[Variant[
       String,
       Numeric,
       Array[String]
-  ]]`
+  ]]
+```
 
 The data to place inside the registry value.
 
-Default value: ``undef``
+Default value: `undef`
 
 ## Resource types
 
@@ -191,26 +194,26 @@ Default value: `present`
 
 The following parameters are available in the `registry_key` type.
 
-* [`path`](#path)
-* [`provider`](#provider)
-* [`purge_values`](#purge_values)
+* [`path`](#-registry_key--path)
+* [`provider`](#-registry_key--provider)
+* [`purge_values`](#-registry_key--purge_values)
 
-##### <a name="path"></a>`path`
+##### <a name="-registry_key--path"></a>`path`
 
 The path to the registry key to manage
 
-##### <a name="provider"></a>`provider`
+##### <a name="-registry_key--provider"></a>`provider`
 
 The specific backend to use for this `registry_key` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
 
-##### <a name="purge_values"></a>`purge_values`
+##### <a name="-registry_key--purge_values"></a>`purge_values`
 
-Valid values: ``true``, ``false``
+Valid values: `true`, `false`
 
 Common boolean for munging and validation.
 
-Default value: ``false``
+Default value: `false`
 
 ### <a name="registry_value"></a>`registry_value`
 
@@ -244,14 +247,14 @@ Default value: `string`
 
 The following parameters are available in the `registry_value` type.
 
-* [`path`](#path)
-* [`provider`](#provider)
+* [`path`](#-registry_value--path)
+* [`provider`](#-registry_value--provider)
 
-##### <a name="path"></a>`path`
+##### <a name="-registry_value--path"></a>`path`
 
 The path to the registry value to manage.
 
-##### <a name="provider"></a>`provider`
+##### <a name="-registry_value--provider"></a>`provider`
 
 The specific backend to use for this `registry_value` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
