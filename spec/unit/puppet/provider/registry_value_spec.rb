@@ -181,11 +181,11 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       end
 
       it 'can destroy a randomly created REG_DWORD value' do
-        create_and_destroy(path, :dword, rand(2**32 - 1))
+        create_and_destroy(path, :dword, rand((2**32) - 1))
       end
 
       it 'can destroy a randomly created REG_QWORD value' do
-        create_and_destroy(path, :qword, rand(2**64 - 1))
+        create_and_destroy(path, :qword, rand((2**64) - 1))
       end
 
       it 'can destroy a randomly created REG_MULTI_SZ value' do
@@ -210,11 +210,11 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     it 'can destroy a randomly created REG_DWORD value' do
-      create_and_destroy(path, :dword, rand(2**32 - 1))
+      create_and_destroy(path, :dword, rand((2**32) - 1))
     end
 
     it 'can destroy a randomly created REG_QWORD value' do
-      create_and_destroy(path, :qword, rand(2**64 - 1))
+      create_and_destroy(path, :qword, rand((2**64) - 1))
     end
 
     it 'can destroy a randomly created REG_MULTI_SZ value' do
