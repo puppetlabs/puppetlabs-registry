@@ -18,11 +18,6 @@ RSpec/NoExpectationExample:
     - 'spec/unit/puppet/type/registry_value_spec.rb'
 
 # Offense count: 1
-RSpec/PendingWithoutReason:
-  Exclude:
-    - 'spec/unit/puppet/type/registry_value_spec.rb'
-
-# Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Style/SelectByRegexp:
   Exclude:

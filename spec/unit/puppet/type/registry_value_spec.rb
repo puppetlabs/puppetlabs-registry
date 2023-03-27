@@ -157,8 +157,6 @@ describe Puppet::Type.type(:registry_value) do
           value[:data] = data
         end
       end
-
-      pending 'it should accept nil'
     end
 
     context 'integer data' do
