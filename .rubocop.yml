@@ -1,10 +1,13 @@
 ---
+inherit_from: .rubocop_todo.yml
+
 require:
 - rubocop-performance
 - rubocop-rspec
 AllCops:
   DisplayCopNames: true
-  TargetRubyVersion: '2.5'
+  TargetRubyVersion: '2.7'
+  NewCops: enable
   Include:
   - "**/*.rb"
   Exclude:
