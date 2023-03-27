@@ -121,7 +121,7 @@ Puppet::Type.newtype(:registry_value) do
         unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
           raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'")
         end
-      else #:string, :expand, :array
+      else # :string, :expand, :array
         true
       end
     end
@@ -149,7 +149,7 @@ Puppet::Type.newtype(:registry_value) do
               .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
               .rstrip
               .downcase
-      else #:string, :expand, :array
+      else # :string, :expand, :array
         value
       end
     end
