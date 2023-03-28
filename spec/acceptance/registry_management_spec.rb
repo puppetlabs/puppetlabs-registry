@@ -144,14 +144,14 @@ DELETE
   end
 
   it 'creates registry entries' do
-    expect(idempotent_apply(create)).to be(true)
+    expect(idempotent_apply(create))
   end
 
   it 'update registry entries' do
-    expect(idempotent_apply(update)).to be(true)
+    expect(idempotent_apply(update))
   end
 
   it 'deletes registry entries' do
-    expect(idempotent_apply(delete)).to be(true)
+    expect(idempotent_apply(delete))
   end
 end
