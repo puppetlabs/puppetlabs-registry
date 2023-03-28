@@ -19,29 +19,29 @@ describe Puppet::Type.type(:registry_key) do
 
   [:ensure].each do |property|
     it "has a #{property} property" do
-      described_class.attrclass(property).ancestors.should be_include(Puppet::Property)
+      expect(described_class.attrclass(property).ancestors).to be_include(Puppet::Property)
     end
 
     it "has documentation for its #{property} property" do
-      described_class.attrclass(property).doc.should be_instance_of(String)
+      expect(described_class.attrclass(property).doc).to be_instance_of(String)
     end
   end
 
   describe 'path parameter' do
     it 'has a path parameter' do
-      Puppet::Type.type(:registry_key).attrtype(:path).must == :param
+      expect(Puppet::Type.type(:registry_key).attrtype(:path).must == :param)
     end
 
     # rubocop:disable RSpec/RepeatedExample,RSpec/RepeatedDescription
     ['hklm', 'hklm\\software', 'hklm\\software\\vendor'].each do |path|
       it "accepts #{path}" do
-        key[:path] = path
+        expect(key[:path] = path)
       end
     end
 
     ['hku', 'hku\\.DEFAULT', 'hku\\.DEFAULT\\software', 'hku\\.DEFAULT\\software\\vendor'].each do |path|
       it "accepts #{path}" do
-        key[:path] = path
+        expect(key[:path] = path)
       end
     end
     # rubocop:enable RSpec/RepeatedExample,RSpec/RepeatedDescription
@@ -61,8 +61,8 @@ describe Puppet::Type.type(:registry_key) do
 
     ['HKLM', 'HKEY_LOCAL_MACHINE', 'hklm'].each do |root|
       it "canonicalizes the root key #{root}" do
-        key[:path] = root
-        key[:path].must == 'hklm'
+        expect(key[:path] = root)
+        expect(key[:path].must == 'hklm')
       end
     end
 
@@ -70,14 +70,14 @@ describe Puppet::Type.type(:registry_key) do
     it 'should be case-insensitive'
     it 'should autorequire ancestor keys'
     it 'supports 32-bit keys' do
-      key[:path] = '32:hklm\software'
+      expect(key[:path] = '32:hklm\software')
     end
   end
 
   describe '#eval_generate' do
     context 'not purging' do
       it 'returns an empty array' do
-        key.eval_generate.must be_empty
+        expect(key.eval_generate.must(be_empty))
       end
     end
 
@@ -156,20 +156,20 @@ describe Puppet::Type.type(:registry_key) do
     end
 
     it 'initializes the catalog instance variable' do
-      the_resource.catalog.must be the_catalog
+      expect(the_resource.catalog.must(be the_catalog))
     end
 
     it 'allows case insensitive lookup using the downcase path' do
-      the_resource.must be the_catalog.resource(:registry_key, the_resource_name.downcase)
+      expect(the_resource.must(be the_catalog.resource(:registry_key, the_resource_name.downcase)))
     end
 
     it 'preserves the case of the user specified path' do
-      the_resource.must be the_catalog.resource(:registry_key, the_resource_name)
+      expect(the_resource.must(be the_catalog.resource(:registry_key, the_resource_name)))
     end
 
     it 'returns the same resource regardless of the alias used' do
-      the_resource.must be the_catalog.resource(:registry_key, the_resource_name)
-      the_resource.must be the_catalog.resource(:registry_key, the_resource_name.downcase)
+      expect(the_resource.must(be the_catalog.resource(:registry_key, the_resource_name)))
+      expect(the_resource.must(be the_catalog.resource(:registry_key, the_resource_name.downcase)))
     end
   end
 end

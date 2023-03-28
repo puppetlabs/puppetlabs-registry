@@ -30,7 +30,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
       guid = SecureRandom.uuid
       reg_key = type.new(path: "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}", provider: described_class.name)
       already_exists = reg_key.provider.exists?
-      already_exists.should be_falsey
+      expect(already_exists).to be(false)
 
       # something has gone terribly wrong here, pull the ripcord
       break if already_exists

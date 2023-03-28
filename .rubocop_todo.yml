@@ -6,17 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 60
-# Configuration parameters: AllowedPatterns.
-# AllowedPatterns: ^expect_, ^assert_
-RSpec/NoExpectationExample:
-  Exclude:
-    - 'spec/acceptance/registry_management_spec.rb'
-    - 'spec/unit/puppet/provider/registry_key_spec.rb'
-    - 'spec/unit/puppet/provider/registry_value_spec.rb'
-    - 'spec/unit/puppet/type/registry_key_spec.rb'
-    - 'spec/unit/puppet/type/registry_value_spec.rb'
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 Style/SelectByRegexp:
