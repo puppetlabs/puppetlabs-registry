@@ -52,6 +52,7 @@ module PuppetX
       # this class.
       class RegistryPathBase < String
         attr_reader :path
+
         def initialize(path)
           @filter_path_memo = nil
           @path ||= path
