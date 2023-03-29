@@ -56,6 +56,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     Puppet.debug("Destroying registry key #{self}")
 
     raise ArgumentError, "Cannot delete root key: #{path}" unless subkey
+
     delete_key(hive, subkey, access)
   end
 

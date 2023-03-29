@@ -74,6 +74,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # concept of flush.
     Puppet.debug("Flushing registry value: #{self}")
     return if resource[:ensure] == :absent
+
     write_value
   end
 
@@ -121,6 +122,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # should always get an array from Puppet.  We need to convert this
     # array to something usable by the Win API.
     raise Puppet::Error, 'Data should be an Array (ErrorID 37D9BBAB-52E8-4A7C-9F2E-D7BF16A59050)' unless pdata.is_a?(Array)
+
     ndata =
       case ptype
       when :binary

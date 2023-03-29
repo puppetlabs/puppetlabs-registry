@@ -102,6 +102,7 @@ module PuppetX
           if @filter_path_memo
             return @filter_path_memo
           end
+
           result = {}
 
           path = @path

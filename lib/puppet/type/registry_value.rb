@@ -158,6 +158,7 @@ Puppet::Type.newtype(:registry_value) do
       case resource[:type]
       when :binary
         return false unless current
+
         current.casecmp(desired).zero?
       else
         super(current, desired)
