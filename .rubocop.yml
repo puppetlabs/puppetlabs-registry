@@ -8,6 +8,8 @@ AllCops:
   DisplayCopNames: true
   TargetRubyVersion: '2.7'
   NewCops: enable
+  ExtraDetails: true
+  DisplayStyleGuide: true
   Include:
   - "**/*.rb"
   Exclude:
