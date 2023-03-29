@@ -41,7 +41,7 @@ Puppet::Type.newtype(:registry_key) do
   newparam(:path, namevar: true) do
     @doc = <<-EOT
     The path to the registry key to manage
-  EOT
+    EOT
     validate do |path|
       PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
@@ -67,7 +67,7 @@ Puppet::Type.newtype(:registry_key) do
   newparam(:purge_values, boolean: true) do
     @doc = <<-EOT
     Common boolean for munging and validation.
-  EOT
+    EOT
     newvalues(:true, :false)
     defaultto false
 

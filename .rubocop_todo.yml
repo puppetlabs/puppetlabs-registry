@@ -8,13 +8,6 @@
 
 # Offense count: 5
 # This cop supports safe autocorrection (--autocorrect).
-Layout/ClosingHeredocIndentation:
-  Exclude:
-    - 'lib/puppet/type/registry_key.rb'
-    - 'spec/acceptance/registry_management_spec.rb'
-
-# Offense count: 5
-# This cop supports safe autocorrection (--autocorrect).
 Layout/EmptyLineAfterGuardClause:
   Exclude:
     - 'lib/puppet/provider/registry_key/registry.rb'
