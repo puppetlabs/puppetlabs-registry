@@ -209,7 +209,7 @@ describe Puppet::Type.type(:registry_value) do
       end
       # rubocop:enable RSpec/RepeatedExample
 
-      ["\040\040", 'foobar', :true].each do |data|
+      ["\040\040", 'foobar', true].each do |data|
         it "rejects '#{data}'" do
           value[:type] = :binary
           expect { value[:data] = data }.to raise_error(Puppet::Error)

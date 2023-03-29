@@ -68,12 +68,12 @@ Puppet::Type.newtype(:registry_key) do
     @doc = <<-EOT
     Common boolean for munging and validation.
     EOT
-    newvalues(:true, :false)
+    newvalues(true, false)
     defaultto false
 
     validate do |value|
       case value
-      when true, %r{^true$}i, :true, false, %r{^false$}i, :false, :undef, nil
+      when true, %r{^true$}i, %r{^false$}i, false, :undef, nil
         true
       else
         # We raise an ArgumentError and not a Puppet::Error so we get manifest
@@ -84,7 +84,7 @@ Puppet::Type.newtype(:registry_key) do
 
     munge do |value|
       case value
-      when true, %r{^true$}i, :true
+      when true, %r{^true$}i
         true
       else
         false
