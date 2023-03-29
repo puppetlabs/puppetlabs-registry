@@ -67,10 +67,10 @@ describe Puppet::Type.type(:registry_value) do
     end
 
     {
-      'HKLM\\Software\\\\Middle\\\\Slashes'  => 'hklm\\Software\\\\Middle\\\\Slashes',
+      'HKLM\\Software\\\\Middle\\\\Slashes' => 'hklm\\Software\\\\Middle\\\\Slashes',
       'HKLM\\Software\\\\\\\\LeadingSlashes' => 'hklm\\Software\\\\\\\\LeadingSlashes',
-      'HKLM\\Software\\\\TrailingSlashes\\'  => 'hklm\\Software\\\\TrailingSlashes\\',
-      'HKLM\\Software\\\\\\'                 => 'hklm\\Software\\\\\\', # A value name of backslash
+      'HKLM\\Software\\\\TrailingSlashes\\' => 'hklm\\Software\\\\TrailingSlashes\\',
+      'HKLM\\Software\\\\\\' => 'hklm\\Software\\\\\\', # A value name of backslash
     }.each do |testcase, expected_value|
       it "uses a double backslash as a delimeter between path and value for title #{testcase}" do
         value = described_class.new(path: testcase, catalog: catalog)

@@ -27,13 +27,13 @@ module PuppetX
 
       def self.type2name_map
         {
-          Win32::Registry::REG_NONE      => :none,
-          Win32::Registry::REG_SZ        => :string,
+          Win32::Registry::REG_NONE => :none,
+          Win32::Registry::REG_SZ => :string,
           Win32::Registry::REG_EXPAND_SZ => :expand,
-          Win32::Registry::REG_BINARY    => :binary,
-          Win32::Registry::REG_DWORD     => :dword,
-          Win32::Registry::REG_QWORD     => :qword,
-          Win32::Registry::REG_MULTI_SZ  => :array,
+          Win32::Registry::REG_BINARY => :binary,
+          Win32::Registry::REG_DWORD => :dword,
+          Win32::Registry::REG_QWORD => :qword,
+          Win32::Registry::REG_MULTI_SZ => :array,
         }
       end
 
