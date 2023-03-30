@@ -100,9 +100,7 @@ Puppet::Type.newtype(:registry_key) do
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
     found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
-    if found
-      req << found.to_s.downcase
-    end
+    req << found.to_s.downcase if found
     req
   end
 

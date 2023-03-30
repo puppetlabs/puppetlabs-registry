@@ -108,19 +108,13 @@ Puppet::Type.newtype(:registry_value) do
         raise('An array registry value can not contain empty values') if value.empty?
       when :dword
         munged = munge(value)
-        unless munged && (munged.abs >> 32) <= 0
-          raise("The data must be a valid DWORD: received '#{value}'")
-        end
+        raise("The data must be a valid DWORD: received '#{value}'") unless munged && (munged.abs >> 32) <= 0
       when :qword
         munged = munge(value)
-        unless munged && (munged.abs >> 64) <= 0
-          raise("The data must be a valid QWORD: received '#{value}'")
-        end
+        raise("The data must be a valid QWORD: received '#{value}'") unless munged && (munged.abs >> 64) <= 0
       when :binary
         munged = munge(value)
-        unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
-          raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'")
-        end
+        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
       else # :string, :expand, :array
         true
       end
@@ -166,12 +160,8 @@ Puppet::Type.newtype(:registry_value) do
     end
 
     def change_to_s(currentvalue, newvalue)
-      if currentvalue.respond_to? :join
-        currentvalue = currentvalue.join(',')
-      end
-      if newvalue.respond_to? :join
-        newvalue = newvalue.join(',')
-      end
+      currentvalue = currentvalue.join(',') if currentvalue.respond_to? :join
+      newvalue = newvalue.join(',') if newvalue.respond_to? :join
       super(currentvalue, newvalue)
     end
   end
@@ -180,9 +170,7 @@ Puppet::Type.newtype(:registry_value) do
     # To ensure consistent behavior, always require a value for the data
     # property. This validation can be removed if we remove the default value
     # for the data property, for all data types.
-    if property(:data).nil?
-      raise ArgumentError, "No value supplied for required property 'data'"
-    end
+    raise ArgumentError, "No value supplied for required property 'data'" if property(:data).nil?
   end
 
   # Autorequire the nearest ancestor registry_key found in the catalog.
@@ -195,9 +183,7 @@ Puppet::Type.newtype(:registry_value) do
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
     found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
-    if found
-      req << found.to_s.downcase
-    end
+    req << found.to_s.downcase if found
     req
   end
 end

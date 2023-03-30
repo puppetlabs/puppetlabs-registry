@@ -100,9 +100,7 @@ module PuppetX
         private
 
         def filter_path
-          if @filter_path_memo
-            return @filter_path_memo
-          end
+          return @filter_path_memo if @filter_path_memo
 
           result = {}
 
@@ -111,9 +109,7 @@ module PuppetX
           path = path.gsub(%r{\\*$}, '')
 
           captures = %r{^(32:)?([h|H][^\\]*)((?:\\[^\\]{1,255})*)$}.match(path)
-          unless captures
-            raise ArgumentError, "Invalid registry key: #{path}"
-          end
+          raise ArgumentError, "Invalid registry key: #{path}" unless captures
 
           case captures[1]
           when '32:'

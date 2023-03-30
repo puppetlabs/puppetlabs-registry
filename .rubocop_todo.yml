@@ -124,14 +124,6 @@ RSpec/VoidExpect:
     - 'spec/unit/puppet/type/registry_key_spec.rb'
     - 'spec/unit/puppet/type/registry_value_spec.rb'
 
-# Offense count: 10
-# This cop supports safe autocorrection (--autocorrect).
-Style/IfUnlessModifier:
-  Exclude:
-    - 'lib/puppet/type/registry_key.rb'
-    - 'lib/puppet/type/registry_value.rb'
-    - 'lib/puppet_x/puppetlabs/registry.rb'
-
 # Offense count: 1
 Style/MixinUsage:
   Exclude:
