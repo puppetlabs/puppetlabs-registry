@@ -81,14 +81,6 @@ RSpec/DescribeClass:
     - 'spec/unit/puppet/type/registry_key_spec.rb'
     - 'spec/unit/puppet/type/registry_value_spec.rb'
 
-# Offense count: 10
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowConsecutiveOneLiners.
-# RSpec/EmptyLineAfterExample:
-#   Exclude:
-#     - 'spec/defines/value_spec.rb'
-#     - 'spec/unit/puppet/type/registry_value_spec.rb'
-
 # Offense count: 14
 # Configuration parameters: CountAsOne.
 RSpec/ExampleLength:
@@ -99,14 +91,6 @@ RSpec/ExpectInHook:
   Exclude:
     - 'spec/unit/puppet/provider/registry_key_spec.rb'
     - 'spec/unit/puppet/provider/registry_value_spec.rb'
-
-# Offense count: 9
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: single_line_only, single_statement_only, disallow, require_implicit
-RSpec/ImplicitSubject:
-  Exclude:
-    - 'spec/defines/value_spec.rb'
 
 # Offense count: 4
 RSpec/LeakyConstantDeclaration:

@@ -25,12 +25,12 @@ RSpec.describe 'registry::value', type: :define do
         it { is_expected.to compile }
 
         it {
-          is_expected.to contain_registry_key('HKLM\Software\Vendor')
+          expect(subject).to contain_registry_key('HKLM\Software\Vendor')
             .with_ensure('present')
         }
 
         it {
-          is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+          expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
             .with(
               ensure: 'present',
               type: 'string',
@@ -50,7 +50,7 @@ RSpec.describe 'registry::value', type: :define do
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+            expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
                 ensure: 'present',
                 type: 'string',
@@ -66,7 +66,7 @@ RSpec.describe 'registry::value', type: :define do
             it { is_expected.to compile }
 
             it {
-              is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+              expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
                 .with(
                   ensure: 'present',
                   type: type,
@@ -82,7 +82,7 @@ RSpec.describe 'registry::value', type: :define do
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+            expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
                 ensure: 'present',
                 type: 'binary',
@@ -98,7 +98,7 @@ RSpec.describe 'registry::value', type: :define do
             it { is_expected.to compile }
 
             it {
-              is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+              expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
                 .with(
                   ensure: 'present',
                   type: type,
@@ -114,7 +114,7 @@ RSpec.describe 'registry::value', type: :define do
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
+            expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
                 ensure: 'present',
                 type: 'array',
@@ -129,7 +129,7 @@ RSpec.describe 'registry::value', type: :define do
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\')
+            expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\')
               .with_ensure('present')
           }
         end
@@ -140,7 +140,7 @@ RSpec.describe 'registry::value', type: :define do
           it { is_expected.to compile }
 
           it {
-            is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\other_name')
+            expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\other_name')
               .with_ensure('present')
           }
         end
