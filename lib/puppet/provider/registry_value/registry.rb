@@ -126,7 +126,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     ndata =
       case ptype
       when :binary
-        pdata.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join('')
+        pdata.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join
       when :array
         # We already have an array, and the native API write method takes an
         # array, so send it thru.
