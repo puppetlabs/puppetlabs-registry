@@ -27,18 +27,18 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
     # rubocop:disable RSpec/ExpectInHook
-    expect(instance).to receive(:export_string).never
+    expect(instance).not_to receive(:export_string)
 
-    expect(instance).to receive(:delete_value).never
-    expect(instance).to receive(:delete_key).never
+    expect(instance).not_to receive(:delete_value)
+    expect(instance).not_to receive(:delete_key)
 
     if RUBY_VERSION >= '2.1'
       # also, expect that we're not using Rubys each_key / each_value which exhibit bad behavior
-      expect(instance).to receive(:each_key).never
-      expect(instance).to receive(:each_value).never
+      expect(instance).not_to receive(:each_key)
+      expect(instance).not_to receive(:each_value)
 
       # this covers []= write_s write_i and write_bin
-      expect(instance).to receive(:write).never
+      expect(instance).not_to receive(:write)
     end
 
     # rubocop:enable RSpec/ExpectInHook

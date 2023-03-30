@@ -19,10 +19,10 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
     # rubocop:disable RSpec/ExpectInHook
-    expect(instance).to receive(:export_string).never
+    expect(instance).not_to receive(:export_string)
 
-    expect(instance).to receive(:delete_value).never
-    expect(instance).to receive(:delete_key).never
+    expect(instance).not_to receive(:delete_value)
+    expect(instance).not_to receive(:delete_key)
     # rubocop:enable RSpec/ExpectInHook
   end
 
