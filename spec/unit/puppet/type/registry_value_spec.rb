@@ -20,6 +20,7 @@ describe Puppet::Type.type(:registry_value) do
     it 'has a path parameter' do
       expect(Puppet::Type.type(:registry_value).attrtype(:path).should == :param)
     end
+
     # rubocop:disable RSpec/RepeatedExample
     ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
       it "accepts #{path}" do

@@ -23,10 +23,12 @@ RSpec.describe 'registry::value', type: :define do
         let(:params) { { key: 'HKLM\Software\Vendor' } }
 
         it { is_expected.to compile }
+
         it {
           is_expected.to contain_registry_key('HKLM\Software\Vendor')
             .with_ensure('present')
         }
+
         it {
           is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
             .with(
@@ -46,6 +48,7 @@ RSpec.describe 'registry::value', type: :define do
           let(:params) { super().merge(data: 'some string data') }
 
           it { is_expected.to compile }
+
           it {
             is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
@@ -61,6 +64,7 @@ RSpec.describe 'registry::value', type: :define do
             let(:params) { super().merge(type: type, data: 42) }
 
             it { is_expected.to compile }
+
             it {
               is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
                 .with(
@@ -76,6 +80,7 @@ RSpec.describe 'registry::value', type: :define do
           let(:params) { super().merge(type: 'binary', data: '1') }
 
           it { is_expected.to compile }
+
           it {
             is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
@@ -91,6 +96,7 @@ RSpec.describe 'registry::value', type: :define do
             let(:params) { super().merge(type: type, data: 'some typed string data') }
 
             it { is_expected.to compile }
+
             it {
               is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
                 .with(
@@ -106,6 +112,7 @@ RSpec.describe 'registry::value', type: :define do
           let(:params) { super().merge(type: 'array', data: ['JakeTheSnake', 'AndreTheGiant']) }
 
           it { is_expected.to compile }
+
           it {
             is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
               .with(
@@ -120,6 +127,7 @@ RSpec.describe 'registry::value', type: :define do
           let(:params) { super().merge(value: '(default)') }
 
           it { is_expected.to compile }
+
           it {
             is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\')
               .with_ensure('present')
@@ -130,6 +138,7 @@ RSpec.describe 'registry::value', type: :define do
           let(:params) { super().merge(value: 'other_name') }
 
           it { is_expected.to compile }
+
           it {
             is_expected.to contain_registry_value('HKLM\Software\Vendor\\\\other_name')
               .with_ensure('present')

@@ -84,10 +84,10 @@ RSpec/DescribeClass:
 # Offense count: 10
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: AllowConsecutiveOneLiners.
-RSpec/EmptyLineAfterExample:
-  Exclude:
-    - 'spec/defines/value_spec.rb'
-    - 'spec/unit/puppet/type/registry_value_spec.rb'
+# RSpec/EmptyLineAfterExample:
+#   Exclude:
+#     - 'spec/defines/value_spec.rb'
+#     - 'spec/unit/puppet/type/registry_value_spec.rb'
 
 # Offense count: 14
 # Configuration parameters: CountAsOne.
