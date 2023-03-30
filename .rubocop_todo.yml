@@ -13,12 +13,6 @@ Lint/ConstantDefinitionInBlock:
   Exclude:
     - 'spec/unit/puppet/provider/registry_value_spec.rb'
 
-# Offense count: 1
-# Configuration parameters: IgnoreLiteralBranches, IgnoreConstantBranches.
-Lint/DuplicateBranch:
-  Exclude:
-    - 'lib/puppet/provider/registry_value/registry.rb'
-
 # Offense count: 6
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes.
 Metrics/AbcSize:

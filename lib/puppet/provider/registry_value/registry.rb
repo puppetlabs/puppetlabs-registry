@@ -148,9 +148,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       case PuppetX::Puppetlabs::Registry.type2name(ntype)
       when :binary
         ndata.bytes.map { |byte| '%02x' % byte }.join(' ')
-      when :array
-        # We get the data from the registry in Array form.
-        ndata
       else
         ndata
       end
