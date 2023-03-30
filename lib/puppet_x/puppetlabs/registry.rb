@@ -168,9 +168,9 @@ module PuppetX
         # delimiter if the valuename actually contains a backslash
         def self.combine_path_and_value(keypath, valuename)
           if valuename.include?('\\')
-            keypath + '\\\\' + valuename
+            "#{keypath}\\\\#{valuename}"
           else
-            keypath + '\\' + valuename
+            "#{keypath}\\#{valuename}"
           end
         end
 
@@ -191,9 +191,9 @@ module PuppetX
           # Because we extracted the valuename in the initializer we
           # need to add it back in when canonical is called.
           if valuename.include?('\\')
-            filter_path[:canonical] + '\\\\' + valuename
+            "#{filter_path[:canonical]}\\\\#{valuename}"
           else
-            filter_path[:canonical] + '\\' + valuename
+            "#{filter_path[:canonical]}\\#{valuename}"
           end
         end
 

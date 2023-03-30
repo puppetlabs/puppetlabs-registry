@@ -139,12 +139,12 @@ Style/RedundantArgument:
 # Offense count: 12
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: Mode.
-Style/StringConcatenation:
-  Exclude:
-    - 'lib/puppet/provider/registry_key/registry.rb'
-    - 'lib/puppet/provider/registry_value/registry.rb'
-    - 'lib/puppet/type/registry_key.rb'
-    - 'lib/puppet/type/registry_value.rb'
-    - 'lib/puppet_x/puppetlabs/registry.rb'
-    - 'spec/unit/puppet/provider/registry_value_spec.rb'
-    - 'spec/unit/puppet/type/registry_key_spec.rb'
+# Style/StringConcatenation:
+#   Exclude:
+#     - 'lib/puppet/provider/registry_key/registry.rb'
+#     - 'lib/puppet/provider/registry_value/registry.rb'
+#     - 'lib/puppet/type/registry_key.rb'
+#     - 'lib/puppet/type/registry_value.rb'
+#     - 'lib/puppet_x/puppetlabs/registry.rb'
+#     - 'spec/unit/puppet/provider/registry_value_spec.rb'
+#     - 'spec/unit/puppet/type/registry_key_spec.rb'

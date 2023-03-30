@@ -139,7 +139,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a leading double backslash' do
-      let(:valuename) { '\\\\' + SecureRandom.uuid }
+      let(:valuename) { "\\\\#{SecureRandom.uuid}" }
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
@@ -148,7 +148,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     context 'with a valuename containing a trailing double backslash' do
-      let(:valuename) { SecureRandom.uuid + '\\\\' }
+      let(:valuename) { "#{SecureRandom.uuid}\\\\" }
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do

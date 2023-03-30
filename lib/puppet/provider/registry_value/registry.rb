@@ -5,8 +5,8 @@ begin
   require 'puppet_x/puppetlabs/registry'
 rescue LoadError
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  module_base = Pathname.new(__FILE__).dirname + '../../../'
-  require module_base + 'puppet_x/puppetlabs/registry'
+  module_base = "#{Pathname.new(__FILE__).dirname}../../../"
+  require "#{module_base}puppet_x/puppetlabs/registry"
 end
 
 Puppet::Type.type(:registry_value).provide(:registry) do

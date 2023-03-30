@@ -8,7 +8,7 @@ rescue LoadError
   # Work around #7788 (Rubygems support for modules)
   require 'pathname' # JJM WORK_AROUND #14073
   module_base = Pathname.new(__FILE__).dirname
-  require module_base + '../../../' + 'puppet_x/puppetlabs/registry'
+  require "#{module_base}../../../puppet_x/puppetlabs/registry"
 end
 Puppet::Type.type(:registry_key).provide(:registry) do
   desc <<-DOC

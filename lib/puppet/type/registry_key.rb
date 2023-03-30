@@ -5,7 +5,7 @@ begin
   require 'puppet_x/puppetlabs/registry'
 rescue LoadError
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  require Pathname.new(__FILE__).dirname + '../../' + 'puppet_x/puppetlabs/registry'
+  require "#{Pathname.new(__FILE__).dirname}../../puppet_x/puppetlabs/registry"
 end
 
 # @summary
