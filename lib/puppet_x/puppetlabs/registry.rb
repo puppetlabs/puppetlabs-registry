@@ -17,7 +17,7 @@ module PuppetX
         {
           hkcr: Win32::Registry::HKEY_CLASSES_ROOT,
           hklm: Win32::Registry::HKEY_LOCAL_MACHINE,
-          hku: Win32::Registry::HKEY_USERS,
+          hku: Win32::Registry::HKEY_USERS
         }
       end
 
@@ -33,7 +33,7 @@ module PuppetX
           Win32::Registry::REG_BINARY => :binary,
           Win32::Registry::REG_DWORD => :dword,
           Win32::Registry::REG_QWORD => :qword,
-          Win32::Registry::REG_MULTI_SZ => :array,
+          Win32::Registry::REG_MULTI_SZ => :array
         }
       end
 

@@ -151,12 +151,12 @@ RSpec.describe 'registry::value', type: :define do
   context 'On a non-windows platform' do
     let(:params) do
       {
-        key: 'foo',
+        key: 'foo'
       }
     end
     let(:facts) do
       {
-        os: { name: 'bar' },
+        os: { name: 'bar' }
       }
     end
 
