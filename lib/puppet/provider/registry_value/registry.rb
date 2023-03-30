@@ -49,15 +49,15 @@ Puppet::Type.type(:registry_value).provide(:registry) do
           raise Win32::Registry::Error, status unless found
         end
       end
-    rescue Win32::Registry::Error => detail
-      case detail.code
+    rescue Win32::Registry::Error => e
+      case e.code
       when 2
         # Code 2 is the error message for "The system cannot find the file specified."
         # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
         found = false
       else
-        error = Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{detail.message}) ERROR CODE: #{detail.code}. Puppet Error ID: D4B679E4-0E22-48D5-80EF-96AAEC0282B9")
-        error.set_backtrace detail.backtrace
+        error = Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{e.message}) ERROR CODE: #{e.code}. Puppet Error ID: D4B679E4-0E22-48D5-80EF-96AAEC0282B9")
+        error.set_backtrace e.backtrace
         raise error
       end
     end
@@ -169,16 +169,16 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       ary = to_native(resource[:type], resource[:data])
       write(reg, valuename, ary[0], ary[1])
     end
-  rescue Win32::Registry::Error => detail
-    error = case detail.code
+  rescue Win32::Registry::Error => e
+    error = case e.code
             when 2
               # Code 2 is the error message for "The system cannot find the file specified."
               # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
-              Puppet::Error.new("Cannot write to the registry. The parent key does not exist. detail: (#{detail.message}) Puppet Error ID: AC99C7C6-98D6-4E91-A75E-970F4064BF95")
+              Puppet::Error.new("Cannot write to the registry. The parent key does not exist. detail: (#{e.message}) Puppet Error ID: AC99C7C6-98D6-4E91-A75E-970F4064BF95")
             else
-              Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{detail.message}). ERROR CODE: #{detail.code}. Puppet Error ID: F46C6AE2-C711-48F9-86D6-5D50E1988E48")
+              Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{e.message}). ERROR CODE: #{e.code}. Puppet Error ID: F46C6AE2-C711-48F9-86D6-5D50E1988E48")
             end
-    error.set_backtrace detail.backtrace
+    error.set_backtrace e.backtrace
     raise error
   end
 
