@@ -18,7 +18,7 @@ end
 #
 #   **Autorequires:** Any parent registry key managed by Puppet will be
 #   autorequired.
-#
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_value) do
   @doc = <<-EOT
     Manages registry values on Windows systems.
@@ -187,3 +187,4 @@ Puppet::Type.newtype(:registry_value) do
     req
   end
 end
+# rubocop:enable Metrics/BlockLength

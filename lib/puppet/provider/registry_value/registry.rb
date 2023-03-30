@@ -9,6 +9,7 @@ rescue LoadError
   require "#{module_base}puppet_x/puppetlabs/registry"
 end
 
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_value).provide(:registry) do
   desc <<-DOC
     @summary Registry_value provider
@@ -269,3 +270,4 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value)
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -10,6 +10,7 @@ rescue LoadError
   module_base = Pathname.new(__FILE__).dirname
   require "#{module_base}../../../puppet_x/puppetlabs/registry"
 end
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_key).provide(:registry) do
   desc <<-DOC
    @summary Registry_key provider
@@ -77,3 +78,4 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     @path ||= PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(resource.parameter(:path).value)
   end
 end
+# rubocop:enable Metrics/BlockLength
