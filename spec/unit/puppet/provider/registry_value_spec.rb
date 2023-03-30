@@ -111,6 +111,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     let(:valuename) { SecureRandom.uuid }
     let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
 
+    # rubocop:disable Metrics/MethodLength
     def create_and_destroy(path, reg_type, data)
       reg_value = type.new(path: path,
                            type: reg_type,
@@ -128,6 +129,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       reg_value.provider.destroy
       expect(reg_value.provider.exists?).to be(false)
     end
+    # rubocop:enable Metrics/MethodLength
 
     context 'with a valuename containing a middle double backslash' do
       let(:valuename) { SecureRandom.uuid.insert(5, '\\\\') }

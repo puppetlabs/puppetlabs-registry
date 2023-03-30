@@ -104,6 +104,7 @@ Puppet::Type.newtype(:registry_key) do
     req
   end
 
+  # rubocop:disable Metrics/MethodLength
   def eval_generate
     # This value will be given post-munge so we can assume it will be a ruby true or false object
     return [] unless value(:purge_values)
@@ -126,4 +127,5 @@ Puppet::Type.newtype(:registry_key) do
     end
     resources
   end
+  # rubocop:enable Metrics/MethodLength
 end

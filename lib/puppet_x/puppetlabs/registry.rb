@@ -99,6 +99,42 @@ module PuppetX
 
         private
 
+        def filter_32_64(prefix, res)
+          case prefix
+          when '32:'
+            res[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_32KEY
+            res[:prefix] = '32:'
+          else
+            res[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY
+            res[:prefix] = ''
+          end
+          res
+        end
+
+        def filter_canonical(res)
+          return "#{res[:prefix]}#{res[:root]}" if res[:trailing_path].empty?
+
+          # Leading backslash is not part of the subkey name
+          "#{res[:prefix]}#{res[:root]}\\#{res[:trailing_path]}"
+        end
+
+        # rubocop:disable Metrics/MethodLength
+        def filter_hkey(path)
+          case path
+          when %r{hkey_local_machine}, %r{hklm}
+            :hklm
+          when %r{hkey_classes_root}, %r{hkcr}
+            :hkcr
+          when %r{hkey_users}, %r{hku}
+            :hku
+          when %r{hkey_current_user}, %r{hkcu}, %r{hkey_current_config}, %r{hkcc}, %r{hkey_performance_data},
+            %r{hkey_performance_text}, %r{hkey_performance_nlstext}, %r{hkey_dyn_data}
+            raise ArgumentError, "Unsupported predefined key: #{path}"
+          else
+            raise ArgumentError, "Invalid registry key: #{path}"
+          end
+        end
+
         def filter_path
           return @filter_path_memo if @filter_path_memo
 
@@ -111,47 +147,17 @@ module PuppetX
           captures = %r{^(32:)?([h|H][^\\]*)((?:\\[^\\]{1,255})*)$}.match(path)
           raise ArgumentError, "Invalid registry key: #{path}" unless captures
 
-          case captures[1]
-          when '32:'
-            result[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_32KEY
-            result[:prefix] = '32:'
-          else
-            result[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY
-            result[:prefix] = ''
-          end
+          filter_32_64(captures[1], result)
 
           # canonical root key symbol
-          result[:root] = case captures[2].to_s.downcase
-                          when %r{hkey_local_machine}, %r{hklm}
-                            :hklm
-                          when %r{hkey_classes_root}, %r{hkcr}
-                            :hkcr
-                          when %r{hkey_users}, %r{hku}
-                            :hku
-                          when %r{hkey_current_user}, %r{hkcu},
-                    %r{hkey_current_config}, %r{hkcc},
-                    %r{hkey_performance_data},
-                    %r{hkey_performance_text},
-                    %r{hkey_performance_nlstext},
-                    %r{hkey_dyn_data}
-                            raise ArgumentError, "Unsupported predefined key: #{path}"
-                          else
-                            raise ArgumentError, "Invalid registry key: #{path}"
-                          end
-
+          result[:root] = filter_hkey(captures[2].to_s.downcase)
           result[:trailing_path] = captures[3]
-
           result[:trailing_path].gsub!(%r{^\\}, '')
-
-          result[:canonical] = if result[:trailing_path].empty?
-                                 "#{result[:prefix]}#{result[:root]}"
-                               else
-                                 # Leading backslash is not part of the subkey name
-                                 "#{result[:prefix]}#{result[:root]}\\#{result[:trailing_path]}"
-                               end
+          result[:canonical] = filter_canonical(result)
 
           @filter_path_memo = result
         end
+        # rubocop:enable Metrics/MethodLength
       end
 
       class RegistryKeyPath < RegistryPathBase
