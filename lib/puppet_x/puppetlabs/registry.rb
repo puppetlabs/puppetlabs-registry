@@ -62,7 +62,7 @@ module PuppetX
         # The path is valid if we're able to parse it without exceptions.
         def valid?
           (filter_path && true)
-        rescue
+        rescue StandardError
           false
         end
 

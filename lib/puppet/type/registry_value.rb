@@ -125,7 +125,7 @@ Puppet::Type.newtype(:registry_value) do
       when :dword, :qword
         begin
           Integer(value)
-        rescue
+        rescue StandardError
           nil
         end
       when :binary
