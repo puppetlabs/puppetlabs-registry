@@ -31,11 +31,7 @@ RSpec.describe 'registry::value', type: :define do
 
         it {
           expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-            .with(
-              ensure: 'present',
-              type: 'string',
-              data: nil,
-            )
+            .with(ensure: 'present', type: 'string', data: nil)
         }
 
         context 'with an empty type' do
@@ -51,11 +47,7 @@ RSpec.describe 'registry::value', type: :define do
 
           it {
             expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-              .with(
-                ensure: 'present',
-                type: 'string',
-                data: 'some string data',
-              )
+              .with(ensure: 'present', type: 'string', data: 'some string data')
           }
         end
 
@@ -68,11 +60,7 @@ RSpec.describe 'registry::value', type: :define do
 
             it {
               expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-                .with(
-                  ensure: 'present',
-                  type: type,
-                  data: 42,
-                )
+                .with(ensure: 'present', type: type, data: 42)
             }
           end
         end
@@ -84,11 +72,7 @@ RSpec.describe 'registry::value', type: :define do
 
           it {
             expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-              .with(
-                ensure: 'present',
-                type: 'binary',
-                data: '1',
-              )
+              .with(ensure: 'present', type: 'binary', data: '1')
           }
         end
 
@@ -101,11 +85,7 @@ RSpec.describe 'registry::value', type: :define do
 
             it {
               expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-                .with(
-                  ensure: 'present',
-                  type: type,
-                  data: 'some typed string data',
-                )
+                .with(ensure: 'present', type: type, data: 'some typed string data')
             }
           end
         end
@@ -117,11 +97,7 @@ RSpec.describe 'registry::value', type: :define do
 
           it {
             expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-              .with(
-                ensure: 'present',
-                type: 'array',
-                data: ['JakeTheSnake', 'AndreTheGiant'],
-              )
+              .with(ensure: 'present', type: 'array', data: ['JakeTheSnake', 'AndreTheGiant'])
           }
         end
 
