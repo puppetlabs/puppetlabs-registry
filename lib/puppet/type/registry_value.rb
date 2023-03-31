@@ -20,9 +20,9 @@ end
 #   autorequired.
 # rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_value) do
-  @doc = <<-EOT
+  @doc = <<-VALUES
     Manages registry values on Windows systems.
-  EOT
+  VALUES
   def self.title_patterns
     [[%r{^(.*?)\Z}m, [[:path]]]]
   end
@@ -42,9 +42,9 @@ Puppet::Type.newtype(:registry_value) do
   #      '32:HKLM\Software\Value3'. Use a double backslash between the value name
   #      and path when managing a value with a backslash in the name."
   newparam(:path, namevar: true) do
-    @doc = <<-EOT
+    @doc = <<-PATH
       The path to the registry value to manage.
-    EOT
+    PATH
     validate do |path|
       PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path).valid?
     end
@@ -76,9 +76,9 @@ Puppet::Type.newtype(:registry_value) do
   #     * binary => REG_BINARY
   #
   newproperty(:type) do
-    @doc = <<-EOT
+    @doc = <<-DATA
       The Windows data type of the registry value.
-    EOT
+    DATA
     newvalues(:string, :array, :dword, :qword, :binary, :expand)
     defaultto :string
   end
@@ -91,9 +91,9 @@ Puppet::Type.newtype(:registry_value) do
   #   type is set to `array`."
   #
   newproperty(:data, array_matching: :all) do
-    @doc = <<-EOT
+    @doc = <<-DATA
       The data stored in the registry value.
-    EOT
+    DATA
 
     # We probably shouldn't set default values for this property at all. For
     # dword and qword specifically, the legacy default value will not pass

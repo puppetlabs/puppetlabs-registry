@@ -25,9 +25,9 @@ end
 #   autorequired.
 # rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_key) do
-  @doc = <<-EOT
+  @doc = <<-KEYS
     Manages registry keys on Windows
-  EOT
+  KEYS
   def self.title_patterns
     [[%r{^(.*?)\Z}m, [[:path]]]]
   end
@@ -40,9 +40,9 @@ Puppet::Type.newtype(:registry_key) do
   #   system, the 32-bit registry key can be explicitly managed using a
   #   prefix.  For example: '32:HKLM\Software'"
   newparam(:path, namevar: true) do
-    @doc = <<-EOT
+    @doc = <<-PATH
     The path to the registry key to manage
-    EOT
+    PATH
     validate do |path|
       PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
@@ -66,9 +66,9 @@ Puppet::Type.newtype(:registry_key) do
   # By both registry_key and registry_value types.
   # @summary Whether to delete any registry value associated with this key that is not being managed by puppet.
   newparam(:purge_values, boolean: true) do
-    @doc = <<-EOT
+    @doc = <<-BOOLEAN
     Common boolean for munging and validation.
-    EOT
+    BOOLEAN
     newvalues(true, false)
     defaultto false
 

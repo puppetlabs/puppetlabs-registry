@@ -166,8 +166,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   private
 
-  def eval_error(e)
-    case a
+  def eval_error(err)
+    case err
     when 2
       # Code 2 is the error message for "The system cannot find the file specified."
       # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx

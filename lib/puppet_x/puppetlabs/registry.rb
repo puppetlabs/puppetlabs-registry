@@ -99,7 +99,7 @@ module PuppetX
 
         private
 
-        def filter_32_64(prefix, res)
+        def filter_bits(prefix, res)
           case prefix
           when '32:'
             res[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_32KEY
@@ -147,7 +147,7 @@ module PuppetX
           captures = %r{^(32:)?([h|H][^\\]*)((?:\\[^\\]{1,255})*)$}.match(path)
           raise ArgumentError, "Invalid registry key: #{path}" unless captures
 
-          filter_32_64(captures[1], result)
+          filter_bits(captures[1], result)
 
           # canonical root key symbol
           result[:root] = filter_hkey(captures[2].to_s.downcase)
