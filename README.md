@@ -22,7 +22,7 @@ The Registry is a hierarchical database built into Microsoft Windows. It stores 
 
 ## Setup
 
-This module must be installed on your Puppet server. We've tested it with Puppet agents running on Windows Server 2008 R2, 2012, and 2012 R2.
+This module must be installed on your Puppet server. For a complete list of supported operating systems, please take a look at our [metadata.json](https://github.com/puppetlabs/puppetlabs-registry/blob/main/metadata.json#L13).
 
 ### Beginning with registry
 
