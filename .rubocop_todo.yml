@@ -23,22 +23,6 @@ Metrics/AbcSize:
 Metrics/CyclomaticComplexity:
   Max: 9
 
-# Offense count: 4
-# Configuration parameters: MinSize.
-# Performance/CollectionLiteralInLoop:
-#   Exclude:
-#     - 'spec/defines/value_spec.rb'
-#     - 'spec/unit/puppet/type/registry_value_spec.rb'
-
-# Offense count: 10
-# Configuration parameters: Prefixes, AllowedPatterns.
-# Prefixes: when, with, without
-RSpec/ContextWording:
-  Exclude:
-    - 'spec/defines/value_spec.rb'
-    - 'spec/unit/puppet/type/registry_key_spec.rb'
-    - 'spec/unit/puppet/type/registry_value_spec.rb'
-
 # Offense count: 7
 # Configuration parameters: IgnoredMetadata.
 RSpec/DescribeClass:

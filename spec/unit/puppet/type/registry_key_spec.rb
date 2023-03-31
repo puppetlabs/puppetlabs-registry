@@ -75,13 +75,13 @@ describe Puppet::Type.type(:registry_key) do
   end
 
   describe '#eval_generate' do
-    context 'not purging' do
+    context 'without purging' do
       it 'returns an empty array' do
         expect(key.eval_generate.must(be_empty))
       end
     end
 
-    context 'purging' do
+    context 'when purging' do
       let(:catalog) { Puppet::Resource::Catalog.new }
 
       # This is overridden here so we get a consistent association with the key

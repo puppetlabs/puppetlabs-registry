@@ -151,7 +151,7 @@ describe Puppet::Type.type(:registry_value) do
   describe 'data property' do
     let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
-    context 'string data' do
+    context 'with string data' do
       ['', 'foobar'].each do |data|
         it "accepts '#{data}'" do
           value[:type] = :string
@@ -160,9 +160,9 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context 'integer data' do
+    context 'with integer data' do
       [:dword, :qword].each do |type|
-        context "for #{type}" do
+        context "when #{type}" do
           arr1 = [0, 0xFFFFFFFF, -1, 42]
           arr1.each do |data|
             it "accepts #{data}" do
@@ -180,7 +180,7 @@ describe Puppet::Type.type(:registry_value) do
         end
       end
 
-      context 'for 64-bit integers' do
+      context 'when 64-bit integers' do
         let(:data) { 0xFFFFFFFFFFFFFFFF }
 
         it 'accepts qwords' do
@@ -195,7 +195,7 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context 'binary data' do
+    context 'when binary data' do
       # rubocop:disable RSpec/RepeatedExample
       ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
         it "accepts '#{data}'" do
@@ -219,7 +219,7 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context 'array data' do
+    context 'when array data' do
       it 'supports array data' do
         value[:type] = :array
         expect(value[:data] = ['foo', 'bar', 'baz'])

@@ -8,7 +8,7 @@ RSpec.describe 'registry::value', type: :define do
   let(:title) { 'value_name' }
 
   on_supported_os.each do |os, facts|
-    context "on #{os}" do
+    context "when #{os}" do
       let(:facts) do
         facts
       end
@@ -150,7 +150,7 @@ RSpec.describe 'registry::value', type: :define do
     end
   end
 
-  context 'On a non-windows platform' do
+  context 'when a non-windows platform' do
     let(:params) do
       {
         key: 'foo'
