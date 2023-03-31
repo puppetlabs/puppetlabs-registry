@@ -25,10 +25,10 @@ Metrics/CyclomaticComplexity:
 
 # Offense count: 4
 # Configuration parameters: MinSize.
-Performance/CollectionLiteralInLoop:
-  Exclude:
-    - 'spec/defines/value_spec.rb'
-    - 'spec/unit/puppet/type/registry_value_spec.rb'
+# Performance/CollectionLiteralInLoop:
+#   Exclude:
+#     - 'spec/defines/value_spec.rb'
+#     - 'spec/unit/puppet/type/registry_value_spec.rb'
 
 # Offense count: 10
 # Configuration parameters: Prefixes, AllowedPatterns.

@@ -59,7 +59,8 @@ RSpec.describe 'registry::value', type: :define do
           }
         end
 
-        ['dword', 'qword'].each do |type|
+        arr1 = ['dword', 'qword']
+        arr1.each do |type|
           context "with #{type} numeric data" do
             let(:params) { super().merge(type: type, data: 42) }
 
@@ -91,7 +92,8 @@ RSpec.describe 'registry::value', type: :define do
           }
         end
 
-        ['string', 'expand'].each do |type|
+        arr2 = ['string', 'expand']
+        arr2.each do |type|
           context "with string data typed as '#{type}'" do
             let(:params) { super().merge(type: type, data: 'some typed string data') }
 

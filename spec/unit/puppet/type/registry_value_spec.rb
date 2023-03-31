@@ -163,14 +163,15 @@ describe Puppet::Type.type(:registry_value) do
     context 'integer data' do
       [:dword, :qword].each do |type|
         context "for #{type}" do
-          [0, 0xFFFFFFFF, -1, 42].each do |data|
+          arr1 = [0, 0xFFFFFFFF, -1, 42]
+          arr1.each do |data|
             it "accepts #{data}" do
               value[:type] = type
               expect(value[:data] = data)
             end
           end
-
-          ['foobar', ':true'].each do |data|
+          arr2 = ['foobar', ':true']
+          arr2.each do |data|
             it "rejects #{data}" do
               value[:type] = type
               expect { value[:data] = data }.to raise_error(Puppet::Error)
