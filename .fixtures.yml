@@ -2,9 +2,9 @@ fixtures:
   repositories:
     facts: 'https://github.com/puppetlabs/puppetlabs-facts.git'
     provision: 'https://github.com/puppetlabs/provision.git'
-    puppet_agent: 
+    puppet_agent:
       repo: 'https://github.com/puppetlabs/puppetlabs-puppet_agent.git'
-      ref:  v4.13.0
+      ref:   v4.13.0
   symlinks:
     registry: "#{source_dir}"
     mixed_default_settings: "#{source_dir}/spec/fixtures/mixed_default_settings"
