@@ -8,28 +8,29 @@ describe Puppet::Type.type(:registry_value) do
 
   [:ensure, :type, :data].each do |property|
     it "has a #{property} property" do
-      described_class.attrclass(property).ancestors.should be_include(Puppet::Property)
+      expect(described_class.attrclass(property).ancestors.should(be_include(Puppet::Property)))
     end
 
     it "has documentation for its #{property} property" do
-      described_class.attrclass(property).doc.should be_instance_of(String)
+      expect(described_class.attrclass(property).doc.should(be_instance_of(String)))
     end
   end
 
   describe 'path parameter' do
     it 'has a path parameter' do
-      Puppet::Type.type(:registry_value).attrtype(:path).should == :param
+      expect(Puppet::Type.type(:registry_value).attrtype(:path).should == :param)
     end
+
     # rubocop:disable RSpec/RepeatedExample
     ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
       it "accepts #{path}" do
-        described_class.new(path: path, catalog: catalog)
+        expect(described_class.new(path: path, catalog: catalog))
       end
     end
 
     ['hklm\\', 'hklm\\software\\', 'hklm\\software\\vendor\\'].each do |path|
       it "accepts the unnamed (default) value: #{path}" do
-        described_class.new(path: path, catalog: catalog)
+        expect(described_class.new(path: path, catalog: catalog))
       end
     end
     # rubocop:enable RSpec/RepeatedExample
@@ -55,26 +56,26 @@ describe Puppet::Type.type(:registry_value) do
     ['HKLM\\name', 'HKEY_LOCAL_MACHINE\\name', 'hklm\\name'].each do |root|
       it "canonicalizes root key #{root}" do
         value = described_class.new(path: root, catalog: catalog)
-        value[:path].should == 'hklm\name'
+        expect(value[:path].should == 'hklm\name')
       end
     end
 
     ['HKLM\\Software\\\\nam\\e', 'HKEY_LOCAL_MACHINE\\Software\\\\nam\\e', 'hklm\\Software\\\\nam\\e'].each do |root|
       it "uses a double backslash when canonicalizing value names with a backslash #{root}" do
         value = described_class.new(path: root, catalog: catalog)
-        value[:path].should == 'hklm\Software\\\\nam\e'
+        expect(value[:path].should == 'hklm\Software\\\\nam\e')
       end
     end
 
     {
-      'HKLM\\Software\\\\Middle\\\\Slashes'  => 'hklm\\Software\\\\Middle\\\\Slashes',
+      'HKLM\\Software\\\\Middle\\\\Slashes' => 'hklm\\Software\\\\Middle\\\\Slashes',
       'HKLM\\Software\\\\\\\\LeadingSlashes' => 'hklm\\Software\\\\\\\\LeadingSlashes',
-      'HKLM\\Software\\\\TrailingSlashes\\'  => 'hklm\\Software\\\\TrailingSlashes\\',
-      'HKLM\\Software\\\\\\'                 => 'hklm\\Software\\\\\\', # A value name of backslash
+      'HKLM\\Software\\\\TrailingSlashes\\' => 'hklm\\Software\\\\TrailingSlashes\\',
+      'HKLM\\Software\\\\\\' => 'hklm\\Software\\\\\\' # A value name of backslash
     }.each do |testcase, expected_value|
       it "uses a double backslash as a delimeter between path and value for title #{testcase}" do
         value = described_class.new(path: testcase, catalog: catalog)
-        value[:path].should == expected_value
+        expect(value[:path].should == expected_value)
       end
     end
 
@@ -83,7 +84,7 @@ describe Puppet::Type.type(:registry_value) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'supports 32-bit values' do
-      _value = described_class.new(path: '32:hklm\software\foo', catalog: catalog)
+      expect(_value = described_class.new(path: '32:hklm\software\foo', catalog: catalog))
     end
   end
 
@@ -94,22 +95,22 @@ describe Puppet::Type.type(:registry_value) do
       {
         context: 'with a non-default value_name',
         reg_value_title: 'hklm\software\foo\bar',
-        expected_reg_key_title: 'hklm\Software\foo',
+        expected_reg_key_title: 'hklm\Software\foo'
       },
       {
         context: 'with a mixed case path and value_name',
         reg_value_title: 'hkLm\soFtwarE\fOo\Bar',
-        expected_reg_key_title: 'hklm\Software\foo',
+        expected_reg_key_title: 'hklm\Software\foo'
       },
       {
         context: 'with a default value_name',
         reg_value_title: 'hklm\software\foo\bar\\',
-        expected_reg_key_title: 'hklm\Software\foo\bar',
+        expected_reg_key_title: 'hklm\Software\foo\bar'
       },
       {
         context: 'with a value whose parent key is not managed but does have an ancestor key in the catalog',
         reg_value_title: 'hklm\software\foo\bar\baz\alice',
-        expected_reg_key_title: 'hklm\Software\foo\bar',
+        expected_reg_key_title: 'hklm\Software\foo\bar'
       },
     ].each do |testcase|
       context testcase[:context] do
@@ -138,7 +139,7 @@ describe Puppet::Type.type(:registry_value) do
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
       it "supports a #{type} type" do
         value[:type] = type
-        value[:type].should == type
+        expect(value[:type].should == type)
       end
     end
 
@@ -150,28 +151,27 @@ describe Puppet::Type.type(:registry_value) do
   describe 'data property' do
     let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
 
-    context 'string data' do
+    context 'with string data' do
       ['', 'foobar'].each do |data|
         it "accepts '#{data}'" do
           value[:type] = :string
-          value[:data] = data
+          expect(value[:data] = data)
         end
       end
-
-      pending 'it should accept nil'
     end
 
-    context 'integer data' do
+    context 'with integer data' do
       [:dword, :qword].each do |type|
-        context "for #{type}" do
-          [0, 0xFFFFFFFF, -1, 42].each do |data|
+        context "when #{type}" do
+          arr1 = [0, 0xFFFFFFFF, -1, 42]
+          arr1.each do |data|
             it "accepts #{data}" do
               value[:type] = type
-              value[:data] = data
+              expect(value[:data] = data)
             end
           end
-
-          ['foobar', ':true'].each do |data|
+          arr2 = ['foobar', ':true']
+          arr2.each do |data|
             it "rejects #{data}" do
               value[:type] = type
               expect { value[:data] = data }.to raise_error(Puppet::Error)
@@ -180,12 +180,12 @@ describe Puppet::Type.type(:registry_value) do
         end
       end
 
-      context 'for 64-bit integers' do
+      context 'when 64-bit integers' do
         let(:data) { 0xFFFFFFFFFFFFFFFF }
 
         it 'accepts qwords' do
           value[:type] = :qword
-          value[:data] = data
+          expect(value[:data] = data)
         end
 
         it 'rejects dwords' do
@@ -195,23 +195,23 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context 'binary data' do
+    context 'when binary data' do
       # rubocop:disable RSpec/RepeatedExample
       ['', 'CA FE BE EF', 'DEADBEEF'].each do |data|
         it "accepts '#{data}'" do
           value[:type] = :binary
-          value[:data] = data
+          expect(value[:data] = data)
         end
       end
       [9, '1', 'A'].each do |data|
         it "accepts '#{data}' and have a leading zero" do
           value[:type] = :binary
-          value[:data] = data
+          expect(value[:data] = data)
         end
       end
       # rubocop:enable RSpec/RepeatedExample
 
-      ["\040\040", 'foobar', :true].each do |data|
+      ["\040\040", 'foobar', true].each do |data|
         it "rejects '#{data}'" do
           value[:type] = :binary
           expect { value[:data] = data }.to raise_error(Puppet::Error)
@@ -219,15 +219,15 @@ describe Puppet::Type.type(:registry_value) do
       end
     end
 
-    context 'array data' do
+    context 'when array data' do
       it 'supports array data' do
         value[:type] = :array
-        value[:data] = ['foo', 'bar', 'baz']
+        expect(value[:data] = ['foo', 'bar', 'baz'])
       end
 
       it 'supports an empty array' do
         value[:type] = :array
-        value[:data] = []
+        expect(value[:data] = [])
       end
 
       [[''], nil, ['', 'foo', 'bar'], ['foo', '', 'bar'], ['foo', 'bar', '']].each do |data|

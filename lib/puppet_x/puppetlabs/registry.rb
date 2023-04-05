@@ -17,7 +17,7 @@ module PuppetX
         {
           hkcr: Win32::Registry::HKEY_CLASSES_ROOT,
           hklm: Win32::Registry::HKEY_LOCAL_MACHINE,
-          hku: Win32::Registry::HKEY_USERS,
+          hku: Win32::Registry::HKEY_USERS
         }
       end
 
@@ -27,13 +27,13 @@ module PuppetX
 
       def self.type2name_map
         {
-          Win32::Registry::REG_NONE      => :none,
-          Win32::Registry::REG_SZ        => :string,
+          Win32::Registry::REG_NONE => :none,
+          Win32::Registry::REG_SZ => :string,
           Win32::Registry::REG_EXPAND_SZ => :expand,
-          Win32::Registry::REG_BINARY    => :binary,
-          Win32::Registry::REG_DWORD     => :dword,
-          Win32::Registry::REG_QWORD     => :qword,
-          Win32::Registry::REG_MULTI_SZ  => :array,
+          Win32::Registry::REG_BINARY => :binary,
+          Win32::Registry::REG_DWORD => :dword,
+          Win32::Registry::REG_QWORD => :qword,
+          Win32::Registry::REG_MULTI_SZ => :array
         }
       end
 
@@ -52,6 +52,7 @@ module PuppetX
       # this class.
       class RegistryPathBase < String
         attr_reader :path
+
         def initialize(path)
           @filter_path_memo = nil
           @path ||= path
@@ -61,7 +62,7 @@ module PuppetX
         # The path is valid if we're able to parse it without exceptions.
         def valid?
           (filter_path && true)
-        rescue
+        rescue StandardError
           false
         end
 
@@ -98,10 +99,45 @@ module PuppetX
 
         private
 
-        def filter_path
-          if @filter_path_memo
-            return @filter_path_memo
+        def filter_bits(prefix, res)
+          case prefix
+          when '32:'
+            res[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_32KEY
+            res[:prefix] = '32:'
+          else
+            res[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY
+            res[:prefix] = ''
           end
+          res
+        end
+
+        def filter_canonical(res)
+          return "#{res[:prefix]}#{res[:root]}" if res[:trailing_path].empty?
+
+          # Leading backslash is not part of the subkey name
+          "#{res[:prefix]}#{res[:root]}\\#{res[:trailing_path]}"
+        end
+
+        # rubocop:disable Metrics/MethodLength
+        def filter_hkey(path)
+          case path
+          when %r{hkey_local_machine}, %r{hklm}
+            :hklm
+          when %r{hkey_classes_root}, %r{hkcr}
+            :hkcr
+          when %r{hkey_users}, %r{hku}
+            :hku
+          when %r{hkey_current_user}, %r{hkcu}, %r{hkey_current_config}, %r{hkcc}, %r{hkey_performance_data},
+            %r{hkey_performance_text}, %r{hkey_performance_nlstext}, %r{hkey_dyn_data}
+            raise ArgumentError, "Unsupported predefined key: #{path}"
+          else
+            raise ArgumentError, "Invalid registry key: #{path}"
+          end
+        end
+
+        def filter_path
+          return @filter_path_memo if @filter_path_memo
+
           result = {}
 
           path = @path
@@ -109,51 +145,19 @@ module PuppetX
           path = path.gsub(%r{\\*$}, '')
 
           captures = %r{^(32:)?([h|H][^\\]*)((?:\\[^\\]{1,255})*)$}.match(path)
-          unless captures
-            raise ArgumentError, "Invalid registry key: #{path}"
-          end
+          raise ArgumentError, "Invalid registry key: #{path}" unless captures
 
-          case captures[1]
-          when '32:'
-            result[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_32KEY
-            result[:prefix] = '32:'
-          else
-            result[:access] = PuppetX::Puppetlabs::Registry::KEY_WOW64_64KEY
-            result[:prefix] = ''
-          end
+          filter_bits(captures[1], result)
 
           # canonical root key symbol
-          result[:root] = case captures[2].to_s.downcase
-                          when %r{hkey_local_machine}, %r{hklm}
-                            :hklm
-                          when %r{hkey_classes_root}, %r{hkcr}
-                            :hkcr
-                          when %r{hkey_users}, %r{hku}
-                            :hku
-                          when %r{hkey_current_user}, %r{hkcu},
-                    %r{hkey_current_config}, %r{hkcc},
-                    %r{hkey_performance_data},
-                    %r{hkey_performance_text},
-                    %r{hkey_performance_nlstext},
-                    %r{hkey_dyn_data}
-                            raise ArgumentError, "Unsupported predefined key: #{path}"
-                          else
-                            raise ArgumentError, "Invalid registry key: #{path}"
-                          end
-
+          result[:root] = filter_hkey(captures[2].to_s.downcase)
           result[:trailing_path] = captures[3]
-
           result[:trailing_path].gsub!(%r{^\\}, '')
-
-          result[:canonical] = if result[:trailing_path].empty?
-                                 "#{result[:prefix]}#{result[:root]}"
-                               else
-                                 # Leading backslash is not part of the subkey name
-                                 "#{result[:prefix]}#{result[:root]}\\#{result[:trailing_path]}"
-                               end
+          result[:canonical] = filter_canonical(result)
 
           @filter_path_memo = result
         end
+        # rubocop:enable Metrics/MethodLength
       end
 
       class RegistryKeyPath < RegistryPathBase
@@ -170,9 +174,9 @@ module PuppetX
         # delimiter if the valuename actually contains a backslash
         def self.combine_path_and_value(keypath, valuename)
           if valuename.include?('\\')
-            keypath + '\\\\' + valuename
+            "#{keypath}\\\\#{valuename}"
           else
-            keypath + '\\' + valuename
+            "#{keypath}\\#{valuename}"
           end
         end
 
@@ -193,9 +197,9 @@ module PuppetX
           # Because we extracted the valuename in the initializer we
           # need to add it back in when canonical is called.
           if valuename.include?('\\')
-            filter_path[:canonical] + '\\\\' + valuename
+            "#{filter_path[:canonical]}\\\\#{valuename}"
           else
-            filter_path[:canonical] + '\\' + valuename
+            "#{filter_path[:canonical]}\\#{valuename}"
           end
         end
 

@@ -60,7 +60,7 @@ describe 'Registry Management' do
         key  => '32:HKLM\\Software\\VENDOR\\PuppetLabs_32bits',
         data => "32bit string",
       }
-CREATE
+    CREATE
   end
 
   let(:update) do
@@ -104,7 +104,7 @@ CREATE
         key  => '32:HKLM\\Software\\VENDOR\\PuppetLabs_32bits',
         data => "updated 32bit string",
       }
-UPDATE
+    UPDATE
   end
 
   let(:delete) do
@@ -140,18 +140,18 @@ UPDATE
       registry_value { '32:HKLM\\Software\\VENDOR\\PuppetLabs_32bits\\\\some_value':
         ensure => absent,
       }
-DELETE
+    DELETE
   end
 
   it 'creates registry entries' do
-    idempotent_apply(create)
+    expect(idempotent_apply(create))
   end
 
   it 'update registry entries' do
-    idempotent_apply(update)
+    expect(idempotent_apply(update))
   end
 
   it 'deletes registry entries' do
-    idempotent_apply(delete)
+    expect(idempotent_apply(delete))
   end
 end

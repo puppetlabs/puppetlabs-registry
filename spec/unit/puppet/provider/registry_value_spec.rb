@@ -26,18 +26,19 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
-    expect(instance).to receive(:export_string).never
+    # rubocop:disable RSpec/ExpectInHook
+    expect(instance).not_to receive(:export_string)
 
-    expect(instance).to receive(:delete_value).never
-    expect(instance).to receive(:delete_key).never
+    expect(instance).not_to receive(:delete_value)
+    expect(instance).not_to receive(:delete_key)
 
     if RUBY_VERSION >= '2.1'
       # also, expect that we're not using Rubys each_key / each_value which exhibit bad behavior
-      expect(instance).to receive(:each_key).never
-      expect(instance).to receive(:each_value).never
+      expect(instance).not_to receive(:each_key)
+      expect(instance).not_to receive(:each_value)
 
       # this covers []= write_s write_i and write_bin
-      expect(instance).to receive(:write).never
+      expect(instance).not_to receive(:write)
     end
 
     # rubocop:enable RSpec/ExpectInHook
@@ -61,47 +62,47 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
   describe '#exists?' do
     it 'returns true for a well known hive' do
       reg_value = type.new(title: 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType', provider: described_class.name)
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
     end
 
     it 'returns true for a well known hive with mixed case name' do
       reg_value = type.new(title: 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareType'.upcase, provider: described_class.name)
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
     end
 
     it 'returns true for a well known hive with double backslash' do
       reg_value = type.new(title: 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\\\\SoftwareType', provider: described_class.name)
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
     end
 
     it 'returns true for a well known hive with mixed case name with double backslash' do
       reg_value = type.new(title: 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\\\\SoftwareType'.upcase, provider: described_class.name)
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
     end
 
     it 'returns false for a bogus hive/path' do
       reg_value = type.new(path: 'hklm\foobar5000', catalog: catalog, provider: described_class.name)
-      reg_value.provider.exists?.should be false
+      expect(reg_value.provider.exists?).to be(false)
     end
   end
 
   describe '#regvalue' do
     it 'returns a valid string for a well known key' do
       reg_value = type.new(path: 'hklm\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRoot', provider: described_class.name)
-      reg_value.provider.data.should eq [ENV['SystemRoot']]
-      reg_value.provider.type.should eq :string
+      expect(reg_value.provider.data).to equal([ENV.fetch('SystemRoot', nil)])
+      expect(reg_value.provider.type).to equal(:string)
     end
 
     it 'returns a string of lowercased hex encoded bytes' do
       reg = described_class.new
       _type, data = reg.from_native([3, "\u07AD"])
-      data.should eq ['de ad']
+      expect(data).to equal(['de ad'])
     end
 
     it 'left pads binary strings' do
       reg = described_class.new
       _type, data = reg.from_native([3, "\x1"])
-      data.should eq ['01']
+      expect(data).to equal(['01'])
     end
   end
 
@@ -110,48 +111,50 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     let(:valuename) { SecureRandom.uuid }
     let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
 
+    # rubocop:disable Metrics/MethodLength
     def create_and_destroy(path, reg_type, data)
       reg_value = type.new(path: path,
                            type: reg_type,
                            data: data,
                            provider: described_class.name)
       already_exists = reg_value.provider.exists?
-      already_exists.should be_falsey
+      expect(already_exists).to be(false)
       # something has gone terribly wrong here, pull the ripcord
       raise if already_exists
 
       reg_value.provider.create
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
       expect(reg_value.provider.data).to eq([data].flatten)
 
       reg_value.provider.destroy
-      reg_value.provider.exists?.should be false
+      expect(reg_value.provider.exists?).to be(false)
     end
+    # rubocop:enable Metrics/MethodLength
 
     context 'with a valuename containing a middle double backslash' do
       let(:valuename) { SecureRandom.uuid.insert(5, '\\\\') }
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
-        create_and_destroy(path, :string, SecureRandom.uuid)
+        expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
       end
     end
 
     context 'with a valuename containing a leading double backslash' do
-      let(:valuename) { '\\\\' + SecureRandom.uuid }
+      let(:valuename) { "\\\\#{SecureRandom.uuid}" }
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
-        create_and_destroy(path, :string, SecureRandom.uuid)
+        expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
       end
     end
 
     context 'with a valuename containing a trailing double backslash' do
-      let(:valuename) { SecureRandom.uuid + '\\\\' }
+      let(:valuename) { "#{SecureRandom.uuid}\\\\" }
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
-        create_and_destroy(path, :string, SecureRandom.uuid)
+        expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
       end
     end
 
@@ -160,7 +163,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
-        create_and_destroy(path, :string, SecureRandom.uuid)
+        expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
       end
     end
 
@@ -169,56 +172,56 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\\\#{valuename}" }
 
       it 'can destroy a randomly created REG_SZ value' do
-        create_and_destroy(path, :string, SecureRandom.uuid)
+        expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
       end
 
       it 'can destroy a randomly created REG_EXPAND_SZ value' do
-        create_and_destroy(path, :expand, "#{SecureRandom.uuid} system root is %SystemRoot%")
+        expect(create_and_destroy(path, :expand, "#{SecureRandom.uuid} system root is %SystemRoot%")).to be(true)
       end
 
       it 'can destroy a randomly created REG_BINARY value' do
-        create_and_destroy(path, :binary, '01 01 10 10')
+        expect(create_and_destroy(path, :binary, '01 01 10 10')).to be(true)
       end
 
       it 'can destroy a randomly created REG_DWORD value' do
-        create_and_destroy(path, :dword, rand(2**32 - 1))
+        expect(create_and_destroy(path, :dword, rand((2**32) - 1))).to be(true)
       end
 
       it 'can destroy a randomly created REG_QWORD value' do
-        create_and_destroy(path, :qword, rand(2**64 - 1))
+        expect(create_and_destroy(path, :qword, rand((2**64) - 1))).to be(true)
       end
 
       it 'can destroy a randomly created REG_MULTI_SZ value' do
-        create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])
+        expect(create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])).to be(true)
       end
     end
 
     it 'can destroy a randomly created default REG_SZ value' do
-      create_and_destroy(default_path, :string, SecureRandom.uuid)
+      expect(create_and_destroy(default_path, :string, SecureRandom.uuid)).to be(true)
     end
 
     it 'can destroy a randomly created REG_SZ value' do
-      create_and_destroy(path, :string, SecureRandom.uuid)
+      expect(create_and_destroy(path, :string, SecureRandom.uuid)).to be(true)
     end
 
     it 'can destroy a randomly created REG_EXPAND_SZ value' do
-      create_and_destroy(path, :expand, "#{SecureRandom.uuid} system root is %SystemRoot%")
+      expect(create_and_destroy(path, :expand, "#{SecureRandom.uuid} system root is %SystemRoot%")).to be(true)
     end
 
     it 'can destroy a randomly created REG_BINARY value' do
-      create_and_destroy(path, :binary, '01 01 10 10')
+      expect(create_and_destroy(path, :binary, '01 01 10 10')).to be(true)
     end
 
     it 'can destroy a randomly created REG_DWORD value' do
-      create_and_destroy(path, :dword, rand(2**32 - 1))
+      expect(create_and_destroy(path, :dword, rand((2**32) - 1))).to be(true)
     end
 
     it 'can destroy a randomly created REG_QWORD value' do
-      create_and_destroy(path, :qword, rand(2**64 - 1))
+      expect(create_and_destroy(path, :qword, rand((2**64) - 1))).to be(true)
     end
 
     it 'can destroy a randomly created REG_MULTI_SZ value' do
-      create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])
+      expect(create_and_destroy(path, :array, [SecureRandom.uuid, SecureRandom.uuid])).to be(true)
     end
   end
 
@@ -248,14 +251,13 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # values chosen at 1 bit past previous byte boundary
     [0xFF + 1, 0xFFFF + 1, 0xFFFFFF + 1, 0xFFFFFFFF].each do |value|
       it 'properly round-trips written values by converting endianness properly - 1' do
-        write_and_read_value(path, :dword, value)
-        write_and_read_value(path, :qword, value)
+        expect(idempotent_apply(write_and_read_value(path, :dword, value))).to be(true)
       end
     end
 
     [0xFFFFFFFFFF + 1, 0xFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFF + 1, 0xFFFFFFFFFFFFFFFF].each do |value|
       it 'properly round-trips written values by converting endianness properly - 2' do
-        write_and_read_value(path, :qword, value)
+        expect(write_and_read_value(path, :qword, value)).to be(true)
       end
     end
   end
@@ -302,15 +304,15 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       already_exists.should be_falsey
 
       reg_value.provider.create
-      reg_value.provider.exists?.should be true
+      expect(reg_value.provider.exists?).to be(true)
 
-      reg_value.provider.data.length.should eq 1
-      reg_value.provider.type.should eq :string
+      expect(reg_value.provider.data.length).to eq(1)
+      expect(reg_value.provider.type).to eq(:string)
 
       # The UTF-16LE string written should come back as the equivalent UTF-8
       written = reg_value.provider.data.first
-      written.should eq(utf_8_str)
-      written.encoding.should eq(Encoding::UTF_8)
+      expect(written).to eq(utf_8_str)
+      expect(written.encoding).to eq(Encoding::UTF_8)
     end
   end
 end

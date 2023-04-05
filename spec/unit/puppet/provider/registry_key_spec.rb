@@ -18,10 +18,11 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
-    expect(instance).to receive(:export_string).never
+    # rubocop:disable RSpec/ExpectInHook
+    expect(instance).not_to receive(:export_string)
 
-    expect(instance).to receive(:delete_value).never
-    expect(instance).to receive(:delete_key).never
+    expect(instance).not_to receive(:delete_value)
+    expect(instance).not_to receive(:delete_key)
     # rubocop:enable RSpec/ExpectInHook
   end
 
@@ -30,7 +31,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
       guid = SecureRandom.uuid
       reg_key = type.new(path: "hklm\\#{puppet_key}\\#{subkey_name}\\#{guid}", provider: described_class.name)
       already_exists = reg_key.provider.exists?
-      already_exists.should be_falsey
+      expect(already_exists).to be(false)
 
       # something has gone terribly wrong here, pull the ripcord
       break if already_exists

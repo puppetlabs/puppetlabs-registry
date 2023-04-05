@@ -8,8 +8,9 @@ rescue LoadError
   # Work around #7788 (Rubygems support for modules)
   require 'pathname' # JJM WORK_AROUND #14073
   module_base = Pathname.new(__FILE__).dirname
-  require module_base + '../../../' + 'puppet_x/puppetlabs/registry'
+  require "#{module_base}../../../puppet_x/puppetlabs/registry"
 end
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_key).provide(:registry) do
   desc <<-DOC
    @summary Registry_key provider
@@ -47,7 +48,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     Puppet.debug("Checking existence of registry key #{self}")
     begin
       !!hive.open(subkey, Win32::Registry::KEY_READ | access) { |_reg| true } # rubocop:disable Style/DoubleNegation
-    rescue
+    rescue StandardError
       false
     end
   end
@@ -56,6 +57,7 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     Puppet.debug("Destroying registry key #{self}")
 
     raise ArgumentError, "Cannot delete root key: #{path}" unless subkey
+
     delete_key(hive, subkey, access)
   end
 
@@ -76,3 +78,4 @@ Puppet::Type.type(:registry_key).provide(:registry) do
     @path ||= PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(resource.parameter(:path).value)
   end
 end
+# rubocop:enable Metrics/BlockLength

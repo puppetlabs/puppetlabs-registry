@@ -5,10 +5,11 @@ begin
   require 'puppet_x/puppetlabs/registry'
 rescue LoadError
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  module_base = Pathname.new(__FILE__).dirname + '../../../'
-  require module_base + 'puppet_x/puppetlabs/registry'
+  module_base = "#{Pathname.new(__FILE__).dirname}../../../"
+  require "#{module_base}puppet_x/puppetlabs/registry"
 end
 
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_value).provide(:registry) do
   desc <<-DOC
     @summary Registry_value provider
@@ -35,6 +36,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     path.subkey
   end
 
+  # rubocop:disable Metrics/MethodLength
   def exists?
     Puppet.debug("Checking the existence of registry value: #{self}")
     found = false
@@ -49,20 +51,21 @@ Puppet::Type.type(:registry_value).provide(:registry) do
           raise Win32::Registry::Error, status unless found
         end
       end
-    rescue Win32::Registry::Error => detail
-      case detail.code
+    rescue Win32::Registry::Error => e
+      case e.code
       when 2
         # Code 2 is the error message for "The system cannot find the file specified."
         # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
         found = false
       else
-        error = Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{detail.message}) ERROR CODE: #{detail.code}. Puppet Error ID: D4B679E4-0E22-48D5-80EF-96AAEC0282B9")
-        error.set_backtrace detail.backtrace
+        error = Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{e.message}) ERROR CODE: #{e.code}. Puppet Error ID: D4B679E4-0E22-48D5-80EF-96AAEC0282B9")
+        error.set_backtrace e.backtrace
         raise error
       end
     end
     found
   end
+  # rubocop:enable Metrics/MethodLength
 
   def create
     Puppet.debug("Creating registry value: #{self}")
@@ -74,6 +77,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # concept of flush.
     Puppet.debug("Flushing registry value: #{self}")
     return if resource[:ensure] == :absent
+
     write_value
   end
 
@@ -98,6 +102,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     regvalue[:data] = value
   end
 
+  # rubocop:disable Metrics/MethodLength
   def regvalue
     unless @regvalue
       @regvalue = {}
@@ -121,10 +126,11 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # should always get an array from Puppet.  We need to convert this
     # array to something usable by the Win API.
     raise Puppet::Error, 'Data should be an Array (ErrorID 37D9BBAB-52E8-4A7C-9F2E-D7BF16A59050)' unless pdata.is_a?(Array)
+
     ndata =
       case ptype
       when :binary
-        pdata.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join('')
+        pdata.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join
       when :array
         # We already have an array, and the native API write method takes an
         # array, so send it thru.
@@ -137,6 +143,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
     [PuppetX::Puppetlabs::Registry.name2type(ptype), ndata]
   end
+  # rubocop:enable Metrics/MethodLength
 
   # convert from native type and data to puppet
   def from_native(ary)
@@ -146,9 +153,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       case PuppetX::Puppetlabs::Registry.type2name(ntype)
       when :binary
         ndata.bytes.map { |byte| '%02x' % byte }.join(' ')
-      when :array
-        # We get the data from the registry in Array form.
-        ndata
       else
         ndata
       end
@@ -162,21 +166,25 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   private
 
+  def eval_error(err)
+    case err
+    when 2
+      # Code 2 is the error message for "The system cannot find the file specified."
+      # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
+      Puppet::Error.new("Cannot write to the registry. The parent key does not exist. detail: (#{e.message}) Puppet Error ID: AC99C7C6-98D6-4E91-A75E-970F4064BF95")
+    else
+      Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{e.message}). ERROR CODE: #{e.code}. Puppet Error ID: F46C6AE2-C711-48F9-86D6-5D50E1988E48")
+    end
+  end
+
   def write_value
     hive.open(subkey, Win32::Registry::KEY_ALL_ACCESS | access) do |reg|
       ary = to_native(resource[:type], resource[:data])
       write(reg, valuename, ary[0], ary[1])
     end
-  rescue Win32::Registry::Error => detail
-    error = case detail.code
-            when 2
-              # Code 2 is the error message for "The system cannot find the file specified."
-              # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
-              Puppet::Error.new("Cannot write to the registry. The parent key does not exist. detail: (#{detail.message}) Puppet Error ID: AC99C7C6-98D6-4E91-A75E-970F4064BF95")
-            else
-              Puppet::Error.new("Unexpected exception from Win32 API. detail: (#{detail.message}). ERROR CODE: #{detail.code}. Puppet Error ID: F46C6AE2-C711-48F9-86D6-5D50E1988E48")
-            end
-    error.set_backtrace detail.backtrace
+  rescue Win32::Registry::Error => e
+    error = eval_error(e.code)
+    error.set_backtrace e.backtrace
     raise error
   end
 
@@ -195,6 +203,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   # byte array for string-based registry values like REG_SZ. In
   # addition REG_MULTI_SZ must append another wide null character
   # to signify there are no more entries in the array.
+  # rubocop:disable Metrics/MethodLength
   def data_to_bytes(type, data)
     bytes = []
 
@@ -219,6 +228,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
     bytes
   end
+  # rubocop:enable Metrics/MethodLength
 
   def write(reg, _name, type, data)
     FFI::Pointer.from_string_to_wide_string(valuename) do |name_ptr|
@@ -260,3 +270,4 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value)
   end
 end
+# rubocop:enable Metrics/BlockLength

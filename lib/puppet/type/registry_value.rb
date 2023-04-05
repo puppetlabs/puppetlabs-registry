@@ -5,7 +5,7 @@ begin
   require 'puppet_x/puppetlabs/registry'
 rescue LoadError
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  require Pathname.new(__FILE__).dirname + '../../' + 'puppet_x/puppetlabs/registry'
+  require "#{Pathname.new(__FILE__).dirname}../../puppet_x/puppetlabs/registry"
 end
 
 # @summary
@@ -18,11 +18,11 @@ end
 #
 #   **Autorequires:** Any parent registry key managed by Puppet will be
 #   autorequired.
-#
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_value) do
-  @doc = <<-EOT
+  @doc = <<-VALUES
     Manages registry values on Windows systems.
-  EOT
+  VALUES
   def self.title_patterns
     [[%r{^(.*?)\Z}m, [[:path]]]]
   end
@@ -42,9 +42,9 @@ Puppet::Type.newtype(:registry_value) do
   #      '32:HKLM\Software\Value3'. Use a double backslash between the value name
   #      and path when managing a value with a backslash in the name."
   newparam(:path, namevar: true) do
-    @doc = <<-EOT
+    @doc = <<-PATH
       The path to the registry value to manage.
-    EOT
+    PATH
     validate do |path|
       PuppetX::Puppetlabs::Registry::RegistryValuePath.new(path).valid?
     end
@@ -76,9 +76,9 @@ Puppet::Type.newtype(:registry_value) do
   #     * binary => REG_BINARY
   #
   newproperty(:type) do
-    @doc = <<-EOT
+    @doc = <<-DATA
       The Windows data type of the registry value.
-    EOT
+    DATA
     newvalues(:string, :array, :dword, :qword, :binary, :expand)
     defaultto :string
   end
@@ -91,9 +91,9 @@ Puppet::Type.newtype(:registry_value) do
   #   type is set to `array`."
   #
   newproperty(:data, array_matching: :all) do
-    @doc = <<-EOT
+    @doc = <<-DATA
       The data stored in the registry value.
-    EOT
+    DATA
 
     # We probably shouldn't set default values for this property at all. For
     # dword and qword specifically, the legacy default value will not pass
@@ -108,20 +108,14 @@ Puppet::Type.newtype(:registry_value) do
         raise('An array registry value can not contain empty values') if value.empty?
       when :dword
         munged = munge(value)
-        unless munged && (munged.abs >> 32) <= 0
-          raise("The data must be a valid DWORD: received '#{value}'")
-        end
+        raise("The data must be a valid DWORD: received '#{value}'") unless munged && (munged.abs >> 32) <= 0
       when :qword
         munged = munge(value)
-        unless munged && (munged.abs >> 64) <= 0
-          raise("The data must be a valid QWORD: received '#{value}'")
-        end
+        raise("The data must be a valid QWORD: received '#{value}'") unless munged && (munged.abs >> 64) <= 0
       when :binary
         munged = munge(value)
-        unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
-          raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'")
-        end
-      else #:string, :expand, :array
+        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
+      else # :string, :expand, :array
         true
       end
     end
@@ -131,7 +125,7 @@ Puppet::Type.newtype(:registry_value) do
       when :dword, :qword
         begin
           Integer(value)
-        rescue
+        rescue StandardError
           nil
         end
       when :binary
@@ -149,7 +143,7 @@ Puppet::Type.newtype(:registry_value) do
               .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
               .rstrip
               .downcase
-      else #:string, :expand, :array
+      else # :string, :expand, :array
         value
       end
     end
@@ -158,6 +152,7 @@ Puppet::Type.newtype(:registry_value) do
       case resource[:type]
       when :binary
         return false unless current
+
         current.casecmp(desired).zero?
       else
         super(current, desired)
@@ -165,12 +160,8 @@ Puppet::Type.newtype(:registry_value) do
     end
 
     def change_to_s(currentvalue, newvalue)
-      if currentvalue.respond_to? :join
-        currentvalue = currentvalue.join(',')
-      end
-      if newvalue.respond_to? :join
-        newvalue = newvalue.join(',')
-      end
+      currentvalue = currentvalue.join(',') if currentvalue.respond_to? :join
+      newvalue = newvalue.join(',') if newvalue.respond_to? :join
       super(currentvalue, newvalue)
     end
   end
@@ -179,9 +170,7 @@ Puppet::Type.newtype(:registry_value) do
     # To ensure consistent behavior, always require a value for the data
     # property. This validation can be removed if we remove the default value
     # for the data property, for all data types.
-    if property(:data).nil?
-      raise ArgumentError, "No value supplied for required property 'data'"
-    end
+    raise ArgumentError, "No value supplied for required property 'data'" if property(:data).nil?
   end
 
   # Autorequire the nearest ancestor registry_key found in the catalog.
@@ -194,9 +183,8 @@ Puppet::Type.newtype(:registry_value) do
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
     found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
-    if found
-      req << found.to_s.downcase
-    end
+    req << found.to_s.downcase if found
     req
   end
 end
+# rubocop:enable Metrics/BlockLength

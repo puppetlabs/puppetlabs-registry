@@ -5,7 +5,7 @@ begin
   require 'puppet_x/puppetlabs/registry'
 rescue LoadError
   require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  require Pathname.new(__FILE__).dirname + '../../' + 'puppet_x/puppetlabs/registry'
+  require "#{Pathname.new(__FILE__).dirname}../../puppet_x/puppetlabs/registry"
 end
 
 # @summary
@@ -23,10 +23,11 @@ end
 #
 #   **Autorequires:** Any parent registry key managed by Puppet will be
 #   autorequired.
+# rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_key) do
-  @doc = <<-EOT
+  @doc = <<-KEYS
     Manages registry keys on Windows
-  EOT
+  KEYS
   def self.title_patterns
     [[%r{^(.*?)\Z}m, [[:path]]]]
   end
@@ -39,9 +40,9 @@ Puppet::Type.newtype(:registry_key) do
   #   system, the 32-bit registry key can be explicitly managed using a
   #   prefix.  For example: '32:HKLM\Software'"
   newparam(:path, namevar: true) do
-    @doc = <<-EOT
+    @doc = <<-PATH
     The path to the registry key to manage
-  EOT
+    PATH
     validate do |path|
       PuppetX::Puppetlabs::Registry::RegistryKeyPath.new(path).valid?
     end
@@ -65,15 +66,15 @@ Puppet::Type.newtype(:registry_key) do
   # By both registry_key and registry_value types.
   # @summary Whether to delete any registry value associated with this key that is not being managed by puppet.
   newparam(:purge_values, boolean: true) do
-    @doc = <<-EOT
+    @doc = <<-BOOLEAN
     Common boolean for munging and validation.
-  EOT
-    newvalues(:true, :false)
+    BOOLEAN
+    newvalues(true, false)
     defaultto false
 
     validate do |value|
       case value
-      when true, %r{^true$}i, :true, false, %r{^false$}i, :false, :undef, nil
+      when true, %r{^true$}i, %r{^false$}i, false, :undef, nil
         true
       else
         # We raise an ArgumentError and not a Puppet::Error so we get manifest
@@ -84,7 +85,7 @@ Puppet::Type.newtype(:registry_key) do
 
     munge do |value|
       case value
-      when true, %r{^true$}i, :true
+      when true, %r{^true$}i
         true
       else
         false
@@ -100,12 +101,11 @@ Puppet::Type.newtype(:registry_key) do
     # other resources are expected to alias themselves to the downcase value so
     # that we respect the case insensitive and preserving nature of Windows.
     found = path.enum_for(:ascend).find { |p| catalog.resource(:registry_key, p.to_s.downcase) }
-    if found
-      req << found.to_s.downcase
-    end
+    req << found.to_s.downcase if found
     req
   end
 
+  # rubocop:disable Metrics/MethodLength
   def eval_generate
     # This value will be given post-munge so we can assume it will be a ruby true or false object
     return [] unless value(:purge_values)
@@ -128,4 +128,6 @@ Puppet::Type.newtype(:registry_key) do
     end
     resources
   end
+  # rubocop:enable Metrics/MethodLength
 end
+# rubocop:enable Metrics/BlockLength
