@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Changed
 
-- \(CONT-796\) Puppet 8 support [\#278](https://github.com/puppetlabs/puppetlabs-registry/pull/278) ([LukasAud](https://github.com/LukasAud))
+- \(CONT-796\) Puppet 8 support / Drop Puppet 6 support [\#278](https://github.com/puppetlabs/puppetlabs-registry/pull/278) ([LukasAud](https://github.com/LukasAud))
 
 ## [v4.1.2](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.2) (2023-03-23)
 
