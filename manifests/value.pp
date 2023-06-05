@@ -67,16 +67,16 @@ define registry::value (
 
   # If value_real is an empty string then the default value of the key will be
   # managed.  Use a double backslash so value names with a backslash are supported
-  if $data == undef {
+  if $data != undef {
     registry_value { "${key}\\\\${value_real}":
       type => $type,
-      data => $data,
+      data => Deferred('registry::deferred_data', [$data]),
     }
   }
   else {
     registry_value { "${key}\\\\${value_real}":
       type => $type,
-      data => Deferred('registry::deferred_data', [$data]),
+      data => $data,
     }
   }
 }

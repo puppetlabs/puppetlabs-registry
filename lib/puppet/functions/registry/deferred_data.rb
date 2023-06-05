@@ -2,8 +2,8 @@
 
 Puppet::Functions.create_function(:'registry::deferred_data') do
   dispatch :deferred_data do
-    param 'Any', :args
-    return_type 'Any'
+    param 'Optional[Variant[String, Numeric, Array[String]]]', :args
+    return_type 'Optional[Variant[String, Numeric, Array[String]]]'
   end
 
   def deferred_data(args)
