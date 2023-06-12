@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 require 'puppet/type'
-begin
-  require 'puppet_x/puppetlabs/registry'
-rescue LoadError
-  require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  require "#{Pathname.new(__FILE__).dirname}../../puppet_x/puppetlabs/registry"
-end
+require_relative '../../puppet_x/puppetlabs/registry'
 
 # @summary
 #   Manages registry keys on Windows systems

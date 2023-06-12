@@ -1,13 +1,7 @@
 # frozen_string_literal: true
 
 require 'puppet/type'
-begin
-  require 'puppet_x/puppetlabs/registry'
-rescue LoadError
-  require 'pathname' # JJM WORK_AROUND #14073 and #7788
-  module_base = "#{Pathname.new(__FILE__).dirname}../../../"
-  require "#{module_base}puppet_x/puppetlabs/registry"
-end
+require_relative '../../../puppet_x/puppetlabs/registry'
 
 # rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_value).provide(:registry) do
