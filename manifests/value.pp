@@ -70,7 +70,10 @@ define registry::value (
   if $data != undef {
     registry_value { "${key}\\\\${value_real}":
       type => $type,
-      data => Deferred('registry::deferred_data', [$data]),
+      data => (($data =~ String)) ? {
+        true    => Deferred('registry::deferred_data', [$data]),
+        default => $data,
+      },
     }
   }
   else {
