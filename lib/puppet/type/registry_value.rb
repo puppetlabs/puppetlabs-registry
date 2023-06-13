@@ -164,33 +164,6 @@ Puppet::Type.newtype(:registry_value) do
       newvalue = newvalue.join(',') if newvalue.respond_to? :join
       super(currentvalue, newvalue)
     end
-
-    # Override the `should` method to support `Deferred` values
-    def should
-      if @should.is_a?(Proc)
-        @should.call
-      else
-        @should
-      end
-    end
-
-    # Override the `insync?` method to compare `Deferred` values
-    def insync?(isa)
-      if @should.is_a?(Proc)
-        @should.call == isa
-      else
-        super(isa)
-      end
-    end
-
-    # Override the `change_to_s` method to handle arrays and `Deferred` values
-    def change_to_s(currentvalue, newvalue)
-      currentvalue = currentvalue.join(',') if currentvalue.is_a?(Array)
-
-      newvalue = newvalue.join(',') if newvalue.is_a?(Array)
-
-      super(currentvalue, newvalue)
-    end
   end
 
   validate do
