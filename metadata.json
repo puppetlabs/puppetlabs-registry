@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-registry",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "author": "puppetlabs",
   "summary": "This module provides a native type and provider to manage keys and values in the Windows Registry",
   "license": "Apache-2.0",
