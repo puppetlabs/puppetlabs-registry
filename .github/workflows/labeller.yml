@@ -10,12 +10,15 @@ on:
     inputs:
       label_name:
         description: "Module version to be released. Must be a valid semver string. (1.2.3)"
+        default: 'community'
         required: true
       label_color:
         description: "Module version to be released. Must be a valid semver string. (1.2.3)"
+        default: '5319e7'
         required: true
       org_membership:
         description: "Module version to be released. Must be a valid semver string. (1.2.3)"
+        default: 'puppetlabs'
         required: true
     
 jobs:
