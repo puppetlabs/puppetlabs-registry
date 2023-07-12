@@ -17,5 +17,5 @@ jobs:
           label_name: community
           label_color: '5319e7'
           org_membership: puppetlabs
-          fail_if_member: true
+          fail_if_member: 'true'
           token: ${{ secrets.IAC_COMMUNITY_LABELER }}
