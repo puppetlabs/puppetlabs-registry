@@ -1,4 +1,4 @@
-name: community-labeller
+name: "labeller"
 
 on:
   pull_request:
@@ -6,45 +6,10 @@ on:
       - opened
       - labeled
       - unlabeled
+  workflow_dispatch:
 
 jobs:
-  label:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Label issues or pull requests
-        uses: puppetlabs/community-labeller@v0
-        with:
-          label_name: community
-          label_color: '5319e7'
-          org_membership: puppetlabs
-          token: ${{ secrets.IAC_COMMUNITY_LABELER }}
 
-  test:
-    name: Label Must Exist
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for Labels
-        uses: actions/github-script@v6
-        with:
-          script: |
-            async function getPullRequest() {
-              // Get current pull request labels
-              const { data: { labels } } = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.number,
-              });
-
-              // Log found label names
-              for (const label of labels) {
-                core.info(`Found label named '${label.name}' on pull request number ${context.payload.number}`);
-              }
-
-              // Fail workflow if no labels exist
-              const labelsExist = labels.length > 0;
-              if (!labelsExist) {
-                core.setFailed(`Please ensure that a label exists on pull request number ${context.payload.number}`);
-              }
-            }
-
-            await getPullRequest();
+  mend:
+    uses: "puppetlabs/cat-github-actions/.github/workflows/labeller.yml@CONT-1219_labeller"
+    secrets: "inherit"
