@@ -20,6 +20,9 @@ on:
         description: "Module version to be released. Must be a valid semver string. (1.2.3)"
         default: 'puppetlabs'
         required: true
+      token: 
+        default: ${{ secrets.IAC_COMMUNITY_LABELER }}
+        required: true
     
 jobs:
   test:
