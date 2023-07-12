@@ -2,8 +2,9 @@ name: community-labeller
 
 on:
   pull_request:
-    branches:
-      - "main"
+    types:
+      - opened
+      - synchronize
 
 jobs:
   label:
