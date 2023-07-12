@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: puppetlabs/community-labeller@maint_pr_without_label
+      - uses: puppetlabs/community-labeller@test
         name: Label issues or pull requests
         with:
           label_name: community
