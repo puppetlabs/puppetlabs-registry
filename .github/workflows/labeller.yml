@@ -10,13 +10,9 @@ on:
   
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Labeller Workflow
-        uses: puppetlabs/cat-github-actions/.github/workflows/labeller.yml@CONT-1219_labeller
-        with:
-          label_name: community
-          label_color: '5319e7'
-          org_membership: puppetlabs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: "puppetlabs/cat-github-actions/.github/workflows/labeller.yml@CONT-1219_labeller"
+    with:
+      label_name: community
+      label_color: '5319e7'
+      org_membership: puppetlabs
+    secrets: "inherit"
