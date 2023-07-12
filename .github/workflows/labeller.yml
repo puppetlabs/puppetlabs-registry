@@ -1,7 +1,9 @@
 name: community-labeller
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - "main"
 
 jobs:
   label:
