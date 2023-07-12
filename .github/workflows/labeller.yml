@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: puppetlabs/community-labeller@test
+      - uses: puppetlabs/community-labeller@test2
         name: Label issues or pull requests
         with:
           label_name: community
