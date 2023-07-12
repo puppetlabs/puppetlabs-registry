@@ -28,4 +28,4 @@ jobs:
       label_name: "${{ github.event.inputs.label_name }}"
       label_color: "${{ github.event.inputs.label_color }}"
       org_membership: "${{ github.event.inputs.org_membership }}"
-    secrets: "inherit"
+    secrets: ${{ secrets.IAC_COMMUNITY_LABELER }}
