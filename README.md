@@ -174,3 +174,5 @@ If you would like to contribute to this module, please follow the rules in the [
 ### Contributors
 
 To see who's already involved, see the [list of contributors.](https://github.com/puppetlabs/puppetlabs-registry/graphs/contributors)
+
+###
