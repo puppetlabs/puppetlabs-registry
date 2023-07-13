@@ -14,6 +14,8 @@
 
 ## Overview
 
+
+
 This module supplies the types and providers you'll need to manage the Registry on your Windows nodes.
 
 ## Module Description
