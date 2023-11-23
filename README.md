@@ -9,7 +9,8 @@
 4. [Usage - Configuration options and additional functionality](#usage)
 5. [Reference](#reference)
 6. [Limitations](#limitations)
-7. [Development - Guide for contributing to registry](#development)
+7. [License](#license)
+8. [Development - Guide for contributing to registry](#development)
 
 ## Overview
 
@@ -159,6 +160,10 @@ For information on the classes and types, see the [REFERENCE.md](https://github.
 * Puppet doesn't recursively delete Registry keys.
 
 Please report any issues through our [Module Issue Tracker](https://tickets.puppet.com/browse/MODULES).
+
+## License
+
+This codebase is licensed under the Apache2.0 licensing, however due to the nature of the codebase the open source dependencies may also use a combination of [AGPL](https://opensource.org/license/agpl-v3/), [BSD-2](https://opensource.org/license/bsd-2-clause/), [BSD-3](https://opensource.org/license/bsd-3-clause/), [GPL2.0](https://opensource.org/license/gpl-2-0/), [LGPL](https://opensource.org/license/lgpl-3-0/), [MIT](https://opensource.org/license/mit/) and [MPL](https://opensource.org/license/mpl-2-0/) Licensing.
 
 ## Development
 
