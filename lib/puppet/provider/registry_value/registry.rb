@@ -3,7 +3,6 @@
 require 'puppet/type'
 require_relative '../../../puppet_x/puppetlabs/registry'
 
-# rubocop:disable Metrics/BlockLength
 Puppet::Type.type(:registry_value).provide(:registry) do
   desc <<-DOC
     @summary Registry_value provider
@@ -30,7 +29,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     path.subkey
   end
 
-  # rubocop:disable Metrics/MethodLength
   def exists?
     Puppet.debug("Checking the existence of registry value: #{self}")
     found = false
@@ -59,7 +57,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     end
     found
   end
-  # rubocop:enable Metrics/MethodLength
 
   def create
     Puppet.debug("Creating registry value: #{self}")
@@ -96,7 +93,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     regvalue[:data] = value
   end
 
-  # rubocop:disable Metrics/MethodLength
   def regvalue
     unless @regvalue
       @regvalue = {}
@@ -137,7 +133,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
     [PuppetX::Puppetlabs::Registry.name2type(ptype), ndata]
   end
-  # rubocop:enable Metrics/MethodLength
 
   # convert from native type and data to puppet
   def from_native(ary)
@@ -197,7 +192,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   # byte array for string-based registry values like REG_SZ. In
   # addition REG_MULTI_SZ must append another wide null character
   # to signify there are no more entries in the array.
-  # rubocop:disable Metrics/MethodLength
   def data_to_bytes(type, data)
     bytes = []
 
@@ -222,7 +216,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
     bytes
   end
-  # rubocop:enable Metrics/MethodLength
 
   def write(reg, _name, type, data)
     FFI::Pointer.from_string_to_wide_string(valuename) do |name_ptr|
@@ -264,4 +257,3 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     @path ||= PuppetX::Puppetlabs::Registry::RegistryValuePath.new(resource.parameter(:path).value)
   end
 end
-# rubocop:enable Metrics/BlockLength
