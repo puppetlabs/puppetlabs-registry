@@ -26,7 +26,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     # conversion from the given UTF-16LE characters to local codepage
     # a prime example is that IBM437 has no conversion from a Unicode en-dash
 
-    # rubocop:disable RSpec/ExpectInHook
     expect(instance).not_to receive(:export_string)
 
     expect(instance).not_to receive(:delete_value)
@@ -40,8 +39,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       # this covers []= write_s write_i and write_bin
       expect(instance).not_to receive(:write)
     end
-
-    # rubocop:enable RSpec/ExpectInHook
   end
 
   after(:all) do # rubocop:disable RSpec/BeforeAfterAll
@@ -111,7 +108,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     let(:valuename) { SecureRandom.uuid }
     let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
 
-    # rubocop:disable Metrics/MethodLength
     def create_and_destroy(path, reg_type, data)
       reg_value = type.new(path: path,
                            type: reg_type,
@@ -129,7 +125,6 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
       reg_value.provider.destroy
       expect(reg_value.provider.exists?).to be(false)
     end
-    # rubocop:enable Metrics/MethodLength
 
     context 'with a valuename containing a middle double backslash' do
       let(:valuename) { SecureRandom.uuid.insert(5, '\\\\') }

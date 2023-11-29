@@ -118,7 +118,6 @@ module PuppetX
           "#{res[:prefix]}#{res[:root]}\\#{res[:trailing_path]}"
         end
 
-        # rubocop:disable Metrics/MethodLength
         def filter_hkey(path)
           case path
           when %r{hkey_local_machine}, %r{hklm}

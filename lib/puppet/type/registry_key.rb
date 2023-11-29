@@ -18,7 +18,6 @@ require_relative '../../puppet_x/puppetlabs/registry'
 #
 #   **Autorequires:** Any parent registry key managed by Puppet will be
 #   autorequired.
-# rubocop:disable Metrics/BlockLength
 Puppet::Type.newtype(:registry_key) do
   @doc = <<-KEYS
     Manages registry keys on Windows
@@ -100,7 +99,6 @@ Puppet::Type.newtype(:registry_key) do
     req
   end
 
-  # rubocop:disable Metrics/MethodLength
   def eval_generate
     # This value will be given post-munge so we can assume it will be a ruby true or false object
     return [] unless value(:purge_values)
@@ -123,6 +121,4 @@ Puppet::Type.newtype(:registry_key) do
     end
     resources
   end
-  # rubocop:enable Metrics/MethodLength
 end
-# rubocop:enable Metrics/BlockLength
