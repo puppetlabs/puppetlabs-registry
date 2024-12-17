@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v5.0.2](https://github.com/puppetlabs/puppetlabs-registry/tree/v5.0.2) - 2024-12-17
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.1...v5.0.2)
+
+### Fixed
+
+- (CAT-2180) Upgrade rexml to address CVE-2024-49761 [#310](https://github.com/puppetlabs/puppetlabs-registry/pull/310) ([amitkarsale](https://github.com/amitkarsale))
+
 ## [v5.0.1](https://github.com/puppetlabs/puppetlabs-registry/tree/v5.0.1) - 2023-06-20
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.0...v5.0.1)
@@ -18,6 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v4.1.2...v5.0.0)
 
 ### Changed
+
 - (CONT-796) Puppet 8 support / Drop Puppet 6 support [#278](https://github.com/puppetlabs/puppetlabs-registry/pull/278) ([LukasAud](https://github.com/LukasAud))
 
 ## [v4.1.2](https://github.com/puppetlabs/puppetlabs-registry/tree/v4.1.2) - 2023-03-23
@@ -57,6 +66,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v3.2.0...v4.0.0)
 
 ### Changed
+
 - pdksync - Remove Puppet 5 from testing and bump minimal version to 6.0.0 [#236](https://github.com/puppetlabs/puppetlabs-registry/pull/236) ([carabasdaniel](https://github.com/carabasdaniel))
 
 ## [v3.2.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v3.2.0) - 2020-12-08
