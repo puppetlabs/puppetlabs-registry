@@ -10,8 +10,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
   DOC
   include Puppet::Util::Windows::Registry if Puppet.features.microsoft_windows?
 
-  defaultfor operatingsystem: :windows
-  confine    operatingsystem: :windows
+  defaultfor 'os.name': :windows
+  confine    'os.name': :windows
 
   def self.instances
     []
