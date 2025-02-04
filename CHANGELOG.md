@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v5.0.3](https://github.com/puppetlabs/puppetlabs-registry/tree/v5.0.3) - 2025-02-04
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.2...v5.0.3)
+
+### Fixed
+
+- (CAT-2212) Remove legacy facts [#312](https://github.com/puppetlabs/puppetlabs-registry/pull/312) ([amitkarsale](https://github.com/amitkarsale))
+
 ## [v5.0.2](https://github.com/puppetlabs/puppetlabs-registry/tree/v5.0.2) - 2024-12-17
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.1...v5.0.2)
