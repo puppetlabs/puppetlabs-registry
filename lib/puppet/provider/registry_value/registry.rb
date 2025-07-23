@@ -117,18 +117,27 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # array to something usable by the Win API.
     raise Puppet::Error, 'Data should be an Array (ErrorID 37D9BBAB-52E8-4A7C-9F2E-D7BF16A59050)' unless pdata.is_a?(Array)
 
+    # Unwrap Sensitive values if present
+    unwrapped_data = pdata.map do |item|
+      if item.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+        item.unwrap
+      else
+        item
+      end
+    end
+
     ndata =
       case ptype
       when :binary
-        pdata.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join
+        unwrapped_data.first.scan(%r{[a-f\d]{2}}i).map { |byte| [byte].pack('H2') }.join
       when :array
         # We already have an array, and the native API write method takes an
         # array, so send it thru.
-        pdata
+        unwrapped_data
       else
         # Since we have an array, take the first element and send it to the
         # native API which is expecting a scalar.
-        pdata.first
+        unwrapped_data.first
       end
 
     [PuppetX::Puppetlabs::Registry.name2type(ptype), ndata]
