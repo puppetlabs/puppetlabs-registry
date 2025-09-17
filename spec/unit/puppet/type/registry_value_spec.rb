@@ -24,45 +24,45 @@ describe Puppet::Type.type(:registry_value) do
     # rubocop:disable RSpec/RepeatedExample
     ['hklm\\propname', 'hklm\\software\\propname'].each do |path|
       it "accepts #{path}" do
-        expect(described_class.new(path: path, catalog: catalog))
+        expect(described_class.new(path:, catalog:))
       end
     end
 
     ['hklm\\', 'hklm\\software\\', 'hklm\\software\\vendor\\'].each do |path|
       it "accepts the unnamed (default) value: #{path}" do
-        expect(described_class.new(path: path, catalog: catalog))
+        expect(described_class.new(path:, catalog:))
       end
     end
     # rubocop:enable RSpec/RepeatedExample
 
     it 'strips trailling slashes from unnamed values' do
-      value = described_class.new(path: 'hklm\\software\\\\', catalog: catalog)
+      value = described_class.new(path: 'hklm\\software\\\\', catalog:)
 
       expect(value[:path]).to eq('hklm\\software\\')
     end
 
     ['HKEY_DYN_DATA\\', 'HKEY_PERFORMANCE_DATA\\name'].each do |path|
       it "rejects #{path} as unsupported" do
-        expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Unsupported})
+        expect { described_class.new(path:, catalog:) }.to raise_error(Puppet::Error, %r{Unsupported})
       end
     end
 
     ['hklm', 'hkcr', 'unknown\\name', 'unknown\\subkey\\name'].each do |path|
       it "rejects #{path} as invalid" do
-        expect { described_class.new(path: path, catalog: catalog) }.to raise_error(Puppet::Error, %r{Invalid registry key})
+        expect { described_class.new(path:, catalog:) }.to raise_error(Puppet::Error, %r{Invalid registry key})
       end
     end
 
     ['HKLM\\name', 'HKEY_LOCAL_MACHINE\\name', 'hklm\\name'].each do |root|
       it "canonicalizes root key #{root}" do
-        value = described_class.new(path: root, catalog: catalog)
+        value = described_class.new(path: root, catalog:)
         expect(value[:path].should == 'hklm\name')
       end
     end
 
     ['HKLM\\Software\\\\nam\\e', 'HKEY_LOCAL_MACHINE\\Software\\\\nam\\e', 'hklm\\Software\\\\nam\\e'].each do |root|
       it "uses a double backslash when canonicalizing value names with a backslash #{root}" do
-        value = described_class.new(path: root, catalog: catalog)
+        value = described_class.new(path: root, catalog:)
         expect(value[:path].should == 'hklm\Software\\\\nam\e')
       end
     end
@@ -74,7 +74,7 @@ describe Puppet::Type.type(:registry_value) do
       'HKLM\\Software\\\\\\' => 'hklm\\Software\\\\\\' # A value name of backslash
     }.each do |testcase, expected_value|
       it "uses a double backslash as a delimeter between path and value for title #{testcase}" do
-        value = described_class.new(path: testcase, catalog: catalog)
+        value = described_class.new(path: testcase, catalog:)
         expect(value[:path].should == expected_value)
       end
     end
@@ -84,12 +84,12 @@ describe Puppet::Type.type(:registry_value) do
     it 'should be case-preserving'
     it 'should be case-insensitive'
     it 'supports 32-bit values' do
-      expect(_value = described_class.new(path: '32:hklm\software\foo', catalog: catalog))
+      expect(_value = described_class.new(path: '32:hklm\software\foo', catalog:))
     end
   end
 
   describe '#autorequire' do
-    let(:instance) { described_class.new(title: subject_title, catalog: catalog) }
+    let(:instance) { described_class.new(title: subject_title, catalog:) }
 
     [
       {
@@ -114,16 +114,16 @@ describe Puppet::Type.type(:registry_value) do
       },
     ].each do |testcase|
       context testcase[:context] do
-        let(:instance) { described_class.new(title: testcase[:reg_value_title], catalog: catalog) }
+        let(:instance) { described_class.new(title: testcase[:reg_value_title], catalog:) }
 
         it 'does not autorequire ancestor keys if none exist' do
           expect(instance.autorequire).to eq([])
         end
 
         it 'onlies autorequire the nearest ancestor registry_key resource' do
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software', catalog: catalog))
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo', catalog: catalog))
-          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo\bar', catalog: catalog))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software', catalog:))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo', catalog:))
+          catalog.add_resource(Puppet::Type.type(:registry_key).new(path: 'hklm\Software\foo\bar', catalog:))
 
           autorequire_array = instance.autorequire
           expect(autorequire_array.count).to eq(1)
@@ -134,7 +134,7 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe 'type property' do
-    let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
+    let(:value) { described_class.new(path: 'hklm\software\foo', catalog:) }
 
     [:string, :array, :dword, :qword, :binary, :expand].each do |type|
       it "supports a #{type} type" do
@@ -149,7 +149,7 @@ describe Puppet::Type.type(:registry_value) do
   end
 
   describe 'data property' do
-    let(:value) { described_class.new(path: 'hklm\software\foo', catalog: catalog) }
+    let(:value) { described_class.new(path: 'hklm\software\foo', catalog:) }
 
     context 'with string data' do
       ['', 'foobar'].each do |data|

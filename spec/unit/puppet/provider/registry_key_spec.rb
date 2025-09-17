@@ -72,7 +72,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
       end
 
       it 'does not raise an error' do
-        reg_key = type.new(catalog: catalog,
+        reg_key = type.new(catalog:,
                            ensure: :absent,
                            name: "hklm\\#{reg_path}",
                            purge_values: true,
@@ -101,7 +101,7 @@ describe Puppet::Type.type(:registry_key).provider(:registry) do
       it 'does not use Rubys each_value, which unnecessarily string encodes' do
         # endash and tm undergo LOCALE conversion during Rubys each_value
         # which will generally lead to a conversion exception
-        reg_key = type.new(catalog: catalog,
+        reg_key = type.new(catalog:,
                            ensure: :absent,
                            name: "hklm\\#{reg_path}",
                            purge_values: true,

@@ -54,13 +54,13 @@ RSpec.describe 'registry::value', type: :define do
         arr1 = ['dword', 'qword']
         arr1.each do |type|
           context "with #{type} numeric data" do
-            let(:params) { super().merge(type: type, data: 42) }
+            let(:params) { super().merge(type:, data: 42) }
 
             it { is_expected.to compile }
 
             it {
               expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-                .with(ensure: 'present', type: type, data: 42)
+                .with(ensure: 'present', type:, data: 42)
             }
           end
         end
@@ -79,13 +79,13 @@ RSpec.describe 'registry::value', type: :define do
         arr2 = ['string', 'expand']
         arr2.each do |type|
           context "with string data typed as '#{type}'" do
-            let(:params) { super().merge(type: type, data: 'some typed string data') }
+            let(:params) { super().merge(type:, data: 'some typed string data') }
 
             it { is_expected.to compile }
 
             it {
               expect(subject).to contain_registry_value('HKLM\Software\Vendor\\\\value_name')
-                .with(ensure: 'present', type: type, data: 'some typed string data')
+                .with(ensure: 'present', type:, data: 'some typed string data')
             }
           end
         end

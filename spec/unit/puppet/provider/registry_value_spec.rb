@@ -78,7 +78,7 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     end
 
     it 'returns false for a bogus hive/path' do
-      reg_value = type.new(path: 'hklm\foobar5000', catalog: catalog, provider: described_class.name)
+      reg_value = type.new(path: 'hklm\foobar5000', catalog:, provider: described_class.name)
       expect(reg_value.provider.exists?).to be(false)
     end
   end
@@ -109,9 +109,9 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{valuename}" }
 
     def create_and_destroy(path, reg_type, data)
-      reg_value = type.new(path: path,
+      reg_value = type.new(path:,
                            type: reg_type,
-                           data: data,
+                           data:,
                            provider: described_class.name)
       already_exists = reg_value.provider.exists?
       expect(already_exists).to be(false)
@@ -224,13 +224,13 @@ describe Puppet::Type.type(:registry_value).provider(:registry) do
     let(:path) { "hklm\\#{puppet_key}\\#{subkey_name}\\#{SecureRandom.uuid}" }
 
     after(:each) do
-      reg_value = type.new(path: path, provider: described_class.name)
+      reg_value = type.new(path:, provider: described_class.name)
 
       reg_value.provider.destroy
     end
 
     def write_and_read_value(path, reg_type, value)
-      reg_value = type.new(path: path,
+      reg_value = type.new(path:,
                            type: reg_type,
                            data: value,
                            provider: described_class.name)
