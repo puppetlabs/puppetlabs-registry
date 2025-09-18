@@ -116,7 +116,7 @@ Puppet::Type.newtype(:registry_key) do
     is_values.each do |is_value|
       unless should_values.include?(is_value.downcase)
         resource_path = PuppetX::Puppetlabs::Registry::RegistryValuePath.combine_path_and_value(self[:path], is_value)
-        resources << Puppet::Type.type(:registry_value).new(path: resource_path, ensure: :absent, catalog: catalog)
+        resources << Puppet::Type.type(:registry_value).new(path: resource_path, ensure: :absent, catalog:)
       end
     end
     resources

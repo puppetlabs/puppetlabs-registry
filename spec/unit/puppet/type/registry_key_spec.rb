@@ -10,7 +10,7 @@ describe Puppet::Type.type(:registry_key) do
 
   # This is overridden here so we get a consistent association with the key
   # and a catalog using memoized let methods.
-  let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog) }
+  let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog:) }
   let(:provider) { Puppet::Provider.new(key) }
 
   before(:each) do
@@ -86,14 +86,14 @@ describe Puppet::Type.type(:registry_key) do
 
       # This is overridden here so we get a consistent association with the key
       # and a catalog using memoized let methods.
-      let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog: catalog) }
+      let(:key) { Puppet::Type.type(:registry_key).new(name: 'HKLM\Software', catalog:) }
 
       before :each do
         key[:purge_values] = true
         catalog.add_resource(key)
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\val1", catalog: catalog))
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\vAl2", catalog: catalog))
-        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\\\val\\3", catalog: catalog))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\val1", catalog:))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\vAl2", catalog:))
+        catalog.add_resource(Puppet::Type.type(:registry_value).new(path: "#{key[:path]}\\\\val\\3", catalog:))
       end
 
       it "returns an empty array if the key doesn't have any values" do
