@@ -115,18 +115,25 @@ Puppet::Type.newtype(:registry_value) do
     end
 
     munge do |value|
+      # Unwrap Sensitive values if present
+      unwrapped_value = if value.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
+                          value.unwrap
+                        else
+                          value
+                        end
+
       case resource[:type]
       when :dword, :qword
         begin
-          Integer(value)
+          Integer(unwrapped_value)
         rescue StandardError
           nil
         end
       when :binary
-        munged = if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
-                   "0#{value}"
+        munged = if (unwrapped_value.respond_to?(:length) && unwrapped_value.length == 1) || (unwrapped_value.is_a?(Integer) && unwrapped_value <= 9)
+                   "0#{unwrapped_value}"
                  else
-                   value
+                   unwrapped_value
                  end
 
         # First, strip out all spaces from the string in the manfest.  Next,
@@ -138,7 +145,7 @@ Puppet::Type.newtype(:registry_value) do
               .rstrip
               .downcase
       else # :string, :expand, :array
-        value
+        unwrapped_value
       end
     end
 
