@@ -23,4 +23,4 @@ registry::value { 'MixedArray':
   key  => 'HKLM\Software\MyApp',
   data => ['public_value', Sensitive('secret_value'), 'another_public'],
   type => 'array',
-} 
+}
