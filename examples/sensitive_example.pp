@@ -2,7 +2,7 @@
 # This example shows how to use Sensitive types for sensitive data like passwords
 
 # Create a sensitive password value
-$sensitive_password = Sensitive('mysecretpassword123')
+$sensitive_password = Sensitive('example-password')
 
 # Use the sensitive password in a registry value
 registry::value { 'DefaultPassword':
@@ -14,7 +14,7 @@ registry::value { 'DefaultPassword':
 # You can also use it directly inline
 registry::value { 'ApiKey':
   key  => 'HKLM\Software\MyApp',
-  data => Sensitive('sk-1234567890abcdef'),
+  data => Sensitive('EXAMPLE-API-KEY'),
   type => 'string',
 }
 
