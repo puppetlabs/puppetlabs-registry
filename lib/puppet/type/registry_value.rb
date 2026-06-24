@@ -108,7 +108,7 @@ Puppet::Type.newtype(:registry_value) do
         raise("The data must be a valid QWORD: received '#{value}'") unless munged && (munged.abs >> 64) <= 0
       when :binary
         munged = munge(value)
-        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
+        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless munged =~ %r{^([a-f\d]{2} ?)+$}i || munged.to_s.empty?
       else # :string, :expand, :array
         true
       end

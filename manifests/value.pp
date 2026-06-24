@@ -41,7 +41,7 @@
 #   class myapp {
 #     registry::value { 'DefaultPassword':
 #       key => 'HKLM\Software\MyApp',
-#       data => Sensitive('mysecretpassword123'),
+#       data => Sensitive('example-password'),
 #       type => 'string',
 #     }
 #   }

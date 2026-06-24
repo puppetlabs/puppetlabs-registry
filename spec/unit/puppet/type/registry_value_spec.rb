@@ -242,25 +242,25 @@ describe Puppet::Type.type(:registry_value) do
       it 'supports Sensitive[String] for string type' do
         value[:type] = :string
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_password')
-        expect(value[:data] = sensitive_data)
+        expect { value[:data] = sensitive_data }.not_to raise_error
       end
 
       it 'supports Sensitive[String] for expand type' do
         value[:type] = :expand
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_path')
-        expect(value[:data] = sensitive_data)
+        expect { value[:data] = sensitive_data }.not_to raise_error
       end
 
       it 'supports Sensitive[String] in array type' do
         value[:type] = :array
         sensitive_data = ['public_value', Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_value'), 'another_public']
-        expect(value[:data] = sensitive_data)
+        expect { value[:data] = sensitive_data }.not_to raise_error
       end
 
       it 'supports Sensitive[String] for binary type' do
         value[:type] = :binary
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('CAFEBEEF')
-        expect(value[:data] = sensitive_data)
+        expect { value[:data] = sensitive_data }.not_to raise_error
       end
     end
   end
