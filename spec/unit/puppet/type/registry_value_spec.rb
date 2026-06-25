@@ -243,24 +243,41 @@ describe Puppet::Type.type(:registry_value) do
         value[:type] = :string
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_password')
         expect { value[:data] = sensitive_data }.not_to raise_error
+        expect(value[:data].first).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+        expect(value[:data].first.unwrap).to eq('secret_password')
       end
 
       it 'supports Sensitive[String] for expand type' do
         value[:type] = :expand
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_path')
         expect { value[:data] = sensitive_data }.not_to raise_error
+        expect(value[:data].first).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+        expect(value[:data].first.unwrap).to eq('secret_path')
       end
 
       it 'supports Sensitive[String] in array type' do
         value[:type] = :array
         sensitive_data = ['public_value', Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_value'), 'another_public']
         expect { value[:data] = sensitive_data }.not_to raise_error
+        expect(value[:data][0]).to eq('public_value')
+        expect(value[:data][1]).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+        expect(value[:data][1].unwrap).to eq('secret_value')
+        expect(value[:data][2]).to eq('another_public')
       end
 
       it 'supports Sensitive[String] for binary type' do
         value[:type] = :binary
         sensitive_data = Puppet::Pops::Types::PSensitiveType::Sensitive.new('CAFEBEEF')
         expect { value[:data] = sensitive_data }.not_to raise_error
+        expect(value[:data].first).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+        expect(value[:data].first.unwrap).to eq('ca fe be ef')
+      end
+
+      it 'matches current values against sensitive desired values without unwrapping stored data' do
+        value[:type] = :array
+        value[:data] = ['public_value', Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_value')]
+
+        expect(value.property(:data).property_matches?(['public_value', 'secret_value'], value[:data])).to be(true)
       end
     end
   end
