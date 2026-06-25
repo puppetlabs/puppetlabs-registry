@@ -140,8 +140,9 @@ Puppet::Type.newtype(:registry_value) do
     validate do |value|
       case resource[:type]
       when :array
-        munged = unwrap_sensitive(munge(value))
-        raise('An array registry value can not contain empty values') if !munged.is_a?(Array) && munged.to_s.empty?
+        unwrapped = unwrap_sensitive(value)
+        raise('An array registry value can only contain string values') unless unwrapped.is_a?(String)
+        raise('An array registry value can not contain empty values') if unwrapped.empty?
       when :dword
         munged = unwrap_sensitive(munge(value))
         raise("The data must be a valid DWORD: received '#{value}'") unless munged && (munged.abs >> 32) <= 0
@@ -176,7 +177,7 @@ Puppet::Type.newtype(:registry_value) do
                             unwrapped_value
                           end
 
-                 # First, strip out all spaces from the string in the manfest.  Next,
+                 # First, strip out all spaces from the string in the manifest.  Next,
                  # put a space after each pair of hex digits.  Strip off the rightmost
                  # space if it's present.  Finally, downcase the whole thing.  The final
                  # result should be: "CaFE BEEF" => "ca fe be ef"

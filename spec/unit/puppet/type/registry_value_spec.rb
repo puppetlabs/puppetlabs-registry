@@ -236,6 +236,13 @@ describe Puppet::Type.type(:registry_value) do
           expect { value[:data] = data }.to raise_error(Puppet::Error)
         end
       end
+
+      [[true], [0], [['nested']], ['foo', true, 'bar'], ['foo', 0, 'bar']].each do |data|
+        it "rejects non-string element in '#{data}'" do
+          value[:type] = :array
+          expect { value[:data] = data }.to raise_error(Puppet::Error, %r{can only contain string values})
+        end
+      end
     end
 
     context 'when sensitive data' do
