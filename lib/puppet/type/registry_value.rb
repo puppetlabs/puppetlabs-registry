@@ -192,6 +192,20 @@ Puppet::Type.newtype(:registry_value) do
       rewrap_sensitive(value, munged)
     end
 
+    # array_matching: :all makes Puppet::Property#insync? compare `is` and
+    # @should with a raw array equality check, bypassing property_matches?
+    # entirely. That breaks convergence for Sensitive-wrapped data, since
+    # Sensitive#== never matches the unwrapped value read back from the
+    # registry. Overriding insync? here to delegate to property_matches? per
+    # element restores the intended comparison semantics.
+    def insync?(is)
+      return true if @should.empty?
+      return false unless is.is_a?(Array)
+      return false unless is.length == @should.length
+
+      is.zip(@should).all? { |current, desired| property_matches?(current, desired) }
+    end
+
     def property_matches?(current, desired)
       if sensitive_value?(current) || sensitive_value?(desired)
         current = unwrap_sensitive(current)

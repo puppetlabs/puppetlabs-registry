@@ -117,7 +117,6 @@ Puppet::Type.type(:registry_value).provide(:registry) do
     # array to something usable by the Win API.
     raise Puppet::Error, 'Data should be an Array (ErrorID 37D9BBAB-52E8-4A7C-9F2E-D7BF16A59050)' unless pdata.is_a?(Array)
 
-    # Unwrap Sensitive values if present
     unwrapped_data = pdata.map do |item|
       if item.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
         item.unwrap

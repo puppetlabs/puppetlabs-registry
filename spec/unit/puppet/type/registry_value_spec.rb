@@ -286,6 +286,53 @@ describe Puppet::Type.type(:registry_value) do
 
         expect(value.property(:data).property_matches?(['public_value', 'secret_value'], value[:data])).to be(true)
       end
+
+      # array_matching: :all makes Puppet::Property#insync? do a raw is == @should
+      # comparison, which never calls property_matches?. These tests go through
+      # insync? itself (as a real Puppet run would) rather than calling
+      # property_matches? directly, so they catch a regression where Sensitive-wrapped
+      # data never converges.
+      context 'convergence via insync?' do
+        it 'is in sync when the registry already holds the unwrapped string value' do
+          value[:type] = :string
+          value[:data] = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_password')
+
+          expect(value.property(:data).insync?(['secret_password'])).to be(true)
+        end
+
+        it 'is out of sync when the registry holds a different string value' do
+          value[:type] = :string
+          value[:data] = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_password')
+
+          expect(value.property(:data).insync?(['other_password'])).to be(false)
+        end
+
+        it 'is in sync when the registry already holds the unwrapped array values' do
+          value[:type] = :array
+          value[:data] = ['public_value', Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_value')]
+
+          expect(value.property(:data).insync?(['public_value', 'secret_value'])).to be(true)
+        end
+
+        it 'is out of sync when a sensitive array element differs from the registry' do
+          value[:type] = :array
+          value[:data] = ['public_value', Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_value')]
+
+          expect(value.property(:data).insync?(['public_value', 'other_value'])).to be(false)
+        end
+
+        it 'stays in sync across two successive applies (idempotency)' do
+          value[:type] = :string
+          value[:data] = Puppet::Pops::Types::PSensitiveType::Sensitive.new('secret_password')
+          data_property = value.property(:data)
+
+          first_run_in_sync = data_property.insync?(['secret_password'])
+          second_run_in_sync = data_property.insync?(['secret_password'])
+
+          expect(first_run_in_sync).to be(true)
+          expect(second_run_in_sync).to be(true)
+        end
+      end
     end
   end
 end
