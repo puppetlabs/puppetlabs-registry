@@ -101,6 +101,17 @@ RSpec.describe 'registry::value', type: :define do
           }
         end
 
+        context 'with array data containing sensitive elements' do
+          let(:params) do
+            super().merge(
+              type: 'array',
+              data: ['public_value', sensitive('secret_value')],
+            )
+          end
+
+          it { is_expected.to compile }
+        end
+
         context 'with an empty value name' do
           let(:params) { super().merge(value: '(default)') }
 

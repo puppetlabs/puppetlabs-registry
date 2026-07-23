@@ -164,11 +164,14 @@ Data type:
 Optional[Variant[
       String,
       Numeric,
-      Array[String]
+      Array[Variant[String, Sensitive[String]]],
+      Sensitive[String]
   ]]
 ```
 
-The data to place inside the registry value.
+The data to place inside the registry value. Can be a String, Numeric,
+Array[Variant[String, Sensitive[String]]], or Sensitive[String] for
+sensitive data like passwords.
 
 Default value: `undef`
 
@@ -258,4 +261,3 @@ The path to the registry value to manage.
 
 The specific backend to use for this `registry_value` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
-

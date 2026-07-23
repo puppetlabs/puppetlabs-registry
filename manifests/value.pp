@@ -17,7 +17,9 @@
 #   `puppet describe registry_value` for a list of supported types in the
 #   "type" parameter.
 # @param data
-#   The data to place inside the registry value.
+#   The data to place inside the registry value. Can be a String, Numeric,
+#   Array[Variant[String, Sensitive[String]]], or Sensitive[String] for
+#   sensitive data like passwords.
 #
 # Actions:
 #   - Manage the parent key if not already managed.
@@ -36,6 +38,15 @@
 #     }
 #   }
 #
+# @example This example shows how to use Sensitive types for sensitive data like passwords.
+#   class myapp {
+#     registry::value { 'DefaultPassword':
+#       key => 'HKLM\Software\MyApp',
+#       data => Sensitive('example-password'),
+#       type => 'string',
+#     }
+#   }
+#
 define registry::value (
   Pattern[/^\w+/] $key,
   Optional[String] $value   = undef,
@@ -43,7 +54,8 @@ define registry::value (
   Optional[Variant[
       String,
       Numeric,
-      Array[String]
+      Array[Variant[String, Sensitive[String]]],
+      Sensitive[String]
   ]] $data                  = undef,
 ) {
   # ensure windows os

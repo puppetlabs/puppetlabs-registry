@@ -89,6 +89,47 @@ Puppet::Type.newtype(:registry_value) do
       The data stored in the registry value.
     DATA
 
+    def sensitive_value?(value)
+      value.is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive) ||
+        (value.is_a?(Array) && value.any? { |item| sensitive_value?(item) })
+    end
+
+    def unwrap_sensitive(value)
+      case value
+      when Puppet::Pops::Types::PSensitiveType::Sensitive
+        unwrap_sensitive(value.unwrap)
+      when Array
+        value.map { |item| unwrap_sensitive(item) }
+      else
+        value
+      end
+    end
+
+    def rewrap_sensitive(original_value, munged_value)
+      case original_value
+      when Puppet::Pops::Types::PSensitiveType::Sensitive
+        Puppet::Pops::Types::PSensitiveType::Sensitive.new(munged_value)
+      when Array
+        munged_value.each_with_index.map do |item, index|
+          rewrap_sensitive(original_value[index], item)
+        end
+      else
+        munged_value
+      end
+    end
+
+    def redacted_value
+      Puppet::Pops::Types::PSensitiveType::Sensitive.new('redacted')
+    end
+
+    def normalize_comparable(value)
+      if resource[:type] != :array && value.is_a?(Array) && value.length == 1
+        value.first
+      else
+        value
+      end
+    end
+
     # We probably shouldn't set default values for this property at all. For
     # dword and qword specifically, the legacy default value will not pass
     # validation. As such, no default value will be set for those types. At
@@ -99,50 +140,81 @@ Puppet::Type.newtype(:registry_value) do
     validate do |value|
       case resource[:type]
       when :array
-        raise('An array registry value can not contain empty values') if value.empty?
+        unwrapped = unwrap_sensitive(value)
+        raise('An array registry value can only contain string values') unless unwrapped.is_a?(String)
+        raise('An array registry value can not contain empty values') if unwrapped.empty?
       when :dword
-        munged = munge(value)
+        munged = unwrap_sensitive(munge(value))
         raise("The data must be a valid DWORD: received '#{value}'") unless munged && (munged.abs >> 32) <= 0
       when :qword
-        munged = munge(value)
+        munged = unwrap_sensitive(munge(value))
         raise("The data must be a valid QWORD: received '#{value}'") unless munged && (munged.abs >> 64) <= 0
       when :binary
-        munged = munge(value)
-        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless munged =~ %r{^([a-f\d]{2} ?)+$}i || value.empty?
+        unwrapped = unwrap_sensitive(value)
+        munged = unwrap_sensitive(munge(value))
+        valid_binary = munged.is_a?(String) && munged.match?(%r{^([a-f\d]{2} ?)+$}i)
+        valid_empty = unwrapped.is_a?(String) && unwrapped.empty?
+        raise("The data must be a hex encoded string of the form: '00 01 02 ...': received '#{value}'") unless valid_binary || valid_empty
       else # :string, :expand, :array
         true
       end
     end
 
     munge do |value|
-      case resource[:type]
-      when :dword, :qword
-        begin
-          Integer(value)
-        rescue StandardError
-          nil
-        end
-      when :binary
-        munged = if (value.respond_to?(:length) && value.length == 1) || (value.is_a?(Integer) && value <= 9)
-                   "0#{value}"
-                 else
-                   value
-                 end
+      unwrapped_value = unwrap_sensitive(value)
 
-        # First, strip out all spaces from the string in the manfest.  Next,
-        # put a space after each pair of hex digits.  Strip off the rightmost
-        # space if it's present.  Finally, downcase the whole thing.  The final
-        # result should be: "CaFE BEEF" => "ca fe be ef"
-        munged.gsub(%r{\s+}, '')
-              .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
-              .rstrip
-              .downcase
-      else # :string, :expand, :array
-        value
-      end
+      munged = case resource[:type]
+               when :dword, :qword
+                 begin
+                   Integer(unwrapped_value)
+                 rescue StandardError
+                   nil
+                 end
+               when :binary
+                 munged = if (unwrapped_value.respond_to?(:length) && unwrapped_value.length == 1) || (unwrapped_value.is_a?(Integer) && unwrapped_value <= 9)
+                            "0#{unwrapped_value}"
+                          else
+                            unwrapped_value
+                          end
+
+                 # First, strip out all spaces from the string in the manifest.  Next,
+                 # put a space after each pair of hex digits.  Strip off the rightmost
+                 # space if it's present.  Finally, downcase the whole thing.  The final
+                 # result should be: "CaFE BEEF" => "ca fe be ef"
+                 munged.gsub(%r{\s+}, '')
+                       .gsub(%r{([0-9a-f]{2})}i) { "#{Regexp.last_match(1)} " }
+                       .rstrip
+                       .downcase
+               else # :string, :expand, :array
+                 unwrapped_value
+               end
+
+      rewrap_sensitive(value, munged)
+    end
+
+    # array_matching: :all makes Puppet::Property#insync? compare `is` and
+    # @should with a raw array equality check, bypassing property_matches?
+    # entirely. That breaks convergence for Sensitive-wrapped data, since
+    # Sensitive#== never matches the unwrapped value read back from the
+    # registry. Overriding insync? here to delegate to property_matches? per
+    # element restores the intended comparison semantics.
+    def insync?(is)
+      return true if @should.empty?
+      return false unless is.is_a?(Array)
+      return false unless is.length == @should.length
+
+      is.zip(@should).all? { |current, desired| property_matches?(current, desired) }
     end
 
     def property_matches?(current, desired)
+      if sensitive_value?(current) || sensitive_value?(desired)
+        current = unwrap_sensitive(current)
+        desired = unwrap_sensitive(desired)
+      end
+
+      current = normalize_comparable(current)
+      desired = normalize_comparable(desired)
+
       case resource[:type]
       when :binary
         return false unless current
@@ -154,6 +226,11 @@ Puppet::Type.newtype(:registry_value) do
     end
 
     def change_to_s(currentvalue, newvalue)
+      if sensitive_value?(currentvalue) || sensitive_value?(newvalue)
+        currentvalue = redacted_value
+        newvalue = redacted_value
+      end
+
       currentvalue = currentvalue.join(',') if currentvalue.respond_to? :join
       newvalue = newvalue.join(',') if newvalue.respond_to? :join
       super(currentvalue, newvalue)
