@@ -52,10 +52,10 @@ define registry::value (
   Optional[String] $value   = undef,
   Pattern[/^\w+/] $type     = 'string',
   Optional[Variant[
-      String,
-      Numeric,
-      Array[Variant[String, Sensitive[String]]],
-      Sensitive[String]
+    String,
+    Numeric,
+    Array[Variant[String, Sensitive[String]]],
+    Sensitive[String]
   ]] $data                  = undef,
 ) {
   # ensure windows os

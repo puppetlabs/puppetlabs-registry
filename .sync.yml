@@ -15,11 +15,35 @@ spec/spec_helper.rb:
 .gitpod.yml:
 .github/workflows/auto_release.yml:
   unmanaged: false
+# MODULES-11708: ci.yml and nightly.yml are maintained by hand because they carry
+# a Puppet 9 customisation that pdk-templates cannot express -- the `ruby_version`
+# input (no such key in the templates; voxpupuli-puppet-lint-plugins 7.0, needed
+# for Puppet 9, requires ruby >= 3.2, but the template default is 3.1). Leaving
+# them managed means the scheduled `pdk update` PR silently reverts Puppet 9
+# support. acceptance_flags below is kept in step with the hand-written `flags:`
+# so these can go back to template management once pdk-templates supports that
+# input.
 .github/workflows/ci.yml:
-  unmanaged: false
+  unmanaged: true
+  acceptance_flags:
+    - '--nightly'
 .github/workflows/nightly.yml:
-  unmanaged: false
+  unmanaged: true
+  acceptance_flags:
+    - '--nightly'
 .github/workflows/release.yml:
   unmanaged: false
 .travis.yml:
   delete: true
+# MODULES-11708: pin puppetlabs_spec_helper and puppet_litmus above pdk-templates'
+# own defaults (>= 8.0 and ~> 2.5 respectively), which are loose enough for a
+# scheduled `pdk update` to silently revert this PR: puppetlabs_spec_helper 8.0.0
+# still pins puppet-lint ~> 4.0 (conflicts with voxpupuli-puppet-lint-plugins ~> 7.0,
+# needed for Puppet 9), and puppet_litmus below 2.8.0 doesn't reliably support the
+# Puppet 9 collection matrix.
+Gemfile:
+  overrides:
+    - gem: 'puppetlabs_spec_helper'
+      version: '~> 9.0'
+    - gem: 'puppet_litmus'
+      version: '~> 2.8'
