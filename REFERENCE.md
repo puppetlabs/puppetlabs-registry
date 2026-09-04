@@ -121,6 +121,18 @@ class myapp {
 }
 ```
 
+##### This example shows how to use Sensitive types for sensitive data like passwords.
+
+```puppet
+class myapp {
+  registry::value { 'DefaultPassword':
+    key => 'HKLM\Software\MyApp',
+    data => Sensitive('example-password'),
+    type => 'string',
+  }
+}
+```
+
 #### Parameters
 
 The following parameters are available in the `registry::value` defined type:
@@ -162,10 +174,10 @@ Data type:
 
 ```puppet
 Optional[Variant[
-      String,
-      Numeric,
-      Array[Variant[String, Sensitive[String]]],
-      Sensitive[String]
+    String,
+    Numeric,
+    Array[Variant[String, Sensitive[String]]],
+    Sensitive[String]
   ]]
 ```
 
@@ -261,3 +273,4 @@ The path to the registry value to manage.
 
 The specific backend to use for this `registry_value` resource. You will seldom need to specify this --- Puppet will
 usually discover the appropriate provider for your platform.
+

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v6.0.0](https://github.com/puppetlabs/puppetlabs-registry/tree/v6.0.0) - 2026-09-04
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.3...v6.0.0)
+
+### Changed
+
+- (CAT-2389) Puppetcore update / Drop puppet 7 support [#315](https://github.com/puppetlabs/puppetlabs-registry/pull/315) ([LukasAud](https://github.com/LukasAud))
+
+### Added
+
+- MODULES-11708: Add Puppet 9 support [#320](https://github.com/puppetlabs/puppetlabs-registry/pull/320) ([span786](https://github.com/span786))
+
+### Fixed
+
+- (PA-8354): Add support for Sensitive data in registry_value [#319](https://github.com/puppetlabs/puppetlabs-registry/pull/319) ([span786](https://github.com/span786))
+- Update link to Puppet modules contribution documentation [#318](https://github.com/puppetlabs/puppetlabs-registry/pull/318) ([jst-cyr](https://github.com/jst-cyr))
+
 ## [v5.0.3](https://github.com/puppetlabs/puppetlabs-registry/tree/v5.0.3) - 2025-02-04
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-registry/compare/v5.0.2...v5.0.3)
