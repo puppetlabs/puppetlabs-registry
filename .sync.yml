@@ -29,6 +29,7 @@ spec/spec_helper.rb:
     - '--nightly'
 .github/workflows/nightly.yml:
   unmanaged: true
+  cron: '35 1 * * *'
   acceptance_flags:
     - '--nightly'
 .github/workflows/release.yml:
