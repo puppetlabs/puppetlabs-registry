@@ -163,8 +163,8 @@ Puppet::Type.type(:registry_value).provide(:registry) do
 
   private
 
-  def eval_error(err)
-    case err
+  def eval_error(e)
+    case e.code
     when 2
       # Code 2 is the error message for "The system cannot find the file specified."
       # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382.aspx
@@ -180,7 +180,7 @@ Puppet::Type.type(:registry_value).provide(:registry) do
       write(reg, valuename, ary[0], ary[1])
     end
   rescue Win32::Registry::Error => e
-    error = eval_error(e.code)
+    error = eval_error(e)
     error.set_backtrace e.backtrace
     raise error
   end
