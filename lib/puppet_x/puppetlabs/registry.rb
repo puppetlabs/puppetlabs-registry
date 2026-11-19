@@ -17,7 +17,7 @@ module PuppetX
         {
           hkcr: Win32::Registry::HKEY_CLASSES_ROOT,
           hklm: Win32::Registry::HKEY_LOCAL_MACHINE,
-          hku: Win32::Registry::HKEY_USERS
+          hku: Win32::Registry::HKEY_USERS,
         }
       end
 
@@ -33,7 +33,7 @@ module PuppetX
           Win32::Registry::REG_BINARY => :binary,
           Win32::Registry::REG_DWORD => :dword,
           Win32::Registry::REG_QWORD => :qword,
-          Win32::Registry::REG_MULTI_SZ => :array
+          Win32::Registry::REG_MULTI_SZ => :array,
         }
       end
 
@@ -56,12 +56,12 @@ module PuppetX
         def initialize(path)
           @filter_path_memo = nil
           @path ||= path
-          super(path)
+          super
         end
 
         # The path is valid if we're able to parse it without exceptions.
         def valid?
-          (filter_path && true)
+          filter_path && true
         rescue StandardError
           false
         end
@@ -156,7 +156,6 @@ module PuppetX
 
           @filter_path_memo = result
         end
-        # rubocop:enable Metrics/MethodLength
       end
 
       class RegistryKeyPath < RegistryPathBase
@@ -189,7 +188,7 @@ module PuppetX
           path, _, @valuename = path.rpartition('\\') if @valuename.nil?
           @is_default = @valuename.empty?
 
-          super(path)
+          super
         end
 
         def canonical

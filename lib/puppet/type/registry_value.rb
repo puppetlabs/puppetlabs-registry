@@ -221,7 +221,7 @@ Puppet::Type.newtype(:registry_value) do
 
         current.casecmp(desired).zero?
       else
-        super(current, desired)
+        super
       end
     end
 
@@ -233,7 +233,7 @@ Puppet::Type.newtype(:registry_value) do
 
       currentvalue = currentvalue.join(',') if currentvalue.respond_to? :join
       newvalue = newvalue.join(',') if newvalue.respond_to? :join
-      super(currentvalue, newvalue)
+      super
     end
   end
 
